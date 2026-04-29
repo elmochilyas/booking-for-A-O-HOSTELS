@@ -8,6 +8,9 @@ use App\Modules\Payments\Controllers\PaymentController;
 use App\Modules\Payments\Controllers\WebhookController;
 use App\Modules\Staff\Controllers\StaffController;
 use App\Modules\Staff\Controllers\ReportController;
+use App\Http\Controllers\HealthCheckController;
+
+Route::get('/health', [HealthCheckController::class, 'check']);
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
