@@ -5,6 +5,8 @@ namespace App\Modules\Auth\Controllers;
 use App\Models\Guest;
 use App\Models\Staff;
 use App\Modules\Auth\Services\JwtService;
+use App\Modules\Auth\Services\EmailVerificationService;
+use App\Modules\Auth\Services\TwoFactorService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
@@ -14,10 +16,14 @@ use Illuminate\Support\Str;
 class AuthController
 {
     private JwtService $jwtService;
+    private EmailVerificationService $emailService;
+    private TwoFactorService $twoFactorService;
 
-    public function __construct(JwtService $jwtService)
+    public function __construct(JwtService $jwtService, EmailVerificationService $emailService, TwoFactorService $twoFactorService)
     {
         $this->jwtService = $jwtService;
+        $this->emailService = $emailService;
+        $this->twoFactorService = $twoFactorService;
     }
 
     public function guestLogin(Request $request): JsonResponse
@@ -83,6 +89,19 @@ class AuthController
             return response()->json(['message' => 'Account is deactivated'], 403);
         }
 
+        if ($staff->two_factor_enabled) {
+            if (!$request->two_factor_code) {
+                return response()->json([
+                    'requires_2fa' => true,
+                    'message' => 'Please provide your 2FA code',
+                ], 200);
+            }
+
+            if (!$this->twoFactorService->verifyCode($staff->two_factor_secret, $request->two_factor_code)) {
+                return response()->json(['message' => 'Invalid 2FA code'], 401);
+            }
+        }
+
         $staff->update(['last_login' => now()]);
 
         $tokens = [
@@ -133,6 +152,8 @@ class AuthController
             'verification_token' => Str::random(64),
         ]);
 
+        $this->emailService->sendVerificationEmail($guest);
+
         return response()->json([
             'message' => 'Registration successful. Please check your email to verify your account.',
             'user' => [
@@ -164,6 +185,8 @@ class AuthController
             'email_verified_at' => now(),
             'verification_token' => null,
         ]);
+
+        $this->emailService->sendWelcomeEmail($guest);
 
         return response()->json(['message' => 'Email verified successfully']);
     }
