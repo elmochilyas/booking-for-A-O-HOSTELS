@@ -1,0 +1,12 @@
+includes:
+    - vendor/nunomaduro/phpstan-laravel/config/laravel.neon
+
+parameters:
+    level: 5
+    paths:
+        - app
+    excludePaths:
+        - app/Providers
+    ignoreErrors:
+        - '#PHPDoc tag @var#'
+    reportUnmatched: false
