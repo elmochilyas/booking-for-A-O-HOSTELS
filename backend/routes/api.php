@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Modules\Auth\Controllers\AuthController;
 use App\Modules\Properties\Controllers\PropertyController;
 use App\Modules\Bookings\Controllers\BookingController;
+use App\Modules\Payments\Controllers\PaymentController;
+use App\Modules\Payments\Controllers\WebhookController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -43,4 +45,14 @@ Route::prefix('bookings')->group(function () {
         Route::post('/{id}/check-out', [BookingController::class, 'checkOut']);
         Route::get('/guest/{guestId}', [BookingController::class, 'guestBookings']);
     });
+});
+
+Route::prefix('payments')->group(function () {
+    Route::post('/create-intent', [PaymentController::class, 'createPaymentIntent']);
+    Route::post('/confirm', [PaymentController::class, 'confirmPayment']);
+    Route::get('/booking/{bookingId}', [PaymentController::class, 'getPaymentDetails']);
+    Route::get('/breakdown', [PaymentController::class, 'getPaymentBreakdown']);
+    Route::post('/refund', [PaymentController::class, 'processRefund']);
+    
+    Route::post('/webhook/stripe', [WebhookController::class, 'handleStripeWebhook']);
 });
