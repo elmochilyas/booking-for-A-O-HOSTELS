@@ -3,56 +3,53 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Property extends Model
 {
-    use HasUuids;
-
     protected $table = 'properties';
-    protected $primaryKey = 'id';
-    public $timestamps = true;
+    protected $keyType = 'string';
+    public $incrementing = false;
 
     protected $fillable = [
-        'name',
-        'location',
-        'address',
-        'latitude',
-        'longitude',
-        'check_in_time',
-        'check_out_time',
-        'total_rooms',
-        'description',
-        'image_url',
-        'is_active',
+        'id', 'name', 'location', 'address', 'latitude', 'longitude',
+        'check_in_time', 'check_out_time', 'total_rooms', 'description',
+        'phone', 'email', 'images', 'amenities', 'rating', 'review_count',
     ];
 
     protected $casts = [
-        'latitude' => 'decimal:8',
-        'longitude' => 'decimal:8',
-        'check_in_time' => 'datetime:H:i:s',
-        'check_out_time' => 'datetime:H:i:s',
+        'latitude' => 'decimal:6',
+        'longitude' => 'decimal:6',
         'total_rooms' => 'integer',
-        'is_active' => 'boolean',
+        'rating' => 'decimal:1',
+        'review_count' => 'integer',
     ];
 
-    public function roomTypes()
+    protected $hidden = ['created_at', 'updated_at'];
+
+    public function roomTypes(): HasMany
     {
         return $this->hasMany(RoomType::class, 'property_id');
     }
 
-    public function rooms()
+    public function rooms(): HasMany
     {
         return $this->hasMany(Room::class, 'property_id');
     }
 
-    public function staff()
+    public function bookings(): HasMany
     {
-        return $this->hasMany(\App\Models\Staff::class, 'property_id');
+        return $this->hasMany(Booking::class, 'property_id');
     }
 
-    public function amenities()
+    public function amenities(): HasMany
     {
-        return $this->belongsToMany(Amenity::class, 'property_amenity', 'property_id', 'amenity_id');
+        return $this->hasMany(Amenity::class, 'property_id');
+    }
+
+    public function staff(): HasMany
+    {
+        return $this->hasMany(Staff::class, 'property_id');
     }
 }

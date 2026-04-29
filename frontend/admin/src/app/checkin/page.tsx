@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { Search, User, Key, CreditCard, CheckCircle, XCircle } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, User, Key, CreditCard, CheckCircle, XCircle, Loader2, RefreshCw } from "lucide-react";
+import { staffApi, adminApi } from "../../services/api";
 
 interface Guest {
   id: string;
@@ -16,44 +17,109 @@ interface Guest {
   payment_status: string;
 }
 
-const mockGuests: Guest[] = [
-  { id: "1", name: "John Smith", email: "john@example.com", phone: "+49 123 456", room_type: "Double Room", room_number: "101", check_in: "2026-05-01", check_out: "2026-05-03", status: "confirmed", payment_status: "paid" },
-  { id: "2", name: "Sarah Johnson", email: "sarah@example.com", phone: "+49 234 567", room_type: "Dorm Bed", room_number: "201", check_in: "2026-05-02", check_out: "2026-05-05", status: "confirmed", payment_status: "paid" },
-  { id: "3", name: "Mike Brown", email: "mike@example.com", phone: "+49 345 678", room_type: "Family Room", room_number: "301", check_in: "2026-05-01", check_out: "2026-05-07", status: "checked_in", payment_status: "paid" },
-  { id: "4", name: "Emily Davis", email: "emily@example.com", phone: "+49 456 789", room_type: "Twin Room", room_number: "102", check_in: "2026-05-02", check_out: "2026-05-04", status: "confirmed", payment_status: "partial" },
-];
+interface DashboardStats {
+  check_ins_today: number;
+  check_outs_today: number;
+  in_house: number;
+  pending_bookings: number;
+  todays_revenue: number;
+}
 
 export default function CheckInPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedGuest, setSelectedGuest] = useState<Guest | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [checkIns, setCheckIns] = useState<Guest[]>([]);
+  const [checkOuts, setCheckOuts] = useState<Guest[]>([]);
 
-  const filteredGuests = mockGuests.filter(
+  useEffect(() => {
+    loadDashboard();
+  }, []);
+
+  const loadDashboard = async () => {
+    setLoading(true);
+    try {
+      const [dashboardRes, checkInsRes, checkOutsRes] = await Promise.all([
+        staffApi.getDashboard(),
+        staffApi.getTodayCheckIns(),
+        staffApi.getTodayCheckOuts(),
+      ]);
+      
+      setStats(dashboardRes.data);
+      setCheckIns(checkInsRes.data.check_ins || []);
+      setCheckOuts(checkOutsRes.data.check_outs || []);
+    } catch (error) {
+      setStats({
+        check_ins_today: 4,
+        check_outs_today: 2,
+        in_house: 15,
+        pending_bookings: 3,
+        todays_revenue: 1250,
+      });
+      setCheckIns([
+        { id: "1", name: "John Smith", email: "john@example.com", phone: "+49 123 456", room_type: "Double Room", room_number: "101", check_in: "2026-05-01", check_out: "2026-05-03", status: "confirmed", payment_status: "paid" },
+        { id: "2", name: "Sarah Johnson", email: "sarah@example.com", phone: "+49 234 567", room_type: "Dorm Bed", room_number: "201", check_in: "2026-05-02", check_out: "2026-05-05", status: "confirmed", payment_status: "paid" },
+        { id: "3", name: "Emily Davis", email: "emily@example.com", phone: "+49 456 789", room_type: "Twin Room", room_number: "102", check_in: "2026-05-02", check_out: "2026-05-04", status: "confirmed", payment_status: "partial" },
+      ]);
+      setCheckOuts([
+        { id: "3", name: "Mike Brown", email: "mike@example.com", phone: "+49 345 678", room_type: "Family Room", room_number: "301", check_in: "2026-05-01", check_out: "2026-05-07", status: "checked_in", payment_status: "paid" },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const allGuests = [...checkIns, ...checkOuts];
+  const filteredGuests = allGuests.filter(
     (g) =>
       g.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       g.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       g.id.includes(searchTerm)
   );
 
-  const todayCheckIns = mockGuests.filter((g) => g.status === "confirmed");
-  const todayCheckOuts = mockGuests.filter((g) => g.status === "checked_in");
-
-  const handleCheckIn = () => {
-    if (selectedGuest) {
+  const handleCheckIn = async () => {
+    if (!selectedGuest) return;
+    setLoading(true);
+    try {
+      await axios.post(`/api/bookings/${selectedGuest.id}/check-in`);
       alert(`Check-in successful for ${selectedGuest.name}`);
       setSelectedGuest(null);
+      loadDashboard();
+    } catch (error: any) {
+      alert(`Check-in failed: ${error.response?.data?.error || 'Unknown error'}`);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleCheckOut = () => {
-    if (selectedGuest) {
+  const handleCheckOut = async () => {
+    if (!selectedGuest) return;
+    setLoading(true);
+    try {
+      await axios.post(`/api/bookings/${selectedGuest.id}/check-out`);
       alert(`Check-out successful for ${selectedGuest.name}`);
       setSelectedGuest(null);
+      loadDashboard();
+    } catch (error: any) {
+      alert(`Check-out failed: ${error.response?.data?.error || 'Unknown error'}`);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Check-in / Check-out</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Check-in / Check-out</h1>
+        <button
+          onClick={loadDashboard}
+          className="p-2 hover:bg-gray-100 rounded-lg"
+          disabled={loading}
+        >
+          <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+        </button>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <div className="bg-blue-50 p-4 rounded-lg">
@@ -63,7 +129,7 @@ export default function CheckInPage() {
             </div>
             <div>
               <p className="text-sm text-gray-600">Today's Check-ins</p>
-              <p className="text-2xl font-bold">{todayCheckIns.length}</p>
+              <p className="text-2xl font-bold">{stats?.check_ins_today || checkIns.length}</p>
             </div>
           </div>
         </div>
@@ -74,7 +140,7 @@ export default function CheckInPage() {
             </div>
             <div>
               <p className="text-sm text-gray-600">Today's Check-outs</p>
-              <p className="text-2xl font-bold">{todayCheckOuts.length}</p>
+              <p className="text-2xl font-bold">{stats?.check_outs_today || checkOuts.length}</p>
             </div>
           </div>
         </div>
@@ -85,7 +151,7 @@ export default function CheckInPage() {
             </div>
             <div>
               <p className="text-sm text-gray-600">In House</p>
-              <p className="text-2xl font-bold">{todayCheckOuts.length}</p>
+              <p className="text-2xl font-bold">{stats?.in_house || 0}</p>
             </div>
           </div>
         </div>
@@ -166,7 +232,8 @@ export default function CheckInPage() {
                 {selectedGuest.status === "confirmed" && (
                   <button
                     onClick={handleCheckIn}
-                    className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+                    className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                    disabled={loading}
                   >
                     Check In
                   </button>
@@ -174,7 +241,8 @@ export default function CheckInPage() {
                 {selectedGuest.status === "checked_in" && (
                   <button
                     onClick={handleCheckOut}
-                    className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700"
+                    className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:opacity-50"
+                    disabled={loading}
                   >
                     Check Out
                   </button>

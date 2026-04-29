@@ -3,90 +3,39 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Guest extends Authenticatable
+class Guest extends Model
 {
-    use Notifiable, HasUuids;
-
     protected $table = 'guests';
-    protected $primaryKey = 'id';
+    protected $keyType = 'string';
+    public $incrementing = false;
 
     protected $fillable = [
-        'email',
-        'password_hash',
-        'first_name',
-        'last_name',
-        'phone',
-        'country',
-        'date_of_birth',
-        'is_loyalty_member',
-        'loyalty_points',
-        'email_verified_at',
-        'verification_token',
+        'id', 'email', 'password_hash', 'first_name', 'last_name',
+        'phone', 'country', 'date_of_birth', 'gender',
+        'address', 'id_type', 'id_number',
+        'email_verified_at', 'is_loyalty_member', 'loyalty_points',
+        'notification_email', 'notification_sms',
     ];
 
     protected $hidden = [
-        'password_hash',
-        'remember_token',
-        'verification_token',
+        'password_hash', 'id_type', 'id_number',
+        'email_verified_at', 'created_at', 'updated_at',
     ];
 
     protected $casts = [
+        'date_of_birth' => 'date',
+        'email_verified_at' => 'datetime',
         'is_loyalty_member' => 'boolean',
         'loyalty_points' => 'integer',
-        'email_verified_at' => 'datetime',
-        'date_of_birth' => 'date',
+        'notification_email' => 'boolean',
+        'notification_sms' => 'boolean',
     ];
 
-    public function getAuthPassword(): string
+    public function bookings(): HasMany
     {
-        return $this->password_hash;
-    }
-
-    public function getAuthIdentifierName(): string
-    {
-        return 'id';
-    }
-
-    public function getAuthIdentifier(): string
-    {
-        return $this->id;
-    }
-
-    public function setPasswordAttribute(string $value): void
-    {
-        $this->attributes['password_hash'] = bcrypt($value);
-    }
-
-    public function bookings()
-    {
-        return $this->hasMany(\App\Models\Booking::class, 'guest_id');
-    }
-
-    public function reviews()
-    {
-        return $this->hasMany(\App\Models\Review::class, 'guest_id');
-    }
-
-    public function isVerified(): bool
-    {
-        return !is_null($this->email_verified_at);
-    }
-
-    public function addLoyaltyPoints(int $points): void
-    {
-        $this->increment('loyalty_points', $points);
-    }
-
-    public function deductLoyaltyPoints(int $points): bool
-    {
-        if ($this->loyalty_points >= $points) {
-            $this->decrement('loyalty_points', $points);
-            return true;
-        }
-        return false;
+        return $this->hasMany(Booking::class, 'guest_id');
     }
 }

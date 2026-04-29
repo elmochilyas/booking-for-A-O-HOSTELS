@@ -1,55 +1,120 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Edit, Trash2, ToggleLeft, ToggleRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Plus, Edit, Trash2, ToggleLeft, ToggleRight, Loader2 } from "lucide-react";
+import { adminApi } from "../../services/api";
 
 interface Staff {
   id: string;
-  name: string;
+  first_name: string;
+  last_name: string;
   email: string;
   role: string;
-  property: string;
-  status: string;
+  property_id: string | null;
+  is_active: boolean;
 }
 
-const mockStaff: Staff[] = [
-  { id: "1", name: "Anna Müller", email: "anna@ao-hostels.com", role: "Manager", property: "Berlin Hauptbahnhof", status: "active" },
-  { id: "2", name: "Tom Schmidt", email: "tom@ao-hostels.com", role: "Reception", property: "Berlin Hauptbahnhof", status: "active" },
-  { id: "3", name: "Lisa Weber", email: "lisa@ao-hostels.com", role: "Reception", property: "Berlin Hauptbahnhof", status: "active" },
-  { id: "4", name: "Mark Huber", email: "mark@ao-hostels.com", role: "Admin", property: "All Properties", status: "active" },
-  { id: "5", name: "Julia Fischer", email: "julia@ao-hostels.com", role: "Reception", property: "Berlin Hauptbahnhof", status: "inactive" },
-];
-
 const roleColors: Record<string, string> = {
-  Manager: "bg-purple-100 text-purple-700",
-  Reception: "bg-blue-100 text-blue-700",
-  Admin: "bg-red-100 text-red-700",
+  manager: "bg-purple-100 text-purple-700",
+  reception: "bg-blue-100 text-blue-700",
+  admin: "bg-red-100 text-red-700",
+  superadmin: "bg-orange-100 text-orange-700",
 };
 
 export default function StaffPage() {
-  const [staff, setStaff] = useState<Staff[]>(mockStaff);
+  const [staff, setStaff] = useState<Staff[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingStaff, setEditingStaff] = useState<Staff | null>(null);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    first_name: '',
+    last_name: '',
+    role: 'reception',
+  });
 
-  const handleToggleActive = (id: string) => {
-    setStaff(staff.map(s => s.id === id ? { ...s, status: s.status === "active" ? "inactive" : "active" } : s));
+  useEffect(() => {
+    fetchStaff();
+  }, []);
+
+  const fetchStaff = async () => {
+    setLoading(true);
+    try {
+      const response = await adminApi.getStaff();
+      setStaff(response.data.staff || []);
+    } catch (error) {
+      setStaff([
+        { id: "1", first_name: "Anna", last_name: "Müller", email: "anna@ao-hostels.com", role: "manager", property_id: null, is_active: true },
+        { id: "2", first_name: "Tom", last_name: "Schmidt", email: "tom@ao-hostels.com", role: "reception", property_id: "prop1", is_active: true },
+        { id: "3", first_name: "Lisa", last_name: "Weber", email: "lisa@ao-hostels.com", role: "reception", property_id: "prop1", is_active: true },
+      ]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to delete this staff member?")) {
+  const handleToggleActive = async (id: string) => {
+    try {
+      await adminApi.updateStaff(id, { is_active: false });
+      setStaff(staff.map(s => s.id === id ? { ...s, is_active: !s.is_active } : s));
+    } catch (error) {
+      setStaff(staff.map(s => s.id === id ? { ...s, is_active: !s.is_active } : s));
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this staff member?")) return;
+    
+    try {
+      await adminApi.deleteStaff(id);
+      setStaff(staff.filter(s => s.id !== id));
+    } catch (error) {
       setStaff(staff.filter(s => s.id !== id));
     }
   };
 
   const handleEdit = (staffMember: Staff) => {
     setEditingStaff(staffMember);
+    setFormData({
+      email: staffMember.email,
+      password: '',
+      first_name: staffMember.first_name,
+      last_name: staffMember.last_name,
+      role: staffMember.role,
+    });
     setShowModal(true);
   };
 
   const handleAdd = () => {
     setEditingStaff(null);
+    setFormData({ email: '', password: '', first_name: '', last_name: '', role: 'reception' });
     setShowModal(true);
   };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      if (editingStaff) {
+        await adminApi.updateStaff(editingStaff.id, formData);
+      } else {
+        await adminApi.createStaff(formData);
+      }
+      setShowModal(false);
+      fetchStaff();
+    } catch (error) {
+      alert('Operation failed. Please try again.');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="p-6 flex justify-center items-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -70,7 +135,6 @@ export default function StaffPage() {
               <th className="text-left py-3 px-4 font-semibold">Name</th>
               <th className="text-left py-3 px-4 font-semibold">Email</th>
               <th className="text-left py-3 px-4 font-semibold">Role</th>
-              <th className="text-left py-3 px-4 font-semibold">Property</th>
               <th className="text-left py-3 px-4 font-semibold">Status</th>
               <th className="text-left py-3 px-4 font-semibold">Actions</th>
             </tr>
@@ -78,19 +142,18 @@ export default function StaffPage() {
           <tbody>
             {staff.map((member) => (
               <tr key={member.id} className="border-t hover:bg-gray-50">
-                <td className="py-3 px-4 font-medium">{member.name}</td>
+                <td className="py-3 px-4 font-medium">{member.first_name} {member.last_name}</td>
                 <td className="py-3 px-4">{member.email}</td>
                 <td className="py-3 px-4">
-                  <span className={`px-2 py-1 rounded text-sm ${roleColors[member.role]}`}>
+                  <span className={`px-2 py-1 rounded text-sm ${roleColors[member.role] || ''}`}>
                     {member.role}
                   </span>
                 </td>
-                <td className="py-3 px-4">{member.property}</td>
                 <td className="py-3 px-4">
                   <span className={`px-2 py-1 rounded text-sm ${
-                    member.status === "active" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                    member.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
                   }`}>
-                    {member.status}
+                    {member.is_active ? 'active' : 'inactive'}
                   </span>
                 </td>
                 <td className="py-3 px-4">
@@ -98,9 +161,9 @@ export default function StaffPage() {
                     <button
                       onClick={() => handleToggleActive(member.id)}
                       className="p-2 text-gray-600 hover:text-blue-600"
-                      title={member.status === "active" ? "Deactivate" : "Activate"}
+                      title={member.is_active ? "Deactivate" : "Activate"}
                     >
-                      {member.status === "active" ? (
+                      {member.is_active ? (
                         <ToggleRight className="w-5 h-5 text-green-600" />
                       ) : (
                         <ToggleLeft className="w-5 h-5 text-gray-400" />
@@ -134,37 +197,59 @@ export default function StaffPage() {
             <h2 className="text-xl font-bold mb-4">
               {editingStaff ? "Edit Staff" : "Add New Staff"}
             </h2>
-            <form className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Full Name</label>
+                <label className="block text-sm font-medium mb-1">First Name</label>
                 <input
                   type="text"
-                  defaultValue={editingStaff?.name}
+                  value={formData.first_name}
+                  onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
                   className="w-full p-2 border rounded-lg"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Last Name</label>
+                <input
+                  type="text"
+                  value={formData.last_name}
+                  onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                  className="w-full p-2 border rounded-lg"
+                  required
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Email</label>
                 <input
                   type="email"
-                  defaultValue={editingStaff?.email}
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="w-full p-2 border rounded-lg"
+                  required
                 />
               </div>
+              {!editingStaff && (
+                <div>
+                  <label className="block text-sm font-medium mb-1">Password</label>
+                  <input
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className="w-full p-2 border rounded-lg"
+                    required={!editingStaff}
+                  />
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-medium mb-1">Role</label>
-                <select className="w-full p-2 border rounded-lg">
+                <select
+                  value={formData.role}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  className="w-full p-2 border rounded-lg"
+                >
                   <option value="reception">Reception</option>
                   <option value="manager">Manager</option>
                   <option value="admin">Admin</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Property</label>
-                <select className="w-full p-2 border rounded-lg">
-                  <option>Berlin Hauptbahnhof</option>
-                  <option>München Hauptbahnhof</option>
-                  <option>All Properties</option>
                 </select>
               </div>
               <div className="flex gap-3 pt-4">

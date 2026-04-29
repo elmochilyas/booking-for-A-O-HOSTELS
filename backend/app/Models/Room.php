@@ -3,56 +3,38 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Room extends Model
 {
-    use HasUuids;
-
     protected $table = 'rooms';
-    protected $primaryKey = 'id';
-    public $timestamps = true;
+    protected $keyType = 'string';
+    public $incrementing = false;
 
     protected $fillable = [
-        'property_id',
-        'room_type_id',
-        'room_number',
-        'floor',
-        'status',
-        'notes',
+        'id', 'property_id', 'room_type_id', 'room_number', 'floor',
+        'status', 'features', 'view', 'window_type',
     ];
 
     protected $casts = [
         'floor' => 'integer',
     ];
 
-    public function property()
+    protected $hidden = ['created_at', 'updated_at'];
+
+    public function property(): BelongsTo
     {
         return $this->belongsTo(Property::class, 'property_id');
     }
 
-    public function roomType()
+    public function roomType(): BelongsTo
     {
         return $this->belongsTo(RoomType::class, 'room_type_id');
     }
 
-    public function bookings()
+    public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class, 'room_id');
-    }
-
-    public function isAvailable(): bool
-    {
-        return $this->status === 'available';
-    }
-
-    public function isBooked(): bool
-    {
-        return $this->status === 'booked';
-    }
-
-    public function isInMaintenance(): bool
-    {
-        return $this->status === 'maintenance';
     }
 }

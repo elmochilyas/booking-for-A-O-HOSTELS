@@ -3,80 +3,40 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class RoomType extends Model
 {
-    use HasUuids;
-
     protected $table = 'room_types';
-    protected $primaryKey = 'id';
-    public $timestamps = true;
+    protected $keyType = 'string';
+    public $incrementing = false;
 
     protected $fillable = [
-        'property_id',
-        'name',
-        'capacity',
-        'base_price',
-        'description',
-        'image_url',
-        'max_occupancy',
-        'bed_count',
-        'bed_type',
-        'is_active',
+        'id', 'property_id', 'name', 'capacity', 'base_price',
+        'description', 'images', 'amenities', 'max_occupancy',
     ];
 
     protected $casts = [
-        'base_price' => 'decimal:2',
         'capacity' => 'integer',
+        'base_price' => 'decimal:2',
         'max_occupancy' => 'integer',
-        'bed_count' => 'integer',
-        'is_active' => 'boolean',
     ];
 
-    public function property()
+    protected $hidden = ['created_at', 'updated_at'];
+
+    public function property(): BelongsTo
     {
         return $this->belongsTo(Property::class, 'property_id');
     }
 
-    public function rooms()
+    public function rooms(): HasMany
     {
         return $this->hasMany(Room::class, 'room_type_id');
     }
 
-    public function bookings()
+    public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class, 'room_type_id');
-    }
-
-    public function amenities()
-    {
-        return $this->belongsToMany(Amenity::class, 'room_type_amenity', 'room_type_id', 'amenity_id');
-    }
-
-    public function seasonalPricing()
-    {
-        return $this->hasMany(SeasonalPricing::class, 'room_type_id');
-    }
-
-    public function getCurrentPrice(\Carbon\Carbon $date = null): float
-    {
-        $date = $date ?? now();
-        $basePrice = (float) $this->base_price;
-
-        $seasonal = $this->seasonalPricing()
-            ->where('start_date', '<=', $date)
-            ->where('end_date', '>=', $date)
-            ->where('is_active', true)
-            ->first();
-
-        if ($seasonal) {
-            if ($seasonal->fixed_price) {
-                return (float) $seasonal->fixed_price;
-            }
-            return $basePrice * (float) $seasonal->price_multiplier;
-        }
-
-        return $basePrice;
     }
 }

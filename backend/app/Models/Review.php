@@ -3,66 +3,44 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Review extends Model
 {
-    use HasUuids;
-
     protected $table = 'reviews';
-    protected $primaryKey = 'id';
-    public $timestamps = true;
+    protected $keyType = 'string';
+    public $incrementing = false;
 
     protected $fillable = [
-        'booking_id',
-        'guest_id',
-        'property_id',
-        'rating',
-        'cleanliness_rating',
-        'location_rating',
-        'staff_rating',
-        'value_rating',
-        'review_text',
-        'response_text',
-        'response_date',
-        'is_approved',
+        'id', 'booking_id', 'guest_id', 'property_id',
+        'overall_rating', 'cleanliness_rating', 'staff_rating',
+        'value_rating', 'location_rating', 'comfort_rating',
+        'review_text', 'photos', 'status', 'moderation_notes',
     ];
 
     protected $casts = [
-        'rating' => 'integer',
+        'overall_rating' => 'integer',
         'cleanliness_rating' => 'integer',
-        'location_rating' => 'integer',
         'staff_rating' => 'integer',
         'value_rating' => 'integer',
-        'response_date' => 'datetime',
-        'is_approved' => 'boolean',
+        'location_rating' => 'integer',
+        'comfort_rating' => 'integer',
     ];
 
-    public function booking()
-    {
-        return $this->belongsTo(Booking::class, 'booking_id');
-    }
+    protected $hidden = ['created_at', 'updated_at'];
 
-    public function guest()
+    public function guest(): BelongsTo
     {
         return $this->belongsTo(Guest::class, 'guest_id');
     }
 
-    public function property()
+    public function property(): BelongsTo
     {
         return $this->belongsTo(Property::class, 'property_id');
     }
 
-    public function getAverageRating(): float
+    public function booking(): BelongsTo
     {
-        $ratings = array_filter([
-            $this->rating,
-            $this->cleanliness_rating,
-            $this->location_rating,
-            $this->staff_rating,
-            $this->value_rating,
-        ]);
-
-        return count($ratings) > 0 ? array_sum($ratings) / count($ratings) : 0;
+        return $this->belongsTo(Booking::class, 'booking_id');
     }
 }
