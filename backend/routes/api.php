@@ -6,6 +6,8 @@ use App\Modules\Properties\Controllers\PropertyController;
 use App\Modules\Bookings\Controllers\BookingController;
 use App\Modules\Payments\Controllers\PaymentController;
 use App\Modules\Payments\Controllers\WebhookController;
+use App\Modules\Staff\Controllers\StaffController;
+use App\Modules\Staff\Controllers\ReportController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -55,4 +57,24 @@ Route::prefix('payments')->group(function () {
     Route::post('/refund', [PaymentController::class, 'processRefund']);
     
     Route::post('/webhook/stripe', [WebhookController::class, 'handleStripeWebhook']);
+});
+
+Route::prefix('staff')->middleware('jwt')->group(function () {
+    Route::get('/', [StaffController::class, 'index']);
+    Route::post('/', [StaffController::class, 'store']);
+    Route::get('/{id}', [StaffController::class, 'show']);
+    Route::put('/{id}', [StaffController::class, 'update']);
+    Route::delete('/{id}', [StaffController::class, 'destroy']);
+    Route::post('/{id}/toggle-active', [StaffController::class, 'toggleActive']);
+    Route::get('/property/{propertyId}', [StaffController::class, 'byProperty']);
+});
+
+Route::prefix('reports')->middleware('jwt')->group(function () {
+    Route::get('/occupancy', [ReportController::class, 'getOccupancy']);
+    Route::get('/revenue', [ReportController::class, 'getRevenue']);
+    Route::get('/bookings', [ReportController::class, 'getBookingStats']);
+    Route::get('/daily', [ReportController::class, 'getDailyStats']);
+    Route::get('/dashboard', [ReportController::class, 'getDashboard']);
+    Route::get('/adr', [ReportController::class, 'getADR']);
+    Route::get('/revpar', [ReportController::class, 'getRevPAR']);
 });

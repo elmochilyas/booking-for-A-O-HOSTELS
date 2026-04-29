@@ -32,20 +32,20 @@ export default function Dashboard() {
           <h1 className="text-xl font-bold text-blue-600">A&O Admin</h1>
         </div>
         <nav className="p-4 space-y-2">
-          <a href="#" className="flex items-center gap-3 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg">
+          <a href="/" className="flex items-center gap-3 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg">
             <Home className="w-5 h-5" /> Dashboard
           </a>
-          <a href="#" className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg">
+          <a href="/bookings" className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg">
             <Calendar className="w-5 h-5" /> Bookings
           </a>
-          <a href="#" className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg">
-            <Users className="w-5 h-5" /> Guests
+          <a href="/checkin" className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg">
+            <Users className="w-5 h-5" /> Check-in/out
+          </a>
+          <a href="/staff" className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg">
+            <Users className="w-5 h-5" /> Staff
           </a>
           <a href="#" className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg">
             <DollarSign className="w-5 h-5" /> Revenue
-          </a>
-          <a href="#" className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg">
-            <Home className="w-5 h-5" /> Properties
           </a>
         </nav>
       </aside>
