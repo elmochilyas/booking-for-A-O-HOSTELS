@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, Button, List, Avatar } from 'react-native-paper';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/MainNavigator';
@@ -18,7 +18,9 @@ export default function ProfileScreen({ navigation }: Props) {
       <View style={styles.menu}>
         <List.Item title="My Bookings" left={(props) => <List.Icon {...props} icon="calendar" />} />
         <List.Item title="Payment Methods" left={(props) => <List.Icon {...props} icon="credit-card" />} />
-        <List.Item title="Notifications" left={(props) => <List.Icon {...props} icon="bell" />} />
+        <TouchableOpacity onPress={() => navigation.navigate('NotificationPreferences')}>
+          <List.Item title="Notifications" left={(props) => <List.Icon {...props} icon="bell" />} />
+        </TouchableOpacity>
         <List.Item title="A&O Club" left={(props) => <List.Icon {...props} icon="star" />} />
       </View>
       

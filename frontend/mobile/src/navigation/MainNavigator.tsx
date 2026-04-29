@@ -12,6 +12,7 @@ import MyBookingsScreen from '../screens/MyBookingsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
+import NotificationPreferencesScreen from '../screens/NotificationPreferencesScreen';
 
 export type RootStackParamList = {
   MainTabs: undefined;
@@ -23,6 +24,7 @@ export type RootStackParamList = {
   BookingConfirmation: { bookingId: string };
   Login: undefined;
   Register: undefined;
+  NotificationPreferences: undefined;
 };
 
 export type TabParamList = {
@@ -55,6 +57,7 @@ export default function MainNavigator() {
       <Stack.Screen name="BookingConfirmation" component={BookingConfirmationScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Screen name="NotificationPreferences" component={NotificationPreferencesScreen} />
     </Stack.Navigator>
   );
 }
