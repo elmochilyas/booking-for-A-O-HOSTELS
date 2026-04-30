@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use SendGrid\Mail\Mail;
-use SendGrid\Mail\ personalization;
+use SendGrid\Mail\Personalization;
 use SendGrid\Mail\Email;
 use SendGrid\Mail\Content;
 use App\Models\Guest;
