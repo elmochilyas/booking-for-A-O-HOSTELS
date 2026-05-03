@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Plus, Edit, Trash2, ToggleLeft, ToggleRight, Loader2 } from "lucide-react";
 import { adminApi } from "../../services/api";
+import { AdminLayout } from "../components/AdminComponents";
 
 interface Staff {
   id: string;
@@ -55,11 +56,14 @@ export default function StaffPage() {
   };
 
   const handleToggleActive = async (id: string) => {
+    const member = staff.find(s => s.id === id);
+    if (!member) return;
+    const newValue = !member.is_active;
+    setStaff(staff.map(s => s.id === id ? { ...s, is_active: newValue } : s));
     try {
-      await adminApi.updateStaff(id, { is_active: false });
-      setStaff(staff.map(s => s.id === id ? { ...s, is_active: !s.is_active } : s));
+      await adminApi.updateStaff(id, { is_active: newValue });
     } catch (error) {
-      setStaff(staff.map(s => s.id === id ? { ...s, is_active: !s.is_active } : s));
+      setStaff(staff.map(s => s.id === id ? { ...s, is_active: !newValue } : s));
     }
   };
 
@@ -108,15 +112,8 @@ export default function StaffPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="p-6 flex justify-center items-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-      </div>
-    );
-  }
-
   return (
+    <AdminLayout>
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Staff Management</h1>
@@ -272,5 +269,6 @@ export default function StaffPage() {
         </div>
       )}
     </div>
+    </AdminLayout>
   );
 }

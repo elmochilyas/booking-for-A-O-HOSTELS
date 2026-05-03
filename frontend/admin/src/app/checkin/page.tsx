@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, User, Key, CreditCard, CheckCircle, XCircle, Loader2, RefreshCw } from "lucide-react";
-import { staffApi, adminApi } from "../../services/api";
+import { Search, User, Key, CheckCircle, Loader2, RefreshCw } from "lucide-react";
+import { staffApi, bookingsApi } from "../../services/api";
+import { AdminLayout } from "../components/AdminComponents";
 
 interface Guest {
   id: string;
@@ -82,7 +83,7 @@ export default function CheckInPage() {
     if (!selectedGuest) return;
     setLoading(true);
     try {
-      await axios.post(`/api/bookings/${selectedGuest.id}/check-in`);
+      await bookingsApi.checkIn(selectedGuest.id);
       alert(`Check-in successful for ${selectedGuest.name}`);
       setSelectedGuest(null);
       loadDashboard();
@@ -97,7 +98,7 @@ export default function CheckInPage() {
     if (!selectedGuest) return;
     setLoading(true);
     try {
-      await axios.post(`/api/bookings/${selectedGuest.id}/check-out`);
+      await bookingsApi.checkOut(selectedGuest.id);
       alert(`Check-out successful for ${selectedGuest.name}`);
       setSelectedGuest(null);
       loadDashboard();
@@ -109,6 +110,7 @@ export default function CheckInPage() {
   };
 
   return (
+    <AdminLayout>
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Check-in / Check-out</h1>
@@ -263,5 +265,6 @@ export default function CheckInPage() {
         </div>
       </div>
     </div>
+    </AdminLayout>
   );
 }
