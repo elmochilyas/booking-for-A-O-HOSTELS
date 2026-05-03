@@ -38,6 +38,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          rm -f backend/composer.lock
           cd backend
           composer update --prefer-lowest --no-interaction
 
