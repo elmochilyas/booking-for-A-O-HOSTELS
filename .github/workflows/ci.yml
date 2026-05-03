@@ -24,15 +24,17 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.composer/cache
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-composer-
 
       - name: Install Dependencies
-        run: composer install --no-interaction --prefer-dist
+        run: |
+          rm -f backend/composer.lock
+          cd backend && composer update --prefer-lowest --no-interaction
 
       - name: Run PHP CS Fixer
-        run: ./vendor/bin/pint --test
+        run: cd backend && ./vendor/bin/pint --test
 
   backend-tests:
     name: Backend Tests
@@ -51,15 +53,17 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.composer/cache
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-composer-
 
       - name: Install Dependencies
-        run: composer install --no-interaction --prefer-dist
+        run: |
+          rm -f backend/composer.lock
+          cd backend && composer update --prefer-lowest --no-interaction
 
       - name: Run PHPUnit
-        run: ./vendor/bin/phpunit --coverage
+        run: cd backend && ./vendor/bin/phpunit --coverage
 
   frontend-tests:
     name: Frontend Tests
@@ -79,7 +83,8 @@ jobs:
           path: |
             frontend/mobile/node_modules
             frontend/admin/node_modules
-          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+            frontend/guest/node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('frontend/*/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-npm-
 
@@ -87,13 +92,16 @@ jobs:
         run: |
           cd frontend/mobile && npm install
           cd ../admin && npm install
+          cd ../guest && npm install
 
       - name: Run ESLint
         run: |
           cd frontend/mobile && npm run lint || true
           cd ../admin && npm run lint || true
+          cd ../guest && npm run lint || true
 
       - name: Run TypeScript Check
         run: |
           cd frontend/mobile && npm run typecheck || true
           cd ../admin && npm run typecheck || true
+          cd ../guest && npm run typecheck || true

@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\StaffController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\PaymentWebhookController;
 use App\Http\Controllers\Api\InvoiceController;
+use App\Modules\Admin\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -24,6 +25,7 @@ Route::prefix('auth')->group(function () {
 
 Route::prefix('properties')->group(function () {
     Route::get('/', [PropertyController::class, 'index']);
+    Route::get('/destinations', [PropertyController::class, 'destinations']);
     Route::get('/{id}', [PropertyController::class, 'show']);
     Route::get('/{id}/rooms', [RoomController::class, 'propertyRooms']);
     Route::get('/{id}/room-types', [RoomController::class, 'propertyRoomTypes']);
@@ -89,4 +91,75 @@ Route::prefix('admin')->middleware(['auth.jwt', 'role:manager|admin|superadmin']
 Route::prefix('invoices')->middleware(['auth.jwt'])->group(function () {
     Route::get('/{bookingId}', [InvoiceController::class, 'generate']);
     Route::get('/download/{bookingId}', [InvoiceController::class, 'download']);
+});
+
+Route::prefix('admin')->group(function () {
+    Route::get('/seed', [AdminController::class, 'seedData']);
+    
+    Route::middleware(['auth.jwt', 'role:superadmin'])->group(function () {
+        Route::get('/staff', [AdminController::class, 'getStaff']);
+        Route::post('/staff', [AdminController::class, 'createStaff']);
+        Route::get('/staff/{id}', [AdminController::class, 'getStaffById']);
+        Route::put('/staff/{id}', [AdminController::class, 'updateStaff']);
+        Route::delete('/staff/{id}', [AdminController::class, 'deleteStaff']);
+        Route::post('/staff/{id}/force-logout', [AdminController::class, 'forceLogout']);
+        
+        Route::get('/roles', [AdminController::class, 'getRoles']);
+        Route::get('/permissions', [AdminController::class, 'getPermissions']);
+        
+        Route::get('/properties', [AdminController::class, 'getProperties']);
+        Route::post('/properties', [AdminController::class, 'createProperty']);
+        Route::put('/properties/{id}', [AdminController::class, 'updateProperty']);
+        Route::delete('/properties/{id}', [AdminController::class, 'deleteProperty']);
+        Route::get('/properties/{id}/kpis', [AdminController::class, 'getPropertyKpis']);
+    });
+    
+    Route::middleware(['auth.jwt', 'role:superadmin|regional_admin|property_admin'])->group(function () {
+        Route::get('/bookings', [AdminController::class, 'getBookings']);
+        Route::put('/bookings/{id}', [AdminController::class, 'updateBooking']);
+        Route::delete('/bookings/{id}', [AdminController::class, 'cancelBooking']);
+        Route::post('/bookings/{id}/refund', [AdminController::class, 'refundBooking']);
+        Route::get('/bookings/export', [AdminController::class, 'exportBookings']);
+        
+        Route::get('/guests', [AdminController::class, 'getGuests']);
+        Route::put('/guests/{id}', [AdminController::class, 'updateGuest']);
+        Route::post('/guests/{id}/ban', [AdminController::class, 'banGuest']);
+        Route::post('/guests/{id}/unban', [AdminController::class, 'unbanGuest']);
+        Route::post('/guests/merge', [AdminController::class, 'mergeGuests']);
+        Route::get('/guests/{id}/export', [AdminController::class, 'exportGuestData']);
+        Route::delete('/guests/{id}/data', [AdminController::class, 'deleteGuestData']);
+        
+        Route::get('/payments', [AdminController::class, 'getPayments']);
+        Route::get('/revenue', [AdminController::class, 'getRevenueDashboard']);
+    });
+    
+    Route::middleware(['auth.jwt', 'role:superadmin|regional_admin|property_admin'])->group(function () {
+        Route::get('/reviews', [AdminController::class, 'getReviews']);
+        Route::put('/reviews/{id}/moderate', [AdminController::class, 'moderateReview']);
+        
+        Route::get('/promotions', [AdminController::class, 'getPromotions']);
+        Route::post('/promotions', [AdminController::class, 'createPromotion']);
+        Route::put('/promotions/{id}', [AdminController::class, 'updatePromotion']);
+        Route::delete('/promotions/{id}', [AdminController::class, 'deletePromotion']);
+        
+        Route::get('/extras', [AdminController::class, 'getExtras']);
+        Route::post('/extras', [AdminController::class, 'createExtra']);
+        Route::put('/extras/{id}', [AdminController::class, 'updateExtra']);
+        Route::delete('/extras/{id}', [AdminController::class, 'deleteExtra']);
+        
+        Route::get('/email-templates', [AdminController::class, 'getEmailTemplates']);
+        Route::put('/email-templates/{id}', [AdminController::class, 'updateEmailTemplate']);
+        Route::post('/announcements', [AdminController::class, 'sendAnnouncement']);
+        
+        Route::get('/config', [AdminController::class, 'getSystemConfig']);
+        Route::put('/config', [AdminController::class, 'updateSystemConfig']);
+    });
+    
+    Route::middleware(['auth.jwt', 'role:superadmin'])->group(function () {
+        Route::get('/audit-logs', [AdminController::class, 'getAuditLogs']);
+    });
+    
+    Route::middleware(['auth.jwt', 'role:superadmin|regional_admin|property_admin'])->group(function () {
+        Route::get('/analytics', [AdminController::class, 'getAnalytics']);
+    });
 });

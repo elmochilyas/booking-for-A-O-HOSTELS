@@ -3,6 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use Database\Seeders\AdminRoleSeeder;
+use Database\Seeders\AdminSeeder;
+use Database\Seeders\PropertySeeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -15,7 +18,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $this->call([
+            PropertySeeder::class,
+            AdminRoleSeeder::class,
+            AdminSeeder::class,
+        ]);
 
         User::factory()->create([
             'name' => 'Test User',

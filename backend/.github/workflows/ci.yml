@@ -38,8 +38,9 @@ jobs:
 
       - name: Install dependencies
         run: |
+          rm -f backend/composer.lock
           cd backend
-          composer install --no-interaction --prefer-dist
+          composer update --prefer-lowest --no-interaction
 
       - name: Copy environment file
         run: |
@@ -90,7 +91,7 @@ jobs:
       - name: Install Pint
         run: |
           cd backend
-          composer require laravel/pint --dev
+          composer update laravel/pint --prefer-lowest --no-interaction --dev
 
       - name: Run Pint
         run: |

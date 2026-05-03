@@ -1,34 +1,70 @@
 import axios from 'axios';
-
-const API_URL = 'http://localhost:8000/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { config } from '../config/environment';
 
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: config.apiUrl,
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 30000,
 });
 
-api.interceptors.request.use((config) => {
+const getToken = async (): Promise<string | null> => {
   try {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  } catch (e) {
-    // localStorage not available (Web)
+    return await AsyncStorage.getItem('token');
+  } catch {
+    return null;
+  }
+};
+
+const setToken = async (token: string): Promise<void> => {
+  try {
+    await AsyncStorage.setItem('token', token);
+  } catch {}
+};
+
+const removeToken = async (): Promise<void> => {
+  try {
+    await AsyncStorage.removeItem('token');
+  } catch {}
+};
+
+const getGuest = async (): Promise<any | null> => {
+  try {
+    const guestStr = await AsyncStorage.getItem('guest');
+    return guestStr ? JSON.parse(guestStr) : null;
+  } catch {
+    return null;
+  }
+};
+
+const setGuest = async (guest: any): Promise<void> => {
+  try {
+    await AsyncStorage.setItem('guest', JSON.stringify(guest));
+  } catch {}
+};
+
+const removeGuest = async (): Promise<void> => {
+  try {
+    await AsyncStorage.removeItem('guest');
+  } catch {}
+};
+
+api.interceptors.request.use(async (config) => {
+  const token = await getToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
 
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     if (error.response?.status === 401) {
-      try {
-        localStorage.removeItem('token');
-        localStorage.removeItem('guest');
-      } catch (e) {}
+      await removeToken();
+      await removeGuest();
     }
     return Promise.reject(error);
   }
@@ -45,8 +81,8 @@ export const authApi = {
   }) => {
     const response = await api.post('/auth/register', data);
     if (response.data.access_token) {
-      localStorage.setItem('token', response.data.access_token);
-      localStorage.setItem('guest', JSON.stringify(response.data.guest));
+      await setToken(response.data.access_token);
+      await setGuest(response.data.guest);
     }
     return response;
   },
@@ -54,8 +90,8 @@ export const authApi = {
   login: async (email: string, password: string) => {
     const response = await api.post('/auth/login', { email, password });
     if (response.data.access_token) {
-      localStorage.setItem('token', response.data.access_token);
-      localStorage.setItem('guest', JSON.stringify(response.data.guest));
+      await setToken(response.data.access_token);
+      await setGuest(response.data.guest);
     }
     return response;
   },
@@ -63,9 +99,9 @@ export const authApi = {
   logout: async () => {
     try {
       await api.post('/auth/logout');
-    } catch (e) {}
-    localStorage.removeItem('token');
-    localStorage.removeItem('guest');
+    } catch {}
+    await removeToken();
+    await removeGuest();
   },
 
   verifyEmail: async (token: string) => {
@@ -78,11 +114,13 @@ export const authApi = {
 };
 
 export const propertiesApi = {
-  getAll: () => api.get('/properties'),
+  getAll: (params?: { location?: string; checkIn?: string; checkOut?: string; guests?: number }) => 
+    api.get('/properties', { params }),
   getById: (id: string) => api.get(`/properties/${id}`),
   getRoomTypes: (id: string) => api.get(`/properties/${id}/room-types`),
   getAvailability: (id: string, checkIn: string, checkOut: string, guests?: number) =>
     api.get(`/properties/${id}/availability`, { params: { check_in: checkIn, check_out: checkOut, guests } }),
+  getDestinations: () => api.get('/properties/destinations'),
 };
 
 export const bookingsApi = {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Property;
+use App\Models\RoomType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -11,20 +12,71 @@ use Illuminate\Support\Str;
 
 class PropertyController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $properties = Property::with(['roomTypes', 'amenities'])->get();
-        
+        $query = Property::with(['roomTypes', 'amenities']);
+
+        if ($request->has('location') && $request->location) {
+            $query->where('location', 'like', '%' . $request->location . '%');
+        }
+
+        if ($request->has('check_in') && $request->check_in && $request->has('check_out') && $request->check_out) {
+            $query->whereHas('roomTypes', function ($q) use ($request) {
+                $q->whereHas('availabilities', function ($aq) use ($request) {
+                    $aq->whereBetween('date', [$request->check_in, $request->check_out])
+                      ->where('available', true);
+                });
+            });
+        }
+
+        if ($request->has('guests') && $request->guests) {
+            $query->whereHas('roomTypes', function ($q) use ($request) {
+                $q->where('capacity', '>=', (int) $request->guests);
+            });
+        }
+
+        $properties = $query->get();
+
         return response()->json([
             'properties' => $properties,
+        ]);
+    }
+
+    public function destinations(): JsonResponse
+    {
+        $destinations = Property::select('location')
+            ->selectRaw('COUNT(*) as properties_count')
+            ->selectRaw('AVG(rating) as avg_rating')
+            ->selectRaw('SUM(review_count) as total_reviews')
+            ->groupBy('location')
+            ->orderByDesc('properties_count')
+            ->get();
+
+        $destinationData = $destinations->map(function ($dest) {
+            $lowestPrice = RoomType::whereHas('property', function ($query) use ($dest) {
+                $query->where('location', $dest->location);
+            })->min('base_price');
+
+            return [
+                'city' => $dest->location,
+                'country' => 'Germany',
+                'properties' => $dest->properties_count,
+                'priceFrom' => (int) ($lowestPrice ?? 0),
+                'rating' => round($dest->avg_rating ?? 0, 1),
+                'reviewCount' => (int) ($dest->total_reviews ?? 0),
+            ];
+        });
+
+        return response()->json([
+            'destinations' => $destinationData,
         ]);
     }
 
     public function show(string $id): JsonResponse
     {
         $property = Property::with(['roomTypes', 'amenities', 'reviews'])->find($id);
-        
-        if (!$property) {
+
+        if (! $property) {
             return response()->json(['error' => 'Property not found'], 404);
         }
 
@@ -67,8 +119,8 @@ class PropertyController extends Controller
     public function update(Request $request, string $id): JsonResponse
     {
         $property = Property::find($id);
-        
-        if (!$property) {
+
+        if (! $property) {
             return response()->json(['error' => 'Property not found'], 404);
         }
 
@@ -101,8 +153,8 @@ class PropertyController extends Controller
     public function destroy(string $id): JsonResponse
     {
         $property = Property::find($id);
-        
-        if (!$property) {
+
+        if (! $property) {
             return response()->json(['error' => 'Property not found'], 404);
         }
 
