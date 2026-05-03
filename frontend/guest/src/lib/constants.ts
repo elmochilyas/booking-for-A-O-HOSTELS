@@ -1,0 +1,177 @@
+export const ROOM_TYPES = {
+  DORM: 'dorm',
+  PRIVATE: 'private',
+  FAMILY: 'family',
+  FEMALE_ONLY: 'female_only',
+} as const
+
+export const AMENITY_ICONS: Record<string, string> = {
+  // concept keys
+  wifi: 'Wifi',
+  breakfast: 'Coffee',
+  parking: 'Car',
+  bar: 'Wine',
+  reception: 'Clock',
+  laundry: 'Shirt',
+  kitchen: 'ChefHat',
+  lockers: 'Lock',
+  bike_rental: 'Bike',
+  pet_friendly: 'PawPrint',
+  air_conditioning: 'Wind',
+  heating: 'Thermometer',
+  gym: 'Dumbbell',
+  elevator: 'ArrowUpDown',
+  luggage_storage: 'Luggage',
+  currency_exchange: 'Coins',
+  tour_desk: 'Map',
+  library: 'BookOpen',
+  game_room: 'Gamepad2',
+  // direct icon name keys (from backend seeder)
+  clock: 'Clock',
+  coffee: 'Coffee',
+  gamepad: 'Gamepad2',
+  utensils: 'ChefHat',
+  car: 'Car',
+  bike: 'Bike',
+  suitcase: 'Luggage',
+  shirt: 'Shirt',
+  tv: 'Tv',
+}
+
+export const EXTRAS = [
+  {
+    id: 'towels',
+    name: 'Towel Rental',
+    description: 'Fresh towels for your stay',
+    price: 2,
+    unit: 'per towel',
+    icon: 'Snowflake',
+  },
+  {
+    id: 'breakfast',
+    name: 'Breakfast',
+    description: 'Continental breakfast buffet',
+    price: 12,
+    unit: 'per person/day',
+    icon: 'Coffee',
+  },
+  {
+    id: 'parking',
+    name: 'Parking',
+    description: 'Secure on-site parking',
+    price: 8,
+    unit: 'per night',
+    icon: 'Car',
+  },
+  {
+    id: 'bike',
+    name: 'Bicycle Rental',
+    description: 'Explore the city on two wheels',
+    price: 15,
+    unit: 'per day',
+    icon: 'Bike',
+  },
+  {
+    id: 'early_checkin',
+    name: 'Early Check-in',
+    description: 'Check in from 10:00 AM',
+    price: 20,
+    unit: 'one-time',
+    icon: 'Clock',
+  },
+  {
+    id: 'late_checkout',
+    name: 'Late Check-out',
+    description: 'Check out until 2:00 PM',
+    price: 20,
+    unit: 'one-time',
+    icon: 'Clock',
+  },
+]
+
+export const AO_CLUB_DISCOUNT = 0.25
+
+export const AO_CLUB_BENEFITS = [
+  {
+    id: 'discount',
+    title: '25% Off Every Stay',
+    description: 'Save on every booking, always.',
+    icon: 'Percent',
+  },
+  {
+    id: 'points',
+    title: 'Loyalty Points',
+    description: 'Earn points with every stay.',
+    icon: 'Star',
+  },
+  {
+    id: 'deals',
+    title: 'Secret Deals',
+    description: 'Access exclusive member offers.',
+    icon: 'Gift',
+  },
+  {
+    id: 'support',
+    title: 'Priority Support',
+    description: 'Fast-track customer service.',
+    icon: 'Headphones',
+  },
+]
+
+export const CITIES = [
+  { name: 'Berlin',      slug: 'berlin',      country: 'Germany',        hostelCount: 4, image: 'https://images.unsplash.com/photo-1560969184-10fe8719e047?w=600' },
+  { name: 'Hamburg',     slug: 'hamburg',     country: 'Germany',        hostelCount: 4, image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600' },
+  { name: 'Munich',      slug: 'munich',      country: 'Germany',        hostelCount: 3, image: 'https://images.unsplash.com/photo-1595867818082-083862f3d630?w=600' },
+  { name: 'Cologne',     slug: 'cologne',     country: 'Germany',        hostelCount: 3, image: 'https://images.unsplash.com/photo-1513622470522-26c3c8a854bc?w=600' },
+  { name: 'Frankfurt',   slug: 'frankfurt',   country: 'Germany',        hostelCount: 2, image: 'https://images.unsplash.com/photo-1577465882459-7a78d84b7264?w=600' },
+  { name: 'Vienna',      slug: 'vienna',      country: 'Austria',        hostelCount: 2, image: 'https://images.unsplash.com/photo-1516550893923-42d28e5677af?w=600' },
+  { name: 'London',      slug: 'london',      country: 'United Kingdom', hostelCount: 1, image: 'https://images.unsplash.com/photo-1529655683826-aba9b3e77383?w=600' },
+  { name: 'Edinburgh',   slug: 'edinburgh',   country: 'United Kingdom', hostelCount: 1, image: 'https://images.unsplash.com/photo-1594394489098-74ac04c0fc2e?w=600' },
+  { name: 'Prague',      slug: 'prague',      country: 'Czech Republic', hostelCount: 1, image: 'https://images.unsplash.com/photo-1541849546-216549ae216d?w=600' },
+  { name: 'Budapest',    slug: 'budapest',    country: 'Hungary',        hostelCount: 1, image: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=600' },
+  { name: 'Amsterdam',   slug: 'amsterdam',   country: 'Netherlands',    hostelCount: 1, image: 'https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=600' },
+  { name: 'Copenhagen',  slug: 'copenhagen',  country: 'Denmark',        hostelCount: 2, image: 'https://images.unsplash.com/photo-1513622470522-26c3c8a854bc?w=600' },
+  { name: 'Dresden',     slug: 'dresden',     country: 'Germany',        hostelCount: 1, image: 'https://images.unsplash.com/photo-1467803738586-46b7eb7b16a1?w=600' },
+  { name: 'Leipzig',     slug: 'leipzig',     country: 'Germany',        hostelCount: 1, image: 'https://images.unsplash.com/photo-1467803738586-46b7eb7b16a1?w=600' },
+  { name: 'Salzburg',    slug: 'salzburg',    country: 'Austria',        hostelCount: 1, image: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=600' },
+  { name: 'Warsaw',      slug: 'warsaw',      country: 'Poland',         hostelCount: 1, image: 'https://images.unsplash.com/photo-1467803738586-46b7eb7b16a1?w=600' },
+  { name: 'Brussels',    slug: 'brussels',    country: 'Belgium',        hostelCount: 1, image: 'https://images.unsplash.com/photo-1559570278-7e2b6a9d4944?w=600' },
+  { name: 'Florence',    slug: 'florence',    country: 'Italy',          hostelCount: 1, image: 'https://images.unsplash.com/photo-1541370976299-4d24ebbc9077?w=600' },
+  { name: 'Milan',       slug: 'milan',       country: 'Italy',          hostelCount: 1, image: 'https://images.unsplash.com/photo-1525874684015-58379d421a52?w=600' },
+  { name: 'Venice',      slug: 'venice',      country: 'Italy',          hostelCount: 1, image: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=600' },
+  { name: 'Brighton',    slug: 'brighton',    country: 'United Kingdom', hostelCount: 1, image: 'https://images.unsplash.com/photo-1567447803219-ccf5aa54d30b?w=600' },
+  { name: 'Manchester',  slug: 'manchester',  country: 'United Kingdom', hostelCount: 1, image: 'https://images.unsplash.com/photo-1529655683826-aba9b3e77383?w=600' },
+  { name: 'Antwerp',     slug: 'antwerp',     country: 'Belgium',        hostelCount: 1, image: 'https://images.unsplash.com/photo-1559570278-7e2b6a9d4944?w=600' },
+  { name: 'Rotterdam',   slug: 'rotterdam',   country: 'Netherlands',    hostelCount: 1, image: 'https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=600' },
+  { name: 'Aachen',      slug: 'aachen',      country: 'Germany',        hostelCount: 1, image: 'https://images.unsplash.com/photo-1467803738586-46b7eb7b16a1?w=600' },
+  { name: 'Bremen',      slug: 'bremen',      country: 'Germany',        hostelCount: 1, image: 'https://images.unsplash.com/photo-1467803738586-46b7eb7b16a1?w=600' },
+  { name: 'Dortmund',    slug: 'dortmund',    country: 'Germany',        hostelCount: 1, image: 'https://images.unsplash.com/photo-1467803738586-46b7eb7b16a1?w=600' },
+  { name: 'Düsseldorf',  slug: 'dusseldorf',  country: 'Germany',        hostelCount: 1, image: 'https://images.unsplash.com/photo-1467803738586-46b7eb7b16a1?w=600' },
+  { name: 'Nuremberg',   slug: 'nuremberg',   country: 'Germany',        hostelCount: 1, image: 'https://images.unsplash.com/photo-1467803738586-46b7eb7b16a1?w=600' },
+  { name: 'Stuttgart',   slug: 'stuttgart',   country: 'Germany',        hostelCount: 1, image: 'https://images.unsplash.com/photo-1467803738586-46b7eb7b16a1?w=600' },
+  { name: 'Weimar',      slug: 'weimar',      country: 'Germany',        hostelCount: 1, image: 'https://images.unsplash.com/photo-1467803738586-46b7eb7b16a1?w=600' },
+  { name: 'Graz',        slug: 'graz',        country: 'Austria',        hostelCount: 1, image: 'https://images.unsplash.com/photo-1516550893923-42d28e5677af?w=600' },
+]
+
+export const FILTER_OPTIONS = {
+  roomTypes: [
+    { value: 'dorm', label: 'Dorm Room' },
+    { value: 'private', label: 'Private Room' },
+    { value: 'family', label: 'Family Room' },
+    { value: 'female_only', label: 'Female Only' },
+  ],
+  amenities: [
+    { value: 'wifi', label: 'Free WiFi' },
+    { value: 'breakfast', label: 'Breakfast' },
+    { value: 'parking', label: 'Parking' },
+    { value: 'bar', label: 'Bar' },
+    { value: 'kitchen', label: 'Kitchen' },
+    { value: 'laundry', label: 'Laundry' },
+    { value: 'bike_rental', label: 'Bike Rental' },
+  ],
+  rating: [
+    { value: '5', label: '5 Stars' },
+    { value: '4', label: '4+ Stars' },
+    { value: '3', label: '3+ Stars' },
+  ],
+}
