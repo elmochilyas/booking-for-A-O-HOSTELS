@@ -2,15 +2,16 @@
 
 namespace App\Modules\Bookings\Controllers;
 
-use App\Modules\Bookings\Services\BookingService;
 use App\Modules\Bookings\Services\AvailabilityService;
-use Illuminate\Http\Request;
+use App\Modules\Bookings\Services\BookingService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class BookingController
 {
     private BookingService $bookingService;
+
     private AvailabilityService $availabilityService;
 
     public function __construct(BookingService $bookingService, AvailabilityService $availabilityService)
@@ -51,8 +52,9 @@ class BookingController
     {
         $result = $this->bookingService->createBooking($request);
 
-        if (!$result['success']) {
+        if (! $result['success']) {
             $status = isset($result['errors']) ? 422 : 400;
+
             return response()->json($result, $status);
         }
 
@@ -63,7 +65,7 @@ class BookingController
     {
         $booking = $this->bookingService->getBooking($id);
 
-        if (!$booking) {
+        if (! $booking) {
             return response()->json(['message' => 'Booking not found'], 404);
         }
 
@@ -79,7 +81,7 @@ class BookingController
     {
         $result = $this->bookingService->cancelBooking($id);
 
-        if (!$result['success']) {
+        if (! $result['success']) {
             return response()->json($result, 400);
         }
 
@@ -90,7 +92,7 @@ class BookingController
     {
         $result = $this->bookingService->confirmBooking($id);
 
-        if (!$result['success']) {
+        if (! $result['success']) {
             return response()->json($result, 400);
         }
 
@@ -101,7 +103,7 @@ class BookingController
     {
         $result = $this->bookingService->cancelBooking($id);
 
-        if (!$result['success']) {
+        if (! $result['success']) {
             return response()->json($result, 400);
         }
 
@@ -127,7 +129,7 @@ class BookingController
 
         $result = $this->bookingService->checkIn($id, $request->room_id);
 
-        if (!$result['success']) {
+        if (! $result['success']) {
             return response()->json($result, 400);
         }
 
@@ -138,7 +140,7 @@ class BookingController
     {
         $result = $this->bookingService->checkOut($id);
 
-        if (!$result['success']) {
+        if (! $result['success']) {
             return response()->json($result, 400);
         }
 

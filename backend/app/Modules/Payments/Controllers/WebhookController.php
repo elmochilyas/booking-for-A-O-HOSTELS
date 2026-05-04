@@ -2,12 +2,12 @@
 
 namespace App\Modules\Payments\Controllers;
 
-use App\Models\Payment;
 use App\Models\Booking;
-use Illuminate\Http\Request;
+use App\Models\Payment;
 use Illuminate\Http\JsonResponse;
-use Stripe\Webhook;
+use Illuminate\Http\Request;
 use Stripe\Exception\SignatureVerificationException;
+use Stripe\Webhook;
 
 class WebhookController
 {

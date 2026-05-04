@@ -2,10 +2,9 @@
 
 namespace App\Modules\Staff\Controllers;
 
-use App\Models\Staff;
 use App\Modules\Staff\Services\StaffService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class StaffController
@@ -49,7 +48,7 @@ class StaffController
     {
         $staff = $this->staffService->getStaffById($id);
 
-        if (!$staff) {
+        if (! $staff) {
             return response()->json(['message' => 'Staff not found'], 404);
         }
 
@@ -60,12 +59,12 @@ class StaffController
     {
         $staff = $this->staffService->getStaffById($id);
 
-        if (!$staff) {
+        if (! $staff) {
             return response()->json(['message' => 'Staff not found'], 404);
         }
 
         $validator = Validator::make($request->all(), [
-            'email' => 'sometimes|email|unique:staff,email,' . $id,
+            'email' => 'sometimes|email|unique:staff,email,'.$id,
             'password' => 'sometimes|string|min:8',
             'first_name' => 'sometimes|string|max:100',
             'last_name' => 'sometimes|string|max:100',
@@ -87,7 +86,7 @@ class StaffController
     {
         $staff = $this->staffService->getStaffById($id);
 
-        if (!$staff) {
+        if (! $staff) {
             return response()->json(['message' => 'Staff not found'], 404);
         }
 
@@ -100,7 +99,7 @@ class StaffController
     {
         $staff = $this->staffService->getStaffById($id);
 
-        if (!$staff) {
+        if (! $staff) {
             return response()->json(['message' => 'Staff not found'], 404);
         }
 
@@ -108,7 +107,7 @@ class StaffController
 
         return response()->json([
             'data' => $staff,
-            'message' => $staff->is_active ? 'Staff activated' : 'Staff deactivated'
+            'message' => $staff->is_active ? 'Staff activated' : 'Staff deactivated',
         ]);
     }
 

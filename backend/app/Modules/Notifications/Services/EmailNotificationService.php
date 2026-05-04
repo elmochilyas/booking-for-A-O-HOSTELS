@@ -3,7 +3,6 @@
 namespace App\Modules\Notifications\Services;
 
 use App\Models\Booking;
-use App\Models\Guest;
 use Illuminate\Support\Facades\Mail;
 
 class EmailNotificationService
@@ -37,7 +36,7 @@ class EmailNotificationService
     public function sendPreArrivalReminder(Booking $booking): void
     {
         $guest = $booking->guest;
-        
+
         $data = [
             'guest_name' => $guest->first_name,
             'check_in' => $booking->check_in_date,
@@ -61,7 +60,7 @@ class EmailNotificationService
             'guest_name' => $guest->first_name,
             'property_name' => $booking->property->name,
             'booking_id' => $booking->id,
-            'review_url' => config('app.frontend_url') . '/review/' . $booking->id,
+            'review_url' => config('app.frontend_url').'/review/'.$booking->id,
         ];
 
         $this->send(

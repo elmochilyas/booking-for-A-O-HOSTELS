@@ -14,7 +14,7 @@ class InvoiceService
         $booking = Booking::with(['property', 'roomType', 'guest', 'payments'])
             ->find($bookingId);
 
-        if (!$booking) {
+        if (! $booking) {
             return null;
         }
 
@@ -57,7 +57,7 @@ class InvoiceService
         $payment = Payment::with(['booking.guest', 'booking.property'])
             ->find($paymentId);
 
-        if (!$payment) {
+        if (! $payment) {
             return null;
         }
 
@@ -91,7 +91,9 @@ class InvoiceService
     public function getInvoiceDownloadPath(string $bookingId): ?string
     {
         $booking = Booking::find($bookingId);
-        if (!$booking) return null;
+        if (! $booking) {
+            return null;
+        }
 
         $invoiceNumber = $this->generateInvoiceNumber($bookingId);
         $path = "invoices/{$invoiceNumber}.pdf";

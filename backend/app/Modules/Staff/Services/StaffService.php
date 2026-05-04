@@ -7,10 +7,10 @@ use Illuminate\Support\Facades\Hash;
 
 class StaffService
 {
-    public function getAllStaff(string $propertyId = null): array
+    public function getAllStaff(?string $propertyId = null): array
     {
         $query = Staff::query();
-        
+
         if ($propertyId) {
             $query->where('property_id', $propertyId);
         }
@@ -39,6 +39,7 @@ class StaffService
         }
 
         $staff->update($data);
+
         return $staff;
     }
 
@@ -49,7 +50,8 @@ class StaffService
 
     public function toggleActive(Staff $staff): Staff
     {
-        $staff->update(['is_active' => !$staff->is_active]);
+        $staff->update(['is_active' => ! $staff->is_active]);
+
         return $staff;
     }
 

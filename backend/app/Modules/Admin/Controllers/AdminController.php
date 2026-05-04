@@ -2,19 +2,21 @@
 
 namespace App\Modules\Admin\Controllers;
 
-use App\Modules\Admin\Services\AdminManagementService;
 use App\Models\AdminPermission;
 use App\Models\AdminRole;
-use App\Models\Property;
 use App\Models\AuditLog;
-use App\Models\SystemConfig;
-use App\Models\RoomType;
-use App\Models\Extra;
-use App\Models\Promotion;
-use App\Models\Review;
+use App\Models\Booking;
 use App\Models\EmailTemplate;
-use Illuminate\Http\Request;
+use App\Models\Extra;
+use App\Models\Guest;
+use App\Models\Promotion;
+use App\Models\Property;
+use App\Models\Review;
+use App\Models\Room;
+use App\Models\RoomType;
+use App\Modules\Admin\Services\AdminManagementService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Str;
 
@@ -24,16 +26,16 @@ class AdminController extends Controller
 
     public function __construct()
     {
-        $this->service = new AdminManagementService();
+        $this->service = new AdminManagementService;
     }
 
     public function getStaff(Request $request): JsonResponse
     {
         $filters = $request->only(['role', 'property', 'is_active', 'search']);
         $staff = $this->service->getAllStaff($filters);
-        
+
         return response()->json([
-            'data' => $staff->map(fn($s) => [
+            'data' => $staff->map(fn ($s) => [
                 'id' => $s->id,
                 'first_name' => $s->first_name,
                 'last_name' => $s->last_name,
@@ -82,7 +84,7 @@ class AdminController extends Controller
     public function updateStaff(Request $request, string $id): JsonResponse
     {
         $validated = $request->validate([
-            'email' => 'sometimes|email|unique:staff,email,' . $id,
+            'email' => 'sometimes|email|unique:staff,email,'.$id,
             'password' => 'sometimes|min:8',
             'first_name' => 'sometimes|string|max:100',
             'last_name' => 'sometimes|string|max:100',
@@ -169,7 +171,7 @@ class AdminController extends Controller
         $properties = $this->service->getAllProperties($filters);
 
         return response()->json([
-            'data' => $properties->map(fn($p) => [
+            'data' => $properties->map(fn ($p) => [
                 'id' => $p->id,
                 'name' => $p->name,
                 'slug' => $p->slug,
@@ -221,7 +223,7 @@ class AdminController extends Controller
     {
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
-            'slug' => 'sometimes|string|unique:properties,slug,' . $id,
+            'slug' => 'sometimes|string|unique:properties,slug,'.$id,
             'location' => 'sometimes|string|max:255',
             'address' => 'nullable|string',
             'latitude' => 'nullable|numeric',
@@ -271,9 +273,9 @@ class AdminController extends Controller
         $bookings = $this->service->getAllBookings($filters);
 
         return response()->json([
-            'data' => $bookings->map(fn($b) => [
+            'data' => $bookings->map(fn ($b) => [
                 'id' => $b->id,
-                'guest' => $b->guest?->first_name . ' ' . $b->guest?->last_name,
+                'guest' => $b->guest?->first_name.' '.$b->guest?->last_name,
                 'property' => $b->property?->name,
                 'room_type' => $b->roomType?->name,
                 'check_in_date' => $b->check_in_date,
@@ -348,12 +350,12 @@ class AdminController extends Controller
         $bookings = $this->service->getAllBookings($filters);
 
         $csv = "ID,Guest,Property,Room Type,Check-in,Check-out,Guests,Price,Status,Payment Status,Created At\n";
-        
+
         foreach ($bookings as $booking) {
             $csv .= sprintf(
                 "%s,%s,%s,%s,%s,%s,%d,%.2f,%s,%s,%s\n",
                 $booking->id,
-                $booking->guest?->first_name . ' ' . $booking->guest?->last_name,
+                $booking->guest?->first_name.' '.$booking->guest?->last_name,
                 $booking->property?->name,
                 $booking->roomType?->name,
                 $booking->check_in_date,
@@ -370,7 +372,7 @@ class AdminController extends Controller
             echo $csv;
         }, 200, [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="bookings_' . date('Y-m-d') . '.csv"',
+            'Content-Disposition' => 'attachment; filename="bookings_'.date('Y-m-d').'.csv"',
         ]);
     }
 
@@ -380,7 +382,7 @@ class AdminController extends Controller
         $guests = $this->service->getAllGuests($filters);
 
         return response()->json([
-            'data' => $guests->map(fn($g) => [
+            'data' => $guests->map(fn ($g) => [
                 'id' => $g->id,
                 'first_name' => $g->first_name,
                 'last_name' => $g->last_name,
@@ -480,10 +482,10 @@ class AdminController extends Controller
         $payments = $this->service->getAllPayments($filters);
 
         return response()->json([
-            'data' => $payments->map(fn($p) => [
+            'data' => $payments->map(fn ($p) => [
                 'id' => $p->id,
                 'booking' => $p->booking?->id,
-                'guest' => $p->booking?->guest?->first_name . ' ' . $p->booking?->guest?->last_name,
+                'guest' => $p->booking?->guest?->first_name.' '.$p->booking?->guest?->last_name,
                 'amount' => $p->amount,
                 'payment_method' => $p->payment_method,
                 'status' => $p->status,
@@ -516,7 +518,7 @@ class AdminController extends Controller
         $query = Review::with(['booking', 'booking.guest', 'booking.property']);
 
         if ($request->query('property')) {
-            $query->whereHas('booking', fn($q) => $q->where('property_id', $request->query('property')));
+            $query->whereHas('booking', fn ($q) => $q->where('property_id', $request->query('property')));
         }
         if ($request->query('status')) {
             $query->where('status', $request->query('status'));
@@ -525,13 +527,14 @@ class AdminController extends Controller
         $reviews = $query->orderByDesc('created_at')->paginate(20);
 
         return response()->json([
-            'data' => $reviews->map(fn($r) => [
+            'data' => $reviews->map(fn ($r) => [
                 'id' => $r->id,
                 'booking' => $r->booking_id,
-                'guest' => $r->booking?->guest?->first_name . ' ' . $r->booking?->guest?->last_name,
+                'guest' => $r->booking?->guest?->first_name.' '.$r->booking?->guest?->last_name,
                 'property' => $r->booking?->property?->name,
-                'rating' => $r->rating,
-                'comment' => $r->comment,
+                'rating' => $r->overall_rating,
+                'comment' => $r->review_text,
+                'reply' => $r->reply,
                 'status' => $r->status,
                 'created_at' => $r->created_at,
             ]),
@@ -546,14 +549,14 @@ class AdminController extends Controller
     public function moderateReview(Request $request, string $id): JsonResponse
     {
         $validated = $request->validate([
-            'status' => 'required|in:approved,hidden,flagged',
+            'status' => 'required|in:pending,approved,rejected,hidden,flagged',
             'reply' => 'nullable|string',
         ]);
 
         $review = Review::findOrFail($id);
         $review->update([
             'status' => $validated['status'],
-            'reply' => $validated['reply'] ?? $review->reply,
+            'reply' => $validated['reply'] ?? null,
         ]);
 
         AuditLog::log('review_moderated', 'review', $id, null, $validated);
@@ -587,7 +590,7 @@ class AdminController extends Controller
     public function createPromotion(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'code' => 'required|string|max:50|unique:promotions,code',
+            'code' => 'required|string|max:50|unique:promotions,promo_code',
             'description' => 'nullable|string',
             'discount_type' => 'required|in:percentage,fixed',
             'discount_value' => 'required|numeric|min:0',
@@ -601,9 +604,18 @@ class AdminController extends Controller
 
         $promotion = Promotion::create([
             'id' => Str::uuid()->toString(),
-            ...$validated,
-            'uses_count' => 0,
+            'property_id' => $validated['property_id'] ?? null,
+            'name' => $validated['code'],
+            'description' => $validated['description'] ?? null,
+            'discount_type' => $validated['discount_type'],
+            'discount_value' => $validated['discount_value'],
+            'promo_code' => $validated['code'],
+            'start_date' => $validated['valid_from'],
+            'end_date' => $validated['valid_until'],
+            'min_nights' => $validated['min_booking_value'] ?? null,
             'is_active' => true,
+            'usage_limit' => $validated['max_uses'] ?? null,
+            'usage_count' => 0,
         ]);
 
         AuditLog::log('promotion_created', 'promotion', $promotion->id, null, $validated);
@@ -617,7 +629,7 @@ class AdminController extends Controller
     public function updatePromotion(Request $request, string $id): JsonResponse
     {
         $validated = $request->validate([
-            'code' => 'sometimes|string|max:50|unique:promotions,code,' . $id,
+            'code' => 'sometimes|string|max:50|unique:promotions,promo_code,'.$id,
             'description' => 'nullable|string',
             'discount_type' => 'sometimes|in:percentage,fixed',
             'discount_value' => 'sometimes|numeric|min:0',
@@ -631,13 +643,47 @@ class AdminController extends Controller
         ]);
 
         $promotion = Promotion::findOrFail($id);
-        $promotion->update($validated);
+
+        $updateData = [];
+        if (isset($validated['code'])) {
+            $updateData['promo_code'] = $validated['code'];
+            $updateData['name'] = $validated['code'];
+        }
+        if (isset($validated['description'])) {
+            $updateData['description'] = $validated['description'];
+        }
+        if (isset($validated['discount_type'])) {
+            $updateData['discount_type'] = $validated['discount_type'];
+        }
+        if (isset($validated['discount_value'])) {
+            $updateData['discount_value'] = $validated['discount_value'];
+        }
+        if (isset($validated['property_id'])) {
+            $updateData['property_id'] = $validated['property_id'];
+        }
+        if (isset($validated['valid_from'])) {
+            $updateData['start_date'] = $validated['valid_from'];
+        }
+        if (isset($validated['valid_until'])) {
+            $updateData['end_date'] = $validated['valid_until'];
+        }
+        if (isset($validated['min_booking_value'])) {
+            $updateData['min_nights'] = $validated['min_booking_value'];
+        }
+        if (isset($validated['max_uses'])) {
+            $updateData['usage_limit'] = $validated['max_uses'];
+        }
+        if (isset($validated['is_active'])) {
+            $updateData['is_active'] = $validated['is_active'];
+        }
+
+        $promotion->update($updateData);
 
         AuditLog::log('promotion_updated', 'promotion', $id, null, $validated);
 
         return response()->json([
             'message' => 'Promotion updated successfully',
-            'data' => $promotion,
+            'data' => $promotion->fresh(),
         ]);
     }
 
@@ -679,7 +725,7 @@ class AdminController extends Controller
             'name' => 'required|string|max:100',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
-            'price_type' => 'required|in:one_time,per_night,per_person',
+            'price_type' => 'required|in:per_stay,per_night,per_person',
             'property_id' => 'nullable|exists:properties,id',
             'is_active' => 'nullable|boolean',
         ]);
@@ -703,7 +749,7 @@ class AdminController extends Controller
             'name' => 'sometimes|string|max:100',
             'description' => 'nullable|string',
             'price' => 'sometimes|numeric|min:0',
-            'price_type' => 'sometimes|in:one_time,per_night,per_person',
+            'price_type' => 'sometimes|in:per_stay,per_night,per_person',
             'property_id' => 'nullable|exists:properties,id',
             'is_active' => 'nullable|boolean',
         ]);
@@ -818,9 +864,9 @@ class AdminController extends Controller
         $logs = $this->service->getAuditLogs($filters);
 
         return response()->json([
-            'data' => $logs->map(fn($l) => [
+            'data' => $logs->map(fn ($l) => [
                 'id' => $l->id,
-                'staff' => $l->staff?->first_name . ' ' . $l->staff?->last_name,
+                'staff' => $l->staff?->first_name.' '.$l->staff?->last_name,
                 'action' => $l->action,
                 'entity_type' => $l->entity_type,
                 'entity_id' => $l->entity_id,
@@ -845,7 +891,7 @@ class AdminController extends Controller
 
         $kpis = $this->service->getRevenueDashboard($propertyId, $startDate, $endDate);
 
-        $occupancyQuery = \App\Models\Booking::query();
+        $occupancyQuery = Booking::query();
         if ($propertyId) {
             $occupancyQuery->where('property_id', $propertyId);
         }
@@ -854,23 +900,230 @@ class AdminController extends Controller
 
         $bookingsCount = $occupancyQuery->count();
         $totalNights = $occupancyQuery->sum(\DB::raw('DATEDIFF(check_out_date, check_in_date)'));
-        $totalRooms = $propertyId 
-            ? \App\Models\Property::findOrFail($propertyId)->rooms()->count()
-            : \App\Models\Property::sum('total_rooms');
-        
-        $occupancyRate = $totalRooms > 0 && $totalNights > 0 
-            ? round(($totalNights / ($totalRooms * 30)) * 100, 1) 
+        $totalRooms = $propertyId
+            ? Property::findOrFail($propertyId)->rooms()->count()
+            : Property::sum('total_rooms');
+
+        $occupancyRate = $totalRooms > 0 && $totalNights > 0
+            ? round(($totalNights / ($totalRooms * 30)) * 100, 1)
             : 0;
+
+        $weeklyBookings = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i)->toDateString();
+            $count = Booking::where('property_id', $propertyId)
+                ->where('check_in_date', $date)
+                ->whereIn('status', ['confirmed', 'checked_in', 'completed'])
+                ->count();
+            $weeklyBookings[] = [
+                'date' => now()->subDays($i)->format('D'),
+                'bookings' => $count,
+            ];
+        }
+
+        $monthlyRevenue = [];
+        for ($i = 11; $i >= 0; $i--) {
+            $monthStart = now()->subMonths($i)->startOfMonth()->toDateString();
+            $monthEnd = now()->subMonths($i)->endOfMonth()->toDateString();
+            $revenue = Booking::where('property_id', $propertyId)
+                ->whereBetween('check_in_date', [$monthStart, $monthEnd])
+                ->whereIn('status', ['confirmed', 'checked_in', 'completed'])
+                ->sum('total_price');
+            $monthlyRevenue[] = [
+                'month' => now()->subMonths($i)->format('M'),
+                'revenue' => (float) $revenue,
+            ];
+        }
+
+        $recentBookings = Booking::with(['guest', 'roomType'])
+            ->where('property_id', $propertyId)
+            ->orderByDesc('created_at')
+            ->limit(5)
+            ->get()
+            ->map(fn ($b) => [
+                'guest_name' => $b->guest?->first_name.' '.$b->guest?->last_name,
+                'room_type' => $b->roomType?->name,
+                'check_in_date' => $b->check_in_date,
+                'status' => $b->status,
+            ]);
+
+        $totalGuests = Guest::count();
+        $adr = $bookingsCount > 0 ? round($kpis['total_revenue'] / $bookingsCount, 2) : 0;
+        $revpar = $totalRooms > 0 ? round($kpis['total_revenue'] / $totalRooms, 2) : 0;
 
         return response()->json([
             'data' => [
                 'occupancy_rate' => $occupancyRate,
                 'total_revenue' => $kpis['total_revenue'],
                 'total_bookings' => $bookingsCount,
+                'total_guests' => $totalGuests,
+                'adr' => $adr,
+                'revpar' => $revpar,
                 'average_transaction' => $kpis['average_transaction'],
                 'daily_revenue' => $kpis['daily_revenue'],
+                'weekly_bookings' => $weeklyBookings,
+                'monthly_revenue' => $monthlyRevenue,
+                'recent_bookings' => $recentBookings,
             ],
         ]);
+    }
+
+    public function getRooms(Request $request): JsonResponse
+    {
+        $query = Room::with(['roomType', 'property']);
+
+        if ($request->query('property')) {
+            $query->where('property_id', $request->query('property'));
+        }
+        if ($request->query('status')) {
+            $query->where('status', $request->query('status'));
+        }
+        if ($request->query('search')) {
+            $query->where('room_number', 'like', '%'.$request->query('search').'%');
+        }
+
+        $rooms = $query->orderBy('room_number')->paginate(50);
+
+        $baseQuery = Room::query();
+        if ($request->query('property')) {
+            $baseQuery->where('property_id', $request->query('property'));
+        }
+
+        $statusCounts = [
+            'available' => (clone $baseQuery)->where('status', 'available')->count(),
+            'booked' => (clone $baseQuery)->where('status', 'booked')->count(),
+            'maintenance' => (clone $baseQuery)->where('status', 'maintenance')->count(),
+            'cleaning' => (clone $baseQuery)->where('status', 'cleaning')->count(),
+        ];
+
+        return response()->json([
+            'data' => $rooms->map(fn ($r) => [
+                'id' => $r->id,
+                'room_number' => $r->room_number,
+                'floor' => $r->floor,
+                'room_type' => $r->roomType?->name,
+                'room_type_id' => $r->room_type_id,
+                'property' => $r->property?->name,
+                'property_id' => $r->property_id,
+                'status' => $r->status,
+                'base_price' => $r->roomType?->base_price ?? 0,
+            ]),
+            'pagination' => [
+                'current_page' => $rooms->currentPage(),
+                'last_page' => $rooms->lastPage(),
+                'per_page' => $rooms->perPage(),
+                'total' => $rooms->total(),
+            ],
+            'status_counts' => $statusCounts,
+        ]);
+    }
+
+    public function createRoom(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'property_id' => 'required|exists:properties,id',
+            'room_type_id' => 'required|exists:room_types,id',
+            'room_number' => 'required|string|max:20',
+            'floor' => 'required|integer|min:0',
+            'status' => 'nullable|in:available,booked,maintenance,cleaning,out_of_service',
+        ]);
+
+        $validated['id'] = Str::uuid()->toString();
+        $validated['status'] = $validated['status'] ?? 'available';
+
+        $room = Room::create($validated);
+        AuditLog::log('room_created', 'room', $room->id, null, $validated);
+
+        return response()->json(['message' => 'Room created successfully', 'data' => $room], 201);
+    }
+
+    public function updateRoom(Request $request, string $id): JsonResponse
+    {
+        $room = Room::findOrFail($id);
+
+        $validated = $request->validate([
+            'room_number' => 'sometimes|string|max:20',
+            'floor' => 'sometimes|integer|min:0',
+            'status' => 'sometimes|in:available,booked,maintenance,cleaning,out_of_service',
+            'room_type_id' => 'sometimes|exists:room_types,id',
+        ]);
+
+        $room->update($validated);
+        AuditLog::log('room_updated', 'room', $id, null, $validated);
+
+        return response()->json(['message' => 'Room updated successfully', 'data' => $room]);
+    }
+
+    public function updateRoomStatus(Request $request, string $id): JsonResponse
+    {
+        $room = Room::findOrFail($id);
+
+        $validated = $request->validate([
+            'status' => 'required|in:available,booked,maintenance,cleaning,out_of_service',
+        ]);
+
+        $room->update($validated);
+        AuditLog::log('room_status_updated', 'room', $id, null, $validated);
+
+        return response()->json(['message' => 'Room status updated successfully', 'data' => $room]);
+    }
+
+    public function getRoomTypes(Request $request): JsonResponse
+    {
+        $query = RoomType::withCount('rooms');
+
+        if ($request->query('property')) {
+            $query->where('property_id', $request->query('property'));
+        }
+
+        $roomTypes = $query->orderBy('name')->get();
+
+        return response()->json([
+            'data' => $roomTypes->map(fn ($rt) => [
+                'id' => $rt->id,
+                'name' => $rt->name,
+                'capacity' => $rt->capacity,
+                'base_price' => $rt->base_price,
+                'description' => $rt->description,
+                'property_id' => $rt->property_id,
+                'rooms_count' => $rt->rooms_count,
+            ]),
+        ]);
+    }
+
+    public function createRoomType(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'property_id' => 'required|exists:properties,id',
+            'name' => 'required|string|max:100',
+            'capacity' => 'required|integer|min:1',
+            'base_price' => 'required|numeric|min:0',
+            'description' => 'nullable|string',
+        ]);
+
+        $validated['id'] = Str::uuid()->toString();
+
+        $roomType = RoomType::create($validated);
+        AuditLog::log('room_type_created', 'room_type', $roomType->id, null, $validated);
+
+        return response()->json(['message' => 'Room type created successfully', 'data' => $roomType], 201);
+    }
+
+    public function updateRoomType(Request $request, string $id): JsonResponse
+    {
+        $roomType = RoomType::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'sometimes|string|max:100',
+            'capacity' => 'sometimes|integer|min:1',
+            'base_price' => 'sometimes|numeric|min:0',
+            'description' => 'nullable|string',
+        ]);
+
+        $roomType->update($validated);
+        AuditLog::log('room_type_updated', 'room_type', $id, null, $validated);
+
+        return response()->json(['message' => 'Room type updated successfully', 'data' => $roomType]);
     }
 
     public function seedData(): JsonResponse
