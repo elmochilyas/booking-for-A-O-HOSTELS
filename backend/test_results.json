@@ -1,0 +1,368 @@
+{
+    "run_at": "2026-05-03 17:32:07",
+    "passed": 72,
+    "failed": 0,
+    "total": 72,
+    "results": [
+        {
+            "status": "PASS",
+            "name": "GET \/properties \u2014 list loads",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "Properties total count",
+            "note": "total=47"
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/properties\/destinations",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/properties\/{uuid} \u2014 detail by UUID",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/properties\/{id}\/room-types",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "Room types returned",
+            "note": "count=4"
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/properties\/{id}\/availability",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "POST \/auth\/register",
+            "note": "HTTP 201"
+        },
+        {
+            "status": "PASS",
+            "name": "Guest token received",
+            "note": ""
+        },
+        {
+            "status": "PASS",
+            "name": "POST \/auth\/login",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/guest\/profile",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/guest\/bookings",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "POST \/auth\/logout \u2014 JWT blacklist (not Sanctum crash)",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "POST \/staff\/login (reception)",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "Reception token received",
+            "note": ""
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/staff\/dashboard",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/staff\/check-ins",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/staff\/check-outs",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "POST \/staff\/logout",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "POST \/staff\/login (superadmin)",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "Superadmin token received",
+            "note": ""
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/admin\/properties",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "Properties list",
+            "note": "total=47"
+        },
+        {
+            "status": "PASS",
+            "name": "POST \/admin\/properties \u2014 create",
+            "note": "HTTP 201"
+        },
+        {
+            "status": "PASS",
+            "name": "PUT \/admin\/properties\/{id} \u2014 update (is_active column)",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/admin\/properties\/{id}\/kpis",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "DELETE \/admin\/properties\/{id} \u2014 archive",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/admin\/rooms",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "Rooms total",
+            "note": "total=4629"
+        },
+        {
+            "status": "PASS",
+            "name": "status_counts present in response",
+            "note": "available=4629"
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/admin\/rooms?property={id} \u2014 filter by property",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/admin\/rooms?status=available \u2014 filter by status",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "PATCH \/admin\/rooms\/{id}\/status \u2014 set maintenance",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/admin\/room-types",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "Room types list",
+            "note": "count=180"
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/admin\/bookings",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "Bookings list",
+            "note": "total=0"
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/admin\/staff \u2014 paginated (AdminController)",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "Response has data + pagination keys",
+            "note": ""
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/admin\/roles",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/admin\/permissions",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/admin\/guests",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "Guests list",
+            "note": "total=4"
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/admin\/analytics",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "analytics.occupancy_rate present",
+            "note": ""
+        },
+        {
+            "status": "PASS",
+            "name": "analytics.total_revenue present",
+            "note": ""
+        },
+        {
+            "status": "PASS",
+            "name": "analytics.total_bookings present",
+            "note": ""
+        },
+        {
+            "status": "PASS",
+            "name": "analytics.weekly_bookings present",
+            "note": ""
+        },
+        {
+            "status": "PASS",
+            "name": "analytics.monthly_revenue present",
+            "note": ""
+        },
+        {
+            "status": "PASS",
+            "name": "analytics.recent_bookings present",
+            "note": ""
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/admin\/revenue \u2014 revenue dashboard",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/admin\/promotions",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "POST \/admin\/promotions \u2014 create (field mapping test)",
+            "note": "HTTP 201"
+        },
+        {
+            "status": "PASS",
+            "name": "PUT \/admin\/promotions\/{id} \u2014 update",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/admin\/extras",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "POST \/admin\/extras \u2014 price_type=per_stay (was broken)",
+            "note": "HTTP 201"
+        },
+        {
+            "status": "PASS",
+            "name": "POST \/admin\/extras \u2014 price_type=one_time rejected (validation)",
+            "note": "HTTP 422"
+        },
+        {
+            "status": "PASS",
+            "name": "PUT \/admin\/extras\/{id} \u2014 update price_type=per_night",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "PUT \/admin\/extras\/{id} \u2014 update price_type=per_stay",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/admin\/reviews",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/admin\/email-templates (table now exists)",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "Email templates count",
+            "note": "count=0"
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/admin\/payments",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/admin\/config",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "Config returns data array",
+            "note": ""
+        },
+        {
+            "status": "PASS",
+            "name": "GET \/admin\/audit-logs",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "Audit log has staff key (not staff_name)",
+            "note": ""
+        },
+        {
+            "status": "PASS",
+            "name": "POST \/staff\/login (manager)",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "Manager correctly denied \/admin\/bookings (below required role)",
+            "note": "HTTP 403 expected"
+        },
+        {
+            "status": "PASS",
+            "name": "Superadmin can access role:superadmin route",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "Superadmin can access role:superadmin|regional_admin route (hierarchy)",
+            "note": "HTTP 200"
+        },
+        {
+            "status": "PASS",
+            "name": "Superadmin can access role:superadmin|regional_admin|property_admin route (hierarchy)",
+            "note": "HTTP 200"
+        }
+    ]
+}
