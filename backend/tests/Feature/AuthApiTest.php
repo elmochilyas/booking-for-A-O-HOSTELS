@@ -113,7 +113,7 @@ class AuthApiTest extends TestCase
 
     public function test_cannot_access_protected_routes_without_token()
     {
-        $response = $this->getJson('/api/staff');
+        $response = $this->getJson('/api/guest/bookings');
 
         $response->assertStatus(401);
     }

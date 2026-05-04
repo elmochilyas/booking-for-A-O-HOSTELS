@@ -5,10 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Str;
 
 class Property extends Model
 {
     protected $table = 'properties';
+
+    protected static function boot(): void
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            if (empty($model->id)) {
+                $model->id = Str::uuid()->toString();
+            }
+        });
+    }
 
     protected $keyType = 'string';
 
