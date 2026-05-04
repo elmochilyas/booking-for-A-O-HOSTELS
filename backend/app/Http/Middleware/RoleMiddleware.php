@@ -34,7 +34,7 @@ class RoleMiddleware
             }
         }
 
-        $userRole      = $user->role ?? null;
+        $userRole = $user->role ?? null;
         $adminRoleSlug = $user->adminRole?->slug ?? null;
 
         if (! $this->hasRequiredRole($userRole, $adminRoleSlug, $expanded)) {

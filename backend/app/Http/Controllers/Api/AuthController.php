@@ -81,12 +81,18 @@ class AuthController extends Controller
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
 
+        if (! $guest->email_verified_at) {
+            return response()->json(['error' => 'Email not verified'], 403);
+        }
+
         $token = $this->jwtService->generateToken($guest);
+        $refreshToken = $this->jwtService->generateRefreshToken($guest);
 
         return response()->json([
             'message' => 'Login successful',
-            'guest' => $guest->makeHidden(['password_hash']),
+            'user' => $guest->makeHidden(['password_hash']),
             'access_token' => $token,
+            'refresh_token' => $refreshToken,
             'token_type' => 'bearer',
         ]);
     }
@@ -143,6 +149,14 @@ class AuthController extends Controller
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $guest = Guest::where('verification_token', $request->token)->first();
+
+        if ($guest) {
+            $guest->update(['email_verified_at' => now(), 'verification_token' => null]);
+
+            return response()->json(['message' => 'Email verified successfully']);
         }
 
         try {

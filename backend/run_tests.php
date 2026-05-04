@@ -25,7 +25,7 @@ function req(string $method, string $url, array $body = [], array $headers = [])
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
     }
 
-    $raw  = curl_exec($ch);
+    $raw = curl_exec($ch);
     $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
@@ -90,7 +90,7 @@ if (assertCode(200, $res, 'GET /properties — list loads')) {
     $count = is_array($props) ? count($props) : 0;
     $total = $res['body']['pagination']['total'] ?? $res['body']['total'] ?? $count;
     pass('Properties total count', "total={$total}");
-    $PROP_ID   = $props[0]['id']   ?? null;
+    $PROP_ID = $props[0]['id'] ?? null;
     $PROP_SLUG = $props[0]['slug'] ?? null;
 }
 
@@ -119,7 +119,7 @@ if (!empty($PROP_ID)) {
     }
 
     // Availability
-    $checkIn  = date('Y-m-d', strtotime('+30 days'));
+    $checkIn = date('Y-m-d', strtotime('+30 days'));
     $checkOut = date('Y-m-d', strtotime('+32 days'));
     $res = req('GET', "$BASE/properties/{$PROP_ID}/availability?check_in={$checkIn}&check_out={$checkOut}&guests=2");
     assertCode(200, $res, 'GET /properties/{id}/availability');
@@ -134,16 +134,19 @@ section('2. Guest Authentication');
 $guestEmail = 'testguest_' . time() . '@example.com';
 
 $res = req('POST', "$BASE/auth/register", [
-    'first_name'            => 'Test',
-    'last_name'             => 'Guest',
-    'email'                 => $guestEmail,
-    'password'              => 'Password123!',
+    'first_name' => 'Test',
+    'last_name' => 'Guest',
+    'email' => $guestEmail,
+    'password' => 'Password123!',
     'password_confirmation' => 'Password123!',
 ]);
 if (assertCode(201, $res, 'POST /auth/register')) {
     $tokens['guest'] = $res['body']['access_token'] ?? null;
-    if ($tokens['guest']) pass('Guest token received');
-    else fail('Guest token missing from register response');
+    if ($tokens['guest']) {
+        pass('Guest token received');
+    } else {
+        fail('Guest token missing from register response');
+    }
 }
 
 // Login
@@ -173,7 +176,9 @@ section('3. Staff Authentication');
 $res = req('POST', "$BASE/staff/login", ['email' => 'reception@ao.com', 'password' => 'reception123']);
 if (assertCode(200, $res, 'POST /staff/login (reception)')) {
     $tokens['reception'] = $res['body']['access_token'] ?? null;
-    if ($tokens['reception']) pass('Reception token received');
+    if ($tokens['reception']) {
+        pass('Reception token received');
+    }
 }
 
 // Staff dashboard
@@ -201,8 +206,11 @@ section('4. Superadmin Authentication');
 $res = req('POST', "$BASE/staff/login", ['email' => 'superadmin@ao.com', 'password' => 'super123']);
 if (assertCode(200, $res, 'POST /staff/login (superadmin)')) {
     $tokens['superadmin'] = $res['body']['access_token'] ?? null;
-    if ($tokens['superadmin']) pass('Superadmin token received');
-    else fail('Superadmin token missing');
+    if ($tokens['superadmin']) {
+        pass('Superadmin token received');
+    } else {
+        fail('Superadmin token missing');
+    }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -221,9 +229,9 @@ if (assertCode(200, $res, 'GET /admin/properties')) {
 
 // Create property
 $res = req('POST', "$BASE/admin/properties", [
-    'name'     => 'Test Property ' . time(),
+    'name' => 'Test Property ' . time(),
     'location' => 'Test City',
-    'address'  => '123 Test Street',
+    'address' => '123 Test Street',
 ], auth('superadmin'));
 if (assertCode(201, $res, 'POST /admin/properties — create')) {
     $NEW_PROP_ID = $res['body']['data']['id'] ?? null;
@@ -232,7 +240,7 @@ if (assertCode(201, $res, 'POST /admin/properties — create')) {
 // Update property
 if (!empty($NEW_PROP_ID)) {
     $res = req('PUT', "$BASE/admin/properties/{$NEW_PROP_ID}", [
-        'name'      => 'Updated Test Property',
+        'name' => 'Updated Test Property',
         'is_active' => true,
     ], auth('superadmin'));
     assertCode(200, $res, 'PUT /admin/properties/{id} — update (is_active column)');
@@ -261,8 +269,11 @@ if (assertCode(200, $res, 'GET /admin/rooms')) {
     $roomTotal = $res['body']['pagination']['total'] ?? 0;
     pass('Rooms total', "total={$roomTotal}");
     $statusCounts = $res['body']['status_counts'] ?? null;
-    if ($statusCounts) pass('status_counts present in response', 'available=' . ($statusCounts['available'] ?? '?'));
-    else fail('status_counts missing from GET /admin/rooms response');
+    if ($statusCounts) {
+        pass('status_counts present in response', 'available=' . ($statusCounts['available'] ?? '?'));
+    } else {
+        fail('status_counts missing from GET /admin/rooms response');
+    }
     $ROOM_ID = $res['body']['data'][0]['id'] ?? null;
 }
 
@@ -311,10 +322,13 @@ section('8. Admin — Staff Management');
 
 $res = req('GET', "$BASE/admin/staff", [], auth('superadmin'));
 if (assertCode(200, $res, 'GET /admin/staff — paginated (AdminController)')) {
-    $hasData       = isset($res['body']['data']);
+    $hasData = isset($res['body']['data']);
     $hasPagination = isset($res['body']['pagination']);
-    if ($hasData && $hasPagination) pass('Response has data + pagination keys');
-    else fail('Missing data or pagination key — still hitting wrong controller', json_encode(array_keys($res['body'] ?? [])));
+    if ($hasData && $hasPagination) {
+        pass('Response has data + pagination keys');
+    } else {
+        fail('Missing data or pagination key — still hitting wrong controller', json_encode(array_keys($res['body'] ?? [])));
+    }
     $STAFF_ID = $res['body']['data'][0]['id'] ?? null;
 }
 
@@ -348,8 +362,11 @@ $res = req('GET', "$BASE/admin/analytics", [], auth('superadmin'));
 if (assertCode(200, $res, 'GET /admin/analytics')) {
     $d = $res['body']['data'] ?? [];
     foreach (['occupancy_rate', 'total_revenue', 'total_bookings', 'weekly_bookings', 'monthly_revenue', 'recent_bookings'] as $key) {
-        if (array_key_exists($key, $d)) pass("analytics.{$key} present");
-        else fail("analytics.{$key} MISSING from response");
+        if (array_key_exists($key, $d)) {
+            pass("analytics.{$key} present");
+        } else {
+            fail("analytics.{$key} MISSING from response");
+        }
     }
 }
 
@@ -367,11 +384,11 @@ assertCode(200, $res, 'GET /admin/promotions');
 
 $promoCode = 'TESTCODE' . rand(1000, 9999);
 $res = req('POST', "$BASE/admin/promotions", [
-    'code'          => $promoCode,
+    'code' => $promoCode,
     'discount_type' => 'percentage',
-    'discount_value'=> 10,
-    'valid_from'    => date('Y-m-d'),
-    'valid_until'   => date('Y-m-d', strtotime('+30 days')),
+    'discount_value' => 10,
+    'valid_from' => date('Y-m-d'),
+    'valid_until' => date('Y-m-d', strtotime('+30 days')),
 ], auth('superadmin'));
 if (assertCode(201, $res, 'POST /admin/promotions — create (field mapping test)')) {
     $PROMO_ID = $res['body']['data']['id'] ?? null;
@@ -379,9 +396,9 @@ if (assertCode(201, $res, 'POST /admin/promotions — create (field mapping test
 
 if (!empty($PROMO_ID)) {
     $res = req('PUT', "$BASE/admin/promotions/{$PROMO_ID}", [
-        'valid_from'   => date('Y-m-d'),
-        'valid_until'  => date('Y-m-d', strtotime('+60 days')),
-        'is_active'    => true,
+        'valid_from' => date('Y-m-d'),
+        'valid_until' => date('Y-m-d', strtotime('+60 days')),
+        'is_active' => true,
     ], auth('superadmin'));
     assertCode(200, $res, 'PUT /admin/promotions/{id} — update');
 }
@@ -397,9 +414,9 @@ assertCode(200, $res, 'GET /admin/extras');
 
 // per_stay should work now
 $res = req('POST', "$BASE/admin/extras", [
-    'name'        => 'Test Extra ' . time(),
-    'price'       => 5.00,
-    'price_type'  => 'per_stay',
+    'name' => 'Test Extra ' . time(),
+    'price' => 5.00,
+    'price_type' => 'per_stay',
     'property_id' => $ADMIN_PROP_ID,
 ], auth('superadmin'));
 if (assertCode(201, $res, 'POST /admin/extras — price_type=per_stay (was broken)')) {
@@ -408,9 +425,9 @@ if (assertCode(201, $res, 'POST /admin/extras — price_type=per_stay (was broke
 
 // one_time should now be rejected
 $res = req('POST', "$BASE/admin/extras", [
-    'name'        => 'Bad Extra',
-    'price'       => 5.00,
-    'price_type'  => 'one_time',
+    'name' => 'Bad Extra',
+    'price' => 5.00,
+    'price_type' => 'one_time',
     'property_id' => $ADMIN_PROP_ID,
 ], auth('superadmin'));
 assertCode(422, $res, 'POST /admin/extras — price_type=one_time rejected (validation)');
@@ -438,8 +455,12 @@ if (assertCode(200, $res, 'GET /admin/reviews')) {
     $REVIEW_ID = $res['body']['data'][0]['id'] ?? null;
     // Verify fields in response use overall_rating / review_text mapping
     $sample = $res['body']['data'][0] ?? [];
-    if (array_key_exists('rating', $sample)) pass('Review has rating field in response');
-    if (array_key_exists('comment', $sample)) pass('Review has comment field in response');
+    if (array_key_exists('rating', $sample)) {
+        pass('Review has rating field in response');
+    }
+    if (array_key_exists('comment', $sample)) {
+        pass('Review has comment field in response');
+    }
 }
 
 // Test hidden and flagged status (previously caused DB constraint error)
@@ -495,8 +516,11 @@ section('16. Admin — System Config');
 $res = req('GET', "$BASE/admin/config", [], auth('superadmin'));
 if (assertCode(200, $res, 'GET /admin/config')) {
     $isArray = is_array($res['body']['data'] ?? null);
-    if ($isArray) pass('Config returns data array');
-    else fail('Config data is not an array');
+    if ($isArray) {
+        pass('Config returns data array');
+    } else {
+        fail('Config data is not an array');
+    }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -508,8 +532,11 @@ section('17. Admin — Audit Logs');
 $res = req('GET', "$BASE/admin/audit-logs", [], auth('superadmin'));
 if (assertCode(200, $res, 'GET /admin/audit-logs')) {
     $sample = $res['body']['data'][0] ?? [];
-    if (array_key_exists('staff', $sample)) pass('Audit log has staff key (not staff_name)');
-    else fail('Audit log missing staff key — column mismatch may remain');
+    if (array_key_exists('staff', $sample)) {
+        pass('Audit log has staff key (not staff_name)');
+    } else {
+        fail('Audit log missing staff key — column mismatch may remain');
+    }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -528,9 +555,13 @@ if (assertCode(200, $res, 'POST /staff/login (manager)')) {
 $res = req('GET', "$BASE/admin/bookings", [], auth('manager'));
 // Manager is below regional_admin so may get 403 depending on hierarchy — note actual result
 $managerBookingsCode = $res['code'];
-if ($managerBookingsCode === 200) pass('Manager can access /admin/bookings');
-elseif ($managerBookingsCode === 403) pass('Manager correctly denied /admin/bookings (below required role)', 'HTTP 403 expected');
-else fail('Manager /admin/bookings — unexpected HTTP ' . $managerBookingsCode);
+if ($managerBookingsCode === 200) {
+    pass('Manager can access /admin/bookings');
+} elseif ($managerBookingsCode === 403) {
+    pass('Manager correctly denied /admin/bookings (below required role)', 'HTTP 403 expected');
+} else {
+    fail('Manager /admin/bookings — unexpected HTTP ' . $managerBookingsCode);
+}
 
 // Superadmin should access everything
 $res = req('GET', "$BASE/admin/staff", [], auth('superadmin'));
@@ -548,7 +579,7 @@ assertCode(200, $res, 'Superadmin can access role:superadmin|regional_admin|prop
 
 $passed = count(array_filter($results, fn($r) => $r['status'] === 'PASS'));
 $failed = count(array_filter($results, fn($r) => $r['status'] === 'FAIL'));
-$total  = count($results);
+$total = count($results);
 
 echo "\n\033[1m══════════════════════════════════════\033[0m\n";
 echo "\033[1m  TEST RESULTS\033[0m\n";
@@ -569,10 +600,10 @@ echo "\n";
 
 // Write results to JSON for the report
 file_put_contents(__DIR__ . '/test_results.json', json_encode([
-    'run_at'  => date('Y-m-d H:i:s'),
-    'passed'  => $passed,
-    'failed'  => $failed,
-    'total'   => $total,
+    'run_at' => date('Y-m-d H:i:s'),
+    'passed' => $passed,
+    'failed' => $failed,
+    'total' => $total,
     'results' => $results,
 ], JSON_PRETTY_PRINT));
 echo "Results saved to test_results.json\n";
