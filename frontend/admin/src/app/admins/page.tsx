@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Shield, Plus, Edit, Trash2, Search, Loader2, Key, UserCheck, UserX } from "lucide-react";
+import { Plus, Edit, Trash2, Search, Loader2, Key, UserCheck, UserX } from "lucide-react";
 import { AdminLayout, PageHeader, Card, DataTable, Button, Input, Select, Modal, Badge } from "../components/AdminComponents";
+import { adminApi } from "../../services/api";
 
 interface Admin {
   id: string;
@@ -17,70 +18,92 @@ interface Admin {
   created_at: string;
 }
 
-const DEMO_ADMINS: Admin[] = [
-  { id: "1", first_name: "Super", last_name: "Admin", email: "superadmin@ao.com", role: "superadmin", is_active: true, admin_role: { name: "Super Admin" }, two_factor_enabled: true, created_at: "2026-01-01" },
-  { id: "2", first_name: "Regional", last_name: "Manager", email: "regional@ao.com", role: "regional_admin", is_active: true, admin_role: { name: "Regional Admin" }, two_factor_enabled: true, created_at: "2026-02-01" },
-  { id: "3", first_name: "Property", last_name: "Admin", email: "property@ao.com", role: "property_admin", is_active: true, property: "A&O Berlin", admin_role: { name: "Property Admin" }, two_factor_enabled: false, created_at: "2026-03-01" },
-  { id: "4", first_name: "Hotel", last_name: "Manager", email: "manager@ao.com", role: "manager", is_active: true, property: "A&O Berlin", admin_role: { name: "Manager" }, two_factor_enabled: false, created_at: "2026-03-15" },
-  { id: "5", first_name: "Front", last_name: "Desk", email: "reception@ao.com", role: "reception", is_active: true, property: "A&O Berlin", admin_role: { name: "Reception" }, two_factor_enabled: false, created_at: "2026-04-01" },
-];
-
-const DEMO_ROLES = [
-  { id: 1, name: "Super Admin", slug: "superadmin", level: 100 },
-  { id: 2, name: "Regional Admin", slug: "regional_admin", level: 75 },
-  { id: 3, name: "Property Admin", slug: "property_admin", level: 50 },
-  { id: 4, name: "Manager", slug: "manager", level: 25 },
-];
-
 export default function AdminsPage() {
-  const [admins, setAdmins] = useState<Admin[]>(DEMO_ADMINS);
-  const [loading, setLoading] = useState(false);
+  const [admins, setAdmins] = useState<Admin[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 5 });
+  const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0 });
   const [modalOpen, setModalOpen] = useState(false);
   const [editingAdmin, setEditingAdmin] = useState<Admin | null>(null);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
-    first_name: "", last_name: "", email: "", password: "", role: "", admin_role_id: "", is_active: true, two_factor_enabled: false,
+    first_name: "", last_name: "", email: "", password: "", role: "", admin_role_id: "", property_id: "", is_active: true, two_factor_enabled: false,
   });
 
   useEffect(() => {
-    if (search) {
-      const filtered = DEMO_ADMINS.filter(a => a.first_name.toLowerCase().includes(search.toLowerCase()) || a.last_name.toLowerCase().includes(search.toLowerCase()) || a.email.toLowerCase().includes(search.toLowerCase()));
-      setAdmins(filtered);
-      setPagination(p => ({ ...p, total: filtered.length }));
-    } else {
-      setAdmins(DEMO_ADMINS);
-      setPagination(p => ({ ...p, total: DEMO_ADMINS.length }));
-    }
-  }, [search]);
+    fetchAdmins();
+  }, [pagination.current_page, search]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const fetchAdmins = async () => {
+    setLoading(true);
+    try {
+      const response = await adminApi.getAdmins({ page: pagination.current_page, search: search || undefined });
+      const data = response.data.data;
+      setAdmins(data);
+      setPagination(response.data.pagination);
+    } catch (error) {
+      console.error("Failed to fetch admins:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    setTimeout(() => {
+    try {
       if (editingAdmin) {
-        setAdmins(prev => prev.map(a => a.id === editingAdmin.id ? { ...a, ...formData } : a));
+        await adminApi.updateStaff(editingAdmin.id, formData);
       } else {
-        const newAdmin: Admin = { id: String(Date.now()), ...formData, created_at: new Date().toISOString().split('T')[0] };
-        setAdmins(prev => [...prev, newAdmin]);
+        await adminApi.createStaff(formData);
       }
+      await fetchAdmins();
       setModalOpen(false);
       setEditingAdmin(null);
-      setFormData({ first_name: "", last_name: "", email: "", password: "", role: "", admin_role_id: "", is_active: true, two_factor_enabled: false });
+      setFormData({ first_name: "", last_name: "", email: "", password: "", role: "", admin_role_id: "", property_id: "", is_active: true, two_factor_enabled: false });
+    } catch (error) {
+      console.error("Failed to save admin:", error);
+    } finally {
       setSaving(false);
-    }, 500);
+    }
   };
 
   const handleEdit = (admin: Admin) => {
     setEditingAdmin(admin);
-    setFormData({ first_name: admin.first_name, last_name: admin.last_name, email: admin.email, password: "", role: admin.role, admin_role_id: "", is_active: admin.is_active, two_factor_enabled: admin.two_factor_enabled });
+    setFormData({
+      first_name: admin.first_name,
+      last_name: admin.last_name,
+      email: admin.email,
+      password: "",
+      role: admin.role,
+      admin_role_id: admin.admin_role?.id || "",
+      property_id: "",
+      is_active: admin.is_active,
+      two_factor_enabled: admin.two_factor_enabled,
+    });
     setModalOpen(true);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (!confirm("Deactivate this admin?")) return;
-    setAdmins(prev => prev.map(a => a.id === id ? { ...a, is_active: false } : a));
+    try {
+      await adminApi.deleteStaff(id);
+      await fetchAdmins();
+    } catch (error) {
+      console.error("Failed to delete admin:", error);
+    }
+  };
+
+  const handleActivate = async (id: string) => {
+    try {
+      const admin = admins.find(a => a.id === id);
+      if (admin) {
+        await adminApi.updateStaff(id, { ...admin, is_active: true });
+        await fetchAdmins();
+      }
+    } catch (error) {
+      console.error("Failed to activate admin:", error);
+    }
   };
 
   const columns = [
@@ -94,7 +117,7 @@ export default function AdminsPage() {
   return (
     <AdminLayout>
       <PageHeader title="Admin Management" subtitle="Manage admin accounts and permissions">
-        <Button onClick={() => { setEditingAdmin(null); setFormData({ first_name: "", last_name: "", email: "", password: "", role: "", admin_role_id: "", is_active: true, two_factor_enabled: false }); setModalOpen(true); }}>
+        <Button onClick={() => { setEditingAdmin(null); setFormData({ first_name: "", last_name: "", email: "", password: "", role: "", admin_role_id: "", property_id: "", is_active: true, two_factor_enabled: false }); setModalOpen(true); }}>
           <Plus className="w-4 h-4" /> Add Admin
         </Button>
       </PageHeader>
@@ -103,13 +126,13 @@ export default function AdminsPage() {
         <div className="p-4 border-b">
           <div className="relative max-w-sm">
             <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input type="text" placeholder="Search admins..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10 pr-4 py-2 w-full border rounded-lg text-sm" />
+            <input type="text" placeholder="Search admins..." value={search} onChange={(e) => { setSearch(e.target.value); setPagination(p => ({ ...p, current_page: 1 })); }} className="pl-10 pr-4 py-2 w-full border rounded-lg text-sm" />
           </div>
         </div>
         <DataTable columns={columns} data={admins} loading={loading} pagination={pagination} onPageChange={(page: number) => setPagination(p => ({ ...p, current_page: page }))} actions={(item: Admin) => (
           <div className="flex gap-2 justify-end">
             <button onClick={() => handleEdit(item)} className="p-1 hover:bg-gray-100 rounded"><Edit className="w-4 h-4 text-gray-500" /></button>
-            {item.is_active ? <button onClick={() => handleDelete(item.id)} className="p-1 hover:bg-gray-100 rounded"><UserX className="w-4 h-4 text-red-500" /></button> : <button onClick={() => setAdmins(prev => prev.map(a => a.id === item.id ? { ...a, is_active: true } : a))} className="p-1 hover:bg-gray-100 rounded"><UserCheck className="w-4 h-4 text-green-500" /></button>}
+            {item.is_active ? <button onClick={() => handleDelete(item.id)} className="p-1 hover:bg-gray-100 rounded"><UserX className="w-4 h-4 text-red-500" /></button> : <button onClick={() => handleActivate(item.id)} className="p-1 hover:bg-gray-100 rounded"><UserCheck className="w-4 h-4 text-green-500" /></button>}
             <button className="p-1 hover:bg-gray-100 rounded"><Key className="w-4 h-4 text-orange-500" /></button>
           </div>
         )} />
@@ -130,7 +153,7 @@ export default function AdminsPage() {
           </div>
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="outline" onClick={() => setModalOpen(false)} className="flex-1">Cancel</Button>
-            <Button type="submit" disabled={saving} className="flex-1">{saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create"}</Button>
+            <Button type="submit" disabled={saving} className="flex-1">{saving ? <Loader2 className="w-4 h-4 animate-spin" /> : editingAdmin ? "Update" : "Create"}</Button>
           </div>
         </form>
       </Modal>

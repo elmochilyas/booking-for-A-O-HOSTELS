@@ -40,6 +40,7 @@ export default function RoomsPage() {
   const [propertyFilter, setPropertyFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0 });
+  const [statusCounts, setStatusCounts] = useState({ available: 0, booked: 0, maintenance: 0, cleaning: 0 });
   const [modalOpen, setModalOpen] = useState(false);
   const [roomTypeModalOpen, setRoomTypeModalOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
@@ -78,14 +79,12 @@ export default function RoomsPage() {
       const response = await adminApi.getRooms(params);
       setRooms(response.data.data);
       setPagination(response.data.pagination);
+      if (response.data.status_counts) {
+        setStatusCounts(response.data.status_counts);
+      }
     } catch (error) {
       console.error("Failed to fetch rooms:", error);
-      setRooms([
-        { id: "1", room_number: "101", floor: 1, room_type: "Double Room", property: "A&O Berlin", status: "available", base_price: 89 },
-        { id: "2", room_number: "102", floor: 1, room_type: "Dorm Bed", property: "A&O Berlin", status: "booked", base_price: 35 },
-        { id: "3", room_number: "201", floor: 2, room_type: "Family Room", property: "A&O Berlin", status: "available", base_price: 149 },
-        { id: "4", room_number: "301", floor: 3, room_type: "Single Room", property: "A&O Berlin", status: "maintenance", base_price: 59 },
-      ]);
+      setRooms([]);
     } finally {
       setLoading(false);
     }
@@ -223,10 +222,10 @@ export default function RoomsPage() {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <StatsCard title="Total Rooms" value={pagination.total || 24} icon={<Home className="w-5 h-5" />} />
-        <StatsCard title="Available" value={(pagination.total || 24) - 8} icon={<Bed className="w-5 h-5" />} />
-        <StatsCard title="Occupied" value={8} icon={<Users className="w-5 h-5" />} />
-        <StatsCard title="Maintenance" value={2} icon={<ToggleLeft className="w-5 h-5" />} />
+        <StatsCard title="Total Rooms" value={pagination.total || 0} icon={<Home className="w-5 h-5" />} />
+        <StatsCard title="Available" value={statusCounts.available} icon={<Bed className="w-5 h-5" />} />
+        <StatsCard title="Occupied" value={statusCounts.booked} icon={<Users className="w-5 h-5" />} />
+        <StatsCard title="Maintenance" value={statusCounts.maintenance} icon={<ToggleLeft className="w-5 h-5" />} />
       </div>
 
       <Card className="mb-6">

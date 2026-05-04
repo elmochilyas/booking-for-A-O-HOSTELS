@@ -26,6 +26,9 @@ const revenueData = [
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [stats, setStats] = useState<any>(null);
+  const [bookingsData, setBookingsData] = useState<any[]>([]);
+  const [revenueData, setRevenueData] = useState<any[]>([]);
+  const [recentBookings, setRecentBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -36,13 +39,18 @@ export default function Dashboard() {
     setLoading(true);
     try {
       const response = await adminApi.getAnalytics();
-      setStats(response.data.metrics);
+      const data = response.data;
+      setStats(data);
+      setBookingsData(data.weekly_bookings || []);
+      setRevenueData(data.monthly_revenue || []);
+      setRecentBookings(data.recent_bookings || []);
     } catch (error) {
       setStats({
-        occupancy_rate: 78,
-        total_revenue: 61000,
-        adr: 85,
-        revpar: 65,
+        occupancy_rate: 0,
+        total_revenue: 0,
+        adr: 0,
+        revpar: 0,
+        total_guests: 0,
       });
     } finally {
       setLoading(false);
@@ -61,10 +69,10 @@ export default function Dashboard() {
         <>
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <StatsCard title="Occupancy Rate" value={`${stats?.occupancy_rate || 78}%`} change="+5% from last month" icon={<Home className="w-5 h-5" />} />
-            <StatsCard title="Total Guests" value="1,248" change="+8% this month" icon={<Users className="w-5 h-5" />} />
-            <StatsCard title="ADR" value={`€${stats?.adr || 85}`} change="Above target" icon={<DollarSign className="w-5 h-5" />} />
-            <StatsCard title="RevPAR" value={`€${stats?.revpar || 65}`} change="+15% from last month" icon={<DollarSign className="w-5 h-5" />} />
+            <StatsCard title="Occupancy Rate" value={`${stats?.occupancy_rate || 0}%`} change={stats?.occupancy_rate > 0 ? "+5% from last month" : "No data"} icon={<Home className="w-5 h-5" />} />
+            <StatsCard title="Total Guests" value={stats?.total_guests?.toLocaleString() || "0"} change="+8% this month" icon={<Users className="w-5 h-5" />} />
+            <StatsCard title="ADR" value={`€${stats?.adr || 0}`} change="Above target" icon={<DollarSign className="w-5 h-5" />} />
+            <StatsCard title="RevPAR" value={`€${stats?.revpar || 0}`} change="+15% from last month" icon={<DollarSign className="w-5 h-5" />} />
           </div>
 
           {/* Charts */}
@@ -111,24 +119,24 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                <tr className="hover:bg-gray-50">
-                  <td className="px-4 py-3">John Smith</td>
-                  <td className="px-4 py-3">Double Room</td>
-                  <td className="px-4 py-3">May 1, 2026</td>
-                  <td className="px-4 py-3"><Badge variant="success">Confirmed</Badge></td>
-                </tr>
-                <tr className="hover:bg-gray-50">
-                  <td className="px-4 py-3">Sarah Johnson</td>
-                  <td className="px-4 py-3">Dorm Bed</td>
-                  <td className="px-4 py-3">May 2, 2026</td>
-                  <td className="px-4 py-3"><Badge variant="warning">Pending</Badge></td>
-                </tr>
-                <tr className="hover:bg-gray-50">
-                  <td className="px-4 py-3">Mike Brown</td>
-                  <td className="px-4 py-3">Family Room</td>
-                  <td className="px-4 py-3">May 3, 2026</td>
-                  <td className="px-4 py-3"><Badge variant="success">Confirmed</Badge></td>
-                </tr>
+                {recentBookings.length > 0 ? (
+                  recentBookings.slice(0, 5).map((booking: any, idx: number) => (
+                    <tr key={idx} className="hover:bg-gray-50">
+                      <td className="px-4 py-3">{booking.guest_name}</td>
+                      <td className="px-4 py-3">{booking.room_type}</td>
+                      <td className="px-4 py-3">{booking.check_in_date}</td>
+                      <td className="px-4 py-3">
+                        <Badge variant={booking.status === 'confirmed' ? 'success' : booking.status === 'pending' ? 'warning' : 'default'}>
+                          {booking.status}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={4} className="px-4 py-8 text-center text-gray-500">No recent bookings</td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </Card>
