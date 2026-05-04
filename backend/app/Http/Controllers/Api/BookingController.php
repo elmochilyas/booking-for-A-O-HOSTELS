@@ -97,7 +97,7 @@ class BookingController extends Controller
                     $data['check_out_date'],
                     $data['guest_count']
                 ),
-            ], 409);
+            ], 400);
         }
 
         DB::beginTransaction();
@@ -301,6 +301,34 @@ class BookingController extends Controller
             'message' => 'Check-out successful',
             'booking' => $booking,
         ]);
+    }
+
+    public function availability(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'property_id' => 'required|uuid|exists:properties,id',
+            'check_in' => 'required|date',
+            'check_out' => 'required|date|after:check_in',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $roomTypes = RoomType::where('property_id', $request->property_id)
+            ->with('rooms')
+            ->get()
+            ->filter(function ($roomType) use ($request) {
+                return ! $this->checkAvailability(
+                    $request->property_id,
+                    $roomType->id,
+                    $request->check_in,
+                    $request->check_out
+                );
+            })
+            ->values();
+
+        return response()->json(['data' => $roomTypes]);
     }
 
     private function checkAvailability(string $propertyId, string $roomTypeId, string $checkIn, string $checkOut, ?string $excludeBookingId = null): bool

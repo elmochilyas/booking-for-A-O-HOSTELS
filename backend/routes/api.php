@@ -40,6 +40,7 @@ Route::prefix('properties')->group(function () {
 
 Route::prefix('bookings')->group(function () {
     Route::get('/', [BookingController::class, 'index']);
+    Route::get('/availability', [BookingController::class, 'availability']);
     Route::get('/{id}', [BookingController::class, 'show']);
 
     Route::middleware(['auth.jwt'])->group(function () {
