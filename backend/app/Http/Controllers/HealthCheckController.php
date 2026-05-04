@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class HealthCheckController
 {
@@ -35,6 +35,7 @@ class HealthCheckController
     {
         try {
             DB::connection()->getPdo();
+
             return ['status' => 'ok', 'message' => 'Database connected'];
         } catch (\Exception $e) {
             return ['status' => 'error', 'message' => $e->getMessage()];
@@ -46,6 +47,7 @@ class HealthCheckController
         try {
             Cache::put('health_check', true, 10);
             $value = Cache::get('health_check');
+
             return ['status' => 'ok', 'message' => 'Redis connected'];
         } catch (\Exception $e) {
             return ['status' => 'error', 'message' => $e->getMessage()];
@@ -58,6 +60,7 @@ class HealthCheckController
             $testFile = storage_path('framework/testing/test.txt');
             file_put_contents($testFile, 'test');
             unlink($testFile);
+
             return ['status' => 'ok', 'message' => 'Storage writable'];
         } catch (\Exception $e) {
             return ['status' => 'error', 'message' => $e->getMessage()];
