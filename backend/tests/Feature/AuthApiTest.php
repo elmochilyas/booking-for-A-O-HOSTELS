@@ -21,7 +21,7 @@ class AuthApiTest extends TestCase
         ]);
 
         $response->assertStatus(201);
-        $response->assertJsonStructure(['message', 'user']);
+        $response->assertJsonStructure(['message', 'guest', 'access_token']);
         $this->assertDatabaseHas('guests', ['email' => 'newuser@example.com']);
     }
 

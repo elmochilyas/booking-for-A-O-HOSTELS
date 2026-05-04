@@ -14,6 +14,9 @@ class BookingApiTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected Property $property;
+    protected RoomType $roomType;
+
     protected function setUp(): void
     {
         parent::setUp();

@@ -17,7 +17,8 @@ class Guest extends Model
         'id', 'email', 'password_hash', 'first_name', 'last_name',
         'phone', 'country', 'date_of_birth', 'gender',
         'address', 'id_type', 'id_number',
-        'email_verified_at', 'is_loyalty_member', 'loyalty_points',
+        'email_verified_at', 'verification_token',
+        'is_loyalty_member', 'loyalty_points',
         'notification_email', 'notification_sms',
     ];
 
