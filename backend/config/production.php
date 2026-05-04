@@ -1,5 +1,7 @@
 <?php
 
+use Monolog\Handler\StreamHandler;
+
 return [
     'app' => [
         'name' => env('APP_NAME', 'A&O Hostels'),
@@ -131,7 +133,7 @@ return [
             'stderr' => [
                 'driver' => 'monolog',
                 'level' => env('LOG_LEVEL', 'debug'),
-                'handler' => Monolog\Handler\StreamHandler::class,
+                'handler' => StreamHandler::class,
                 'formatter' => env('LOG_STDERR_FORMATTER'),
                 'with' => [
                     'stream' => 'php://stderr',

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { 
   LayoutDashboard, Users, Building2, Bed, Calendar, CreditCard, 
@@ -14,6 +14,17 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+    if (userMenuOpen) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [userMenuOpen]);
   
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -89,7 +100,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             <button className="p-2 hover:bg-gray-100 rounded-lg relative">
               <Bell className="w-5 h-5 text-gray-600" /><span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
             </button>
-            <div className="relative">
+            <div className="relative" ref={userMenuRef}>
               <button onClick={() => setUserMenuOpen(!userMenuOpen)} className="flex items-center gap-2 p-1.5 hover:bg-gray-100 rounded-lg">
                 <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm">{(user?.first_name?.[0] || "")}{(user?.last_name?.[0] || "")}</div>
                 <span className="text-sm hidden md:block">{user?.first_name || "User"}</span>
@@ -111,7 +122,6 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         <main className="flex-1 p-4 md:p-6">{children}</main>
       </div>
       {sidebarOpen && <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={() => setSidebarOpen(false)} />}
-      {userMenuOpen && <div className="fixed inset-0 z-40" onClick={() => setUserMenuOpen(false)} />}
     </div>
   );
 }
