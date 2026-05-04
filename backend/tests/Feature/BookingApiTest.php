@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\Booking;
 use App\Models\Guest;
 use App\Models\Property;
-use App\Models\RoomType;
 use App\Models\Room;
-use App\Models\Booking;
+use App\Models\RoomType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -17,7 +17,7 @@ class BookingApiTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $property = Property::create([
             'name' => 'A&O Berlin Hauptbahnhof',
             'location' => 'Berlin',
@@ -48,7 +48,7 @@ class BookingApiTest extends TestCase
 
     public function test_search_availability_returns_available_rooms()
     {
-        $response = $this->getJson('/api/bookings/availability?property_id=' . $this->property->id . '&check_in=2026-06-01&check_out=2026-06-03');
+        $response = $this->getJson('/api/bookings/availability?property_id='.$this->property->id.'&check_in=2026-06-01&check_out=2026-06-03');
 
         $response->assertStatus(200);
         $response->assertJsonStructure(['data']);
@@ -82,7 +82,7 @@ class BookingApiTest extends TestCase
             'password' => 'password',
         ])->json()['access_token'];
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/bookings', [
                 'guest_id' => $guest->id,
                 'property_id' => $this->property->id,
@@ -129,7 +129,7 @@ class BookingApiTest extends TestCase
             'password' => 'password',
         ])->json()['access_token'];
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/bookings', [
                 'guest_id' => $guest2->id,
                 'property_id' => $this->property->id,
