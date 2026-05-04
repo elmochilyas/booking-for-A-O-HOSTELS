@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Booking extends Model
 {
@@ -13,6 +14,16 @@ class Booking extends Model
     protected $keyType = 'string';
 
     public $incrementing = false;
+
+    protected static function boot(): void
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            if (empty($model->id)) {
+                $model->id = Str::uuid()->toString();
+            }
+        });
+    }
 
     protected $fillable = [
         'id', 'guest_id', 'property_id', 'room_type_id', 'room_id',
