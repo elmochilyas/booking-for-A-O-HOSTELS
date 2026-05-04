@@ -24,16 +24,18 @@ export default function AnalyticsPage() {
       setAnalytics(response.data);
     } catch {
       setAnalytics({
-        metrics: { occupancy_rate: 78, total_revenue: 61000, adr: 85, revpar: 65, total_bookings: 312 },
-        revenue_trend: [],
+        occupancy_rate: 0,
+        total_revenue: 0,
+        adr: 0,
+        revpar: 0,
+        total_bookings: 0,
+        daily_revenue: [],
         occupancy_trend: [],
       });
     } finally {
       setLoading(false);
     }
   };
-
-  const metrics = analytics?.metrics || {};
 
   return (
     <AdminLayout>
@@ -50,18 +52,18 @@ export default function AnalyticsPage() {
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <StatsCard title="Occupancy Rate" value={`${metrics.occupancy_rate ?? 0}%`} icon={<Home className="w-5 h-5" />} />
-            <StatsCard title="Total Revenue" value={`€${(metrics.total_revenue ?? 0).toLocaleString('de-DE')}`} icon={<DollarSign className="w-5 h-5" />} />
-            <StatsCard title="ADR" value={`€${metrics.adr ?? 0}`} icon={<TrendingUp className="w-5 h-5" />} />
-            <StatsCard title="RevPAR" value={`€${metrics.revpar ?? 0}`} icon={<Users className="w-5 h-5" />} />
+            <StatsCard title="Occupancy Rate" value={`${analytics?.occupancy_rate ?? 0}%`} icon={<Home className="w-5 h-5" />} />
+            <StatsCard title="Total Revenue" value={`€${(analytics?.total_revenue ?? 0).toLocaleString('de-DE')}`} icon={<DollarSign className="w-5 h-5" />} />
+            <StatsCard title="Total Bookings" value={analytics?.total_bookings?.toString() || "0"} icon={<TrendingUp className="w-5 h-5" />} />
+            <StatsCard title="Average Transaction" value={`€${analytics?.average_transaction ?? 0}`} icon={<Users className="w-5 h-5" />} />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="p-5">
-              <h3 className="font-semibold mb-4">Revenue Trend</h3>
-              {analytics?.revenue_trend?.length > 0 ? (
+              <h3 className="font-semibold mb-4">Daily Revenue</h3>
+              {analytics?.daily_revenue?.length > 0 ? (
                 <ResponsiveContainer width="100%" height={250}>
-                  <LineChart data={analytics.revenue_trend}>
+                  <LineChart data={analytics.daily_revenue}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="date" />
                     <YAxis />

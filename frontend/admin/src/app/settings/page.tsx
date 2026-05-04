@@ -27,7 +27,7 @@ export default function SettingsPage() {
     setLoading(true);
     try {
       const response = await adminApi.getSystemConfig();
-      const items: ConfigItem[] = response.data.config || [];
+      const items: ConfigItem[] = response.data.data || [];
       setConfig(items);
       const initial: Record<string, string> = {};
       items.forEach(item => { initial[item.key] = item.value; });

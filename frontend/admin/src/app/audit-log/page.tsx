@@ -6,7 +6,7 @@ import { AdminLayout, PageHeader, Card, DataTable } from "../components/AdminCom
 
 interface AuditLog {
   id: string;
-  staff_name: string;
+  staff: string;
   action: string;
   entity_type: string;
   entity_id: string;
@@ -42,7 +42,7 @@ export default function AuditLogPage() {
 
   const columns = [
     { key: "created_at", label: "Time", render: (item: AuditLog) => new Date(item.created_at).toLocaleString('de-DE') },
-    { key: "staff_name", label: "Staff" },
+    { key: "staff", label: "Staff" },
     { key: "action", label: "Action" },
     { key: "entity_type", label: "Entity" },
     { key: "entity_id", label: "Entity ID", render: (item: AuditLog) => <span className="font-mono text-xs">{item.entity_id}</span> },
