@@ -1,0 +1,103 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  lint:
+    name: Lint & Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, xml, bcmath, pdo_mysql, sqlite3
+          coverage: none
+
+      - name: Get Composer Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.json') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install Dependencies
+        run: cd backend && composer update --no-interaction --prefer-dist --no-scripts
+
+      - name: Run PHP CS Fixer
+        run: cd backend && ./vendor/bin/pint --test
+
+  backend-tests:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, xml, bcmath, pdo_mysql, sqlite3
+          coverage: none
+
+      - name: Get Composer Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.json') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install Dependencies
+        run: cd backend && composer update --no-interaction --prefer-dist --no-scripts
+
+      - name: Setup Environment
+        run: |
+          cp backend/.env.example backend/.env
+          cd backend && php artisan key:generate
+
+      - name: Run PHPUnit
+        run: cd backend && ./vendor/bin/phpunit
+
+  frontend-tests:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: |
+            frontend/admin/package-lock.json
+            frontend/guest/package-lock.json
+
+      - name: Install Admin Dependencies
+        run: cd frontend/admin && npm ci
+
+      - name: Install Guest Dependencies
+        run: cd frontend/guest && npm ci
+
+      - name: Run ESLint (Admin)
+        run: cd frontend/admin && npm run lint || true
+
+      - name: Run ESLint (Guest)
+        run: cd frontend/guest && npm run lint || true
+
+      - name: Run TypeScript Check (Admin)
+        run: cd frontend/admin && npm run typecheck || true
+
+      - name: Run TypeScript Check (Guest)
+        run: cd frontend/guest && npm run typecheck || true

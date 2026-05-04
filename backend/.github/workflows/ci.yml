@@ -1,0 +1,99 @@
+name: Laravel CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  laravel-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: ao_hostels_test
+          MYSQL_USER: test
+          MYSQL_PASSWORD: test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, bcmath, pdo, pdo_mysql
+
+      - name: Install dependencies
+        run: |
+          rm -f backend/composer.lock
+          cd backend
+          composer update --prefer-lowest --no-interaction
+
+      - name: Copy environment file
+        run: |
+          cd backend
+          cp .env.example .env
+
+      - name: Generate application key
+        run: |
+          cd backend
+          php artisan key:generate
+
+      - name: Directory permissions
+        run: |
+          cd backend
+          chmod -R 775 storage bootstrap/cache
+
+      - name: Run migrations
+        run: |
+          cd backend
+          php artisan migrate --force
+
+      - name: Run tests
+        run: |
+          cd backend
+          php artisan test --coverage
+
+      - name: Run Pint (code style)
+        run: |
+          cd backend
+          vendor/bin/pint --test
+
+      - name: Run PHPStan (static analysis)
+        run: |
+          cd backend
+          vendor/bin/phpstan analyse
+
+  lint-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Install Pint
+        run: |
+          cd backend
+          composer update laravel/pint --prefer-lowest --no-interaction --dev
+
+      - name: Run Pint
+        run: |
+          cd backend
+          vendor/bin/pint --test

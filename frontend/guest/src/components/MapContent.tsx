@@ -1,0 +1,94 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import type { LatLngExpression } from 'leaflet'
+import L from 'leaflet'
+
+import 'leaflet/dist/leaflet.css'
+
+interface MapMarker {
+  id: string
+  name: string
+  city: string
+  country: string
+  latitude: number
+  longitude: number
+  priceFrom: number
+}
+
+interface MapContentProps {
+  markers: MapMarker[]
+  center?: [number, number]
+  zoom?: number
+}
+
+function createCustomIcon() {
+  return L.icon({
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41],
+  })
+}
+
+export default function MapContent({ markers, center = [50.5, 10], zoom = 4 }: MapContentProps) {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    
+    delete (L.Icon.Default.prototype as any)._getIconUrl
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+      iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+    })
+  }, [])
+
+  if (!mounted) {
+    return (
+      <div className="w-full h-[500px] bg-muted animate-pulse rounded-2xl flex items-center justify-center">
+        <span className="text-muted-foreground">Loading map...</span>
+      </div>
+    )
+  }
+
+  const defaultCenter: LatLngExpression = center
+  const defaultZoom = zoom
+  const customIcon = createCustomIcon()
+
+  return (
+    <MapContainer
+      center={defaultCenter}
+      zoom={defaultZoom}
+      style={{ height: '500px', width: '100%', borderRadius: '1rem' }}
+      scrollWheelZoom={true}
+    >
+      <TileLayer
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+      {markers
+        .filter(m => m.latitude && m.longitude)
+        .map((marker) => (
+          <Marker
+            key={marker.id}
+            position={[marker.latitude, marker.longitude] as LatLngExpression}
+            icon={customIcon}
+          >
+            <Popup>
+              <div className="text-center min-w-[150px] p-1">
+                <strong className="block text-sm font-semibold">{marker.name}</strong>
+                <span className="text-xs text-muted-foreground">{marker.city}, {marker.country}</span>
+                <div className="text-orange-600 font-bold text-sm mt-1">from €{Math.round(marker.priceFrom)}</div>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+    </MapContainer>
+  )
+}
