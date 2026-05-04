@@ -4,7 +4,6 @@
  * Full API Integration Test Suite
  * Run: php run_tests.php
  */
-
 $BASE = 'http://localhost:8000/api';
 $results = [];
 $tokens = [];
@@ -30,6 +29,7 @@ function req(string $method, string $url, array $body = [], array $headers = [])
     curl_close($ch);
 
     $data = json_decode($raw, true);
+
     return ['code' => $code, 'body' => $data, 'raw' => $raw];
 }
 
@@ -37,14 +37,14 @@ function pass(string $name, string $note = ''): void
 {
     global $results;
     $results[] = ['status' => 'PASS', 'name' => $name, 'note' => $note];
-    echo "\033[32m  ✓ PASS\033[0m  {$name}" . ($note ? "  ({$note})" : '') . "\n";
+    echo "\033[32m  ✓ PASS\033[0m  {$name}".($note ? "  ({$note})" : '')."\n";
 }
 
 function fail(string $name, string $note = ''): void
 {
     global $results;
     $results[] = ['status' => 'FAIL', 'name' => $name, 'note' => $note];
-    echo "\033[31m  ✗ FAIL\033[0m  {$name}" . ($note ? "  ({$note})" : '') . "\n";
+    echo "\033[31m  ✗ FAIL\033[0m  {$name}".($note ? "  ({$note})" : '')."\n";
 }
 
 function section(string $title): void
@@ -55,6 +55,7 @@ function section(string $title): void
 function auth(string $key): array
 {
     global $tokens;
+
     return isset($tokens[$key]) ? ["Authorization: Bearer {$tokens[$key]}"] : [];
 }
 
@@ -62,9 +63,11 @@ function assertCode(int $expected, array $res, string $name, string $note = ''):
 {
     if ($res['code'] === $expected) {
         pass($name, $note ?: "HTTP {$res['code']}");
+
         return true;
     }
-    fail($name, "Expected HTTP {$expected}, got {$res['code']}. " . substr($res['raw'] ?? '', 0, 120));
+    fail($name, "Expected HTTP {$expected}, got {$res['code']}. ".substr($res['raw'] ?? '', 0, 120));
+
     return false;
 }
 
@@ -72,9 +75,11 @@ function assertKey(array $res, string $key, string $name): bool
 {
     if (isset($res['body'][$key])) {
         pass($name, "key '{$key}' present");
+
         return true;
     }
     fail($name, "Missing key '{$key}' in response");
+
     return false;
 }
 
@@ -115,7 +120,7 @@ if (! empty($PROP_ID)) {
     if (assertCode(200, $res, 'GET /properties/{id}/room-types')) {
         $rts = $res['body']['room_types'] ?? [];
         $RT_ID = $rts[0]['id'] ?? null;
-        pass('Room types returned', 'count=' . count($rts));
+        pass('Room types returned', 'count='.count($rts));
     }
 
     // Availability
@@ -131,7 +136,7 @@ if (! empty($PROP_ID)) {
 
 section('2. Guest Authentication');
 
-$guestEmail = 'testguest_' . time() . '@example.com';
+$guestEmail = 'testguest_'.time().'@example.com';
 
 $res = req('POST', "$BASE/auth/register", [
     'first_name' => 'Test',
@@ -229,7 +234,7 @@ if (assertCode(200, $res, 'GET /admin/properties')) {
 
 // Create property
 $res = req('POST', "$BASE/admin/properties", [
-    'name' => 'Test Property ' . time(),
+    'name' => 'Test Property '.time(),
     'location' => 'Test City',
     'address' => '123 Test Street',
 ], auth('superadmin'));
@@ -270,7 +275,7 @@ if (assertCode(200, $res, 'GET /admin/rooms')) {
     pass('Rooms total', "total={$roomTotal}");
     $statusCounts = $res['body']['status_counts'] ?? null;
     if ($statusCounts) {
-        pass('status_counts present in response', 'available=' . ($statusCounts['available'] ?? '?'));
+        pass('status_counts present in response', 'available='.($statusCounts['available'] ?? '?'));
     } else {
         fail('status_counts missing from GET /admin/rooms response');
     }
@@ -299,7 +304,7 @@ if (! empty($ROOM_ID)) {
 // Room types
 $res = req('GET', "$BASE/admin/room-types", [], auth('superadmin'));
 if (assertCode(200, $res, 'GET /admin/room-types')) {
-    pass('Room types list', 'count=' . count($res['body']['data'] ?? []));
+    pass('Room types list', 'count='.count($res['body']['data'] ?? []));
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -310,7 +315,7 @@ section('7. Admin — Bookings');
 
 $res = req('GET', "$BASE/admin/bookings", [], auth('superadmin'));
 if (assertCode(200, $res, 'GET /admin/bookings')) {
-    pass('Bookings list', 'total=' . ($res['body']['pagination']['total'] ?? 0));
+    pass('Bookings list', 'total='.($res['body']['pagination']['total'] ?? 0));
     $BOOKING_ID = $res['body']['data'][0]['id'] ?? null;
 }
 
@@ -348,7 +353,7 @@ section('9. Admin — Guests');
 
 $res = req('GET', "$BASE/admin/guests", [], auth('superadmin'));
 if (assertCode(200, $res, 'GET /admin/guests')) {
-    pass('Guests list', 'total=' . ($res['body']['pagination']['total'] ?? 0));
+    pass('Guests list', 'total='.($res['body']['pagination']['total'] ?? 0));
     $GUEST_ID = $res['body']['data'][0]['id'] ?? null;
 }
 
@@ -382,7 +387,7 @@ section('11. Admin — Promotions');
 $res = req('GET', "$BASE/admin/promotions", [], auth('superadmin'));
 assertCode(200, $res, 'GET /admin/promotions');
 
-$promoCode = 'TESTCODE' . rand(1000, 9999);
+$promoCode = 'TESTCODE'.rand(1000, 9999);
 $res = req('POST', "$BASE/admin/promotions", [
     'code' => $promoCode,
     'discount_type' => 'percentage',
@@ -414,7 +419,7 @@ assertCode(200, $res, 'GET /admin/extras');
 
 // per_stay should work now
 $res = req('POST', "$BASE/admin/extras", [
-    'name' => 'Test Extra ' . time(),
+    'name' => 'Test Extra '.time(),
     'price' => 5.00,
     'price_type' => 'per_stay',
     'property_id' => $ADMIN_PROP_ID,
@@ -487,13 +492,13 @@ section('14. Admin — Email Templates');
 
 $res = req('GET', "$BASE/admin/email-templates", [], auth('superadmin'));
 if (assertCode(200, $res, 'GET /admin/email-templates (table now exists)')) {
-    pass('Email templates count', 'count=' . count($res['body']['data'] ?? []));
+    pass('Email templates count', 'count='.count($res['body']['data'] ?? []));
     $TEMPLATE_ID = $res['body']['data'][0]['id'] ?? null;
 }
 
 if (! empty($TEMPLATE_ID)) {
     $res = req('PUT', "$BASE/admin/email-templates/{$TEMPLATE_ID}", [
-        'subject' => 'Updated Subject ' . time(),
+        'subject' => 'Updated Subject '.time(),
     ], auth('superadmin'));
     assertCode(200, $res, 'PUT /admin/email-templates/{id} — update');
 }
@@ -560,7 +565,7 @@ if ($managerBookingsCode === 200) {
 } elseif ($managerBookingsCode === 403) {
     pass('Manager correctly denied /admin/bookings (below required role)', 'HTTP 403 expected');
 } else {
-    fail('Manager /admin/bookings — unexpected HTTP ' . $managerBookingsCode);
+    fail('Manager /admin/bookings — unexpected HTTP '.$managerBookingsCode);
 }
 
 // Superadmin should access everything
@@ -599,7 +604,7 @@ if ($failed > 0) {
 echo "\n";
 
 // Write results to JSON for the report
-file_put_contents(__DIR__ . '/test_results.json', json_encode([
+file_put_contents(__DIR__.'/test_results.json', json_encode([
     'run_at' => date('Y-m-d H:i:s'),
     'passed' => $passed,
     'failed' => $failed,
