@@ -26,7 +26,7 @@ return new class extends Migration
             $table->timestamp('actual_check_in')->nullable();
             $table->timestamp('actual_check_out')->nullable();
             $table->timestamps();
-            
+
             $table->foreign('guest_id')->references('id')->on('guests')->onDelete('cascade');
             $table->foreign('property_id')->references('id')->on('properties')->onDelete('cascade');
             $table->foreign('room_type_id')->references('id')->on('room_types')->onDelete('cascade');

@@ -8,18 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('admin_permissions', function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->unique();
+        Schema::create('email_templates', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->string('name');
             $table->string('slug')->unique();
-            $table->string('module');
-            $table->string('description')->nullable();
+            $table->string('subject');
+            $table->text('body');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('admin_permissions');
+        Schema::dropIfExists('email_templates');
     }
 };

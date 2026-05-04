@@ -19,7 +19,7 @@ return new class extends Migration
             $table->json('amenities')->nullable();
             $table->integer('max_occupancy')->nullable();
             $table->timestamps();
-            
+
             $table->foreign('property_id')->references('id')->on('properties')->onDelete('cascade');
             $table->index('property_id');
         });

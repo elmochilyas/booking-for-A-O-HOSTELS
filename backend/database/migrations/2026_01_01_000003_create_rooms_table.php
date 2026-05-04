@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('view', 50)->nullable();
             $table->string('window_type', 50)->nullable();
             $table->timestamps();
-            
+
             $table->foreign('property_id')->references('id')->on('properties')->onDelete('cascade');
             $table->foreign('room_type_id')->references('id')->on('room_types')->onDelete('cascade');
             $table->index('property_id');
