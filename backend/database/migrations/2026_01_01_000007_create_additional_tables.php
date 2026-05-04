@@ -19,7 +19,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->timestamp('last_login')->nullable();
             $table->timestamps();
-            
+
             $table->foreign('property_id')->references('id')->on('properties')->onDelete('set null');
             $table->index('property_id');
         });
@@ -33,7 +33,7 @@ return new class extends Migration
             $table->string('icon', 50)->nullable();
             $table->boolean('is_free')->default(true);
             $table->timestamps();
-            
+
             $table->foreign('property_id')->references('id')->on('properties')->onDelete('cascade');
         });
 
@@ -46,7 +46,7 @@ return new class extends Migration
             $table->enum('price_type', ['per_stay', 'per_night', 'per_person'])->default('per_stay');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-            
+
             $table->foreign('property_id')->references('id')->on('properties')->onDelete('cascade');
         });
 
@@ -57,7 +57,7 @@ return new class extends Migration
             $table->integer('quantity')->default(1);
             $table->decimal('price', 10, 2);
             $table->timestamps();
-            
+
             $table->foreign('booking_id')->references('id')->on('bookings')->onDelete('cascade');
             $table->foreign('extra_id')->references('id')->on('extras')->onDelete('cascade');
         });
@@ -78,7 +78,7 @@ return new class extends Migration
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->text('moderation_notes')->nullable();
             $table->timestamps();
-            
+
             $table->foreign('booking_id')->references('id')->on('bookings')->onDelete('cascade');
             $table->foreign('guest_id')->references('id')->on('guests')->onDelete('cascade');
             $table->foreign('property_id')->references('id')->on('properties')->onDelete('cascade');
@@ -94,7 +94,7 @@ return new class extends Migration
             $table->decimal('fixed_price', 10, 2)->nullable();
             $table->integer('min_nights')->nullable();
             $table->timestamps();
-            
+
             $table->foreign('property_id')->references('id')->on('properties')->onDelete('cascade');
             $table->foreign('room_type_id')->references('id')->on('room_types')->onDelete('cascade');
         });
@@ -115,7 +115,7 @@ return new class extends Migration
             $table->integer('usage_limit')->nullable();
             $table->integer('usage_count')->default(0);
             $table->timestamps();
-            
+
             $table->foreign('property_id')->references('id')->on('properties')->onDelete('cascade');
         });
     }

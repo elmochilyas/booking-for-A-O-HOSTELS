@@ -24,8 +24,8 @@ return new class extends Migration
         Schema::table('staff', function (Blueprint $table) {
             $table->dropForeign(['admin_role_id']);
             $table->dropColumn([
-                'admin_role_id', 'two_factor_secret', 'two_factor_enabled', 
-                'last_login_at', 'last_login_ip', 'permissions', 'assigned_properties'
+                'admin_role_id', 'two_factor_secret', 'two_factor_enabled',
+                'last_login_at', 'last_login_ip', 'permissions', 'assigned_properties',
             ]);
         });
     }

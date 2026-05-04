@@ -27,7 +27,7 @@ return new class extends Migration
             $table->boolean('notification_email')->default(true);
             $table->boolean('notification_sms')->default(false);
             $table->timestamps();
-            
+
             $table->index('email');
         });
     }

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('failure_message')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
-            
+
             $table->foreign('booking_id')->references('id')->on('bookings')->onDelete('cascade');
             $table->index('booking_id');
             $table->index('status');
