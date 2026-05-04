@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Guest;
+use App\Models\Staff;
 use App\Services\JwtService;
 use Closure;
 use Illuminate\Http\Request;
@@ -16,28 +18,28 @@ class JwtAuthenticate
     public function handle(Request $request, Closure $next): Response
     {
         $token = $request->bearerToken();
-        
-        if (!$token) {
+
+        if (! $token) {
             return response()->json(['error' => 'Token not provided'], 401);
         }
 
         try {
             $decoded = $this->jwtService->verifyToken($token);
-            
+
             if ($decoded->type === 'guest') {
-                $guest = \App\Models\Guest::find($decoded->sub);
-                if (!$guest) {
+                $guest = Guest::find($decoded->sub);
+                if (! $guest) {
                     return response()->json(['error' => 'User not found'], 401);
                 }
-                $request->setUserResolver(fn() => $guest);
+                $request->setUserResolver(fn () => $guest);
             } elseif ($decoded->type === 'staff') {
-                $staff = \App\Models\Staff::find($decoded->sub);
-                if (!$staff) {
+                $staff = Staff::find($decoded->sub);
+                if (! $staff) {
                     return response()->json(['error' => 'User not found'], 401);
                 }
-                $request->setUserResolver(fn() => $staff);
+                $request->setUserResolver(fn () => $staff);
             }
-            
+
         } catch (\Exception $e) {
             return response()->json(['error' => 'Invalid or expired token'], 401);
         }
