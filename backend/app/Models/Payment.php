@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Payment extends Model
 {
     protected $table = 'payments';
+
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [

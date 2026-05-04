@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class SystemConfig extends Model
 {
     protected $table = 'system_config';
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -22,8 +23,8 @@ class SystemConfig extends Model
     public static function get(string $key, mixed $default = null): mixed
     {
         $config = self::where('key', $key)->first();
-        
-        if (!$config) {
+
+        if (! $config) {
             return $default;
         }
 

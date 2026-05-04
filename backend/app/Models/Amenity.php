@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Amenity extends Model
 {
     protected $table = 'amenities';
+
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [

@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Guest extends Model
 {
     protected $table = 'guests';
+
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [

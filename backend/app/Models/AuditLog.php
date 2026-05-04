@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class AuditLog extends Model
 {
     protected $table = 'audit_logs';
+
     public $timestamps = false;
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -40,7 +42,7 @@ class AuditLog extends Model
         ?string $staffId = null
     ): self {
         $request = request();
-        
+
         return self::create([
             'staff_id' => $staffId ?? auth()->id(),
             'action' => $action,
