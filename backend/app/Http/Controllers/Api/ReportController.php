@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Property;
-use App\Models\Payment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,8 +14,8 @@ class ReportController extends Controller
     public function analytics(Request $request): JsonResponse
     {
         $propertyId = $request->property_id ?? Property::first()->id ?? null;
-        
-        if (!$propertyId) {
+
+        if (! $propertyId) {
             return response()->json(['error' => 'No property found'], 404);
         }
 
@@ -66,8 +65,8 @@ class ReportController extends Controller
     public function reports(Request $request): JsonResponse
     {
         $propertyId = $request->property_id ?? Property::first()->id ?? null;
-        
-        if (!$propertyId) {
+
+        if (! $propertyId) {
             return response()->json(['error' => 'No property found'], 404);
         }
 
@@ -95,9 +94,9 @@ class ReportController extends Controller
     {
         $property = Property::find($propertyId);
         $totalRooms = $property->total_rooms ?? 1;
-        
+
         $days = (strtotime($end) - strtotime($start)) / (60 * 60 * 24) + 1;
-        
+
         $occupiedRoomNights = Booking::where('property_id', $propertyId)
             ->whereIn('status', ['confirmed', 'checked_in', 'completed'])
             ->where(function ($query) use ($start, $end) {
@@ -105,15 +104,15 @@ class ReportController extends Controller
                     ->orWhereBetween('check_out_date', [$start, $end])
                     ->orWhere(function ($q) use ($start, $end) {
                         $q->where('check_in_date', '<=', $start)
-                          ->where('check_out_date', '>=', $end);
+                            ->where('check_out_date', '>=', $end);
                     });
             })
             ->count();
 
         $availableRoomNights = $totalRooms * $days;
-        
-        return $availableRoomNights > 0 
-            ? round(($occupiedRoomNights / $availableRoomNights) * 100, 2) 
+
+        return $availableRoomNights > 0
+            ? round(($occupiedRoomNights / $availableRoomNights) * 100, 2)
             : 0;
     }
 
@@ -142,7 +141,7 @@ class ReportController extends Controller
         $property = Property::find($propertyId);
         $totalRooms = $property->total_rooms ?? 1;
         $days = (strtotime($end) - strtotime($start)) / (60 * 60 * 24) + 1;
-        
+
         return round($revenue / ($totalRooms * $days), 2);
     }
 

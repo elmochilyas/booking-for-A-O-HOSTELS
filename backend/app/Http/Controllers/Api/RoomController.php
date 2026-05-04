@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
 use App\Models\Room;
 use App\Models\RoomType;
-use App\Models\Booking;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -60,7 +59,7 @@ class RoomController extends Controller
                     ->orWhereBetween('check_out_date', [$checkIn, $checkOut])
                     ->orWhere(function ($q) use ($checkIn, $checkOut) {
                         $q->where('check_in_date', '<=', $checkIn)
-                          ->where('check_out_date', '>=', $checkOut);
+                            ->where('check_out_date', '>=', $checkOut);
                     });
             })
             ->pluck('room_type_id')
@@ -75,10 +74,10 @@ class RoomController extends Controller
                 $availableRooms = Room::where('room_type_id', $roomType->id)
                     ->where('status', 'available')
                     ->count();
-                
+
                 $roomType->available_count = $availableRooms;
                 $roomType->base_price = $this->calculatePrice($roomType->base_price, $checkIn, $checkOut);
-                
+
                 return $roomType;
             });
 
@@ -92,6 +91,7 @@ class RoomController extends Controller
     private function calculatePrice(float $basePrice, string $checkIn, string $checkOut): float
     {
         $nights = (strtotime($checkOut) - strtotime($checkIn)) / (60 * 60 * 24);
+
         return $basePrice * $nights;
     }
 
@@ -117,8 +117,8 @@ class RoomController extends Controller
     public function show(string $id): JsonResponse
     {
         $room = Room::with(['roomType', 'property'])->find($id);
-        
-        if (!$room) {
+
+        if (! $room) {
             return response()->json(['error' => 'Room not found'], 404);
         }
 
@@ -156,8 +156,8 @@ class RoomController extends Controller
     public function update(Request $request, string $id): JsonResponse
     {
         $room = Room::find($id);
-        
-        if (!$room) {
+
+        if (! $room) {
             return response()->json(['error' => 'Room not found'], 404);
         }
 
@@ -182,8 +182,8 @@ class RoomController extends Controller
     public function destroy(string $id): JsonResponse
     {
         $room = Room::find($id);
-        
-        if (!$room) {
+
+        if (! $room) {
             return response()->json(['error' => 'Room not found'], 404);
         }
 

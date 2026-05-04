@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Staff;
 use App\Models\Booking;
-use App\Models\Property;
+use App\Models\Staff;
 use App\Services\JwtService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -22,7 +21,7 @@ class StaffController extends Controller
     public function index(Request $request): JsonResponse
     {
         $staff = Staff::where('property_id', $request->property_id ?? null)->get();
-        
+
         return response()->json(['staff' => $staff]);
     }
 
@@ -57,8 +56,8 @@ class StaffController extends Controller
     public function update(Request $request, string $id): JsonResponse
     {
         $staff = Staff::find($id);
-        
-        if (!$staff) {
+
+        if (! $staff) {
             return response()->json(['error' => 'Staff not found'], 404);
         }
 
@@ -91,8 +90,8 @@ class StaffController extends Controller
     public function destroy(string $id): JsonResponse
     {
         $staff = Staff::find($id);
-        
-        if (!$staff) {
+
+        if (! $staff) {
             return response()->json(['error' => 'Staff not found'], 404);
         }
 
@@ -114,15 +113,17 @@ class StaffController extends Controller
 
         $staff = Staff::where('email', $request->email)->first();
 
-        if (!$staff || !Hash::check($request->password, $staff->password_hash)) {
+        if (! $staff || ! Hash::check($request->password, $staff->password_hash)) {
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
 
-        if (!$staff->is_active) {
+        if (! $staff->is_active) {
             return response()->json(['error' => 'Account is deactivated'], 403);
         }
 
         $token = $this->jwtService->generateStaffToken($staff);
+
+        $staff->update(['last_login_at' => now()]);
 
         return response()->json([
             'message' => 'Login successful',
@@ -132,10 +133,25 @@ class StaffController extends Controller
         ]);
     }
 
+    public function logout(Request $request): JsonResponse
+    {
+        $token = $request->bearerToken();
+
+        if ($token) {
+            try {
+                $decoded = $this->jwtService->verifyToken($token);
+                $this->jwtService->blacklistToken($token, $decoded->exp ?? (time() + 3600));
+            } catch (\Exception $e) {
+            }
+        }
+
+        return response()->json(['message' => 'Logged out successfully']);
+    }
+
     public function dashboard(Request $request): JsonResponse
     {
         $staff = $request->user();
-        
+
         $propertyId = $staff->property_id;
         $today = now()->toDateString();
         $tomorrow = now()->addDay()->toDateString();
@@ -211,7 +227,7 @@ class StaffController extends Controller
         $booking = Booking::with(['guest', 'property', 'roomType', 'payments'])
             ->find($id);
 
-        if (!$booking) {
+        if (! $booking) {
             return response()->json(['error' => 'Booking not found'], 404);
         }
 
