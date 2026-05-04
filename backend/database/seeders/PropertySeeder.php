@@ -2,80 +2,83 @@
 
 namespace Database\Seeders;
 
-use App\Models\Property;
-use App\Models\RoomType;
-use App\Models\Room;
 use App\Models\Amenity;
 use App\Models\Extra;
+use App\Models\Property;
+use App\Models\RoomType;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class PropertySeeder extends Seeder
 {
-    private const BASE_DORM    = 19.00;
-    private const BASE_FEMALE  = 22.00;
+    private const BASE_DORM = 19.00;
+
+    private const BASE_FEMALE = 22.00;
+
     private const BASE_PRIVATE = 49.00;
-    private const BASE_TRIPLE  = 75.00;
-    private const BASE_FAMILY  = 105.00;
+
+    private const BASE_TRIPLE = 75.00;
+
+    private const BASE_FAMILY = 105.00;
 
     private const PRICE_TIERS = [
-        'London'    => 1.85,
+        'London' => 1.85,
         'Amsterdam' => 1.55,
-        'Vienna'    => 1.30,
-        'Salzburg'  => 1.30,
-        'Munich'    => 1.25,
+        'Vienna' => 1.30,
+        'Salzburg' => 1.30,
+        'Munich' => 1.25,
         'Frankfurt' => 1.20,
-        'Hamburg'   => 1.20,
-        'Berlin'    => 1.20,
-        'Cologne'   => 1.15,
-        'Düsseldorf'=> 1.15,
+        'Hamburg' => 1.20,
+        'Berlin' => 1.20,
+        'Cologne' => 1.15,
+        'Düsseldorf' => 1.15,
         'Edinburgh' => 1.25,
-        'Brighton'  => 1.20,
-        'Manchester'=> 1.15,
-        'Milan'     => 1.25,
-        'Florence'  => 1.20,
-        'Venice'    => 1.35,
-        'Brussels'  => 1.15,
-        'Antwerp'   => 1.10,
-        'Copenhagen'=> 1.40,
-        'Prague'    => 0.80,
-        'Budapest'  => 0.80,
-        'Warsaw'    => 0.75,
+        'Brighton' => 1.20,
+        'Manchester' => 1.15,
+        'Milan' => 1.25,
+        'Florence' => 1.20,
+        'Venice' => 1.35,
+        'Brussels' => 1.15,
+        'Antwerp' => 1.10,
+        'Copenhagen' => 1.40,
+        'Prague' => 0.80,
+        'Budapest' => 0.80,
+        'Warsaw' => 0.75,
     ];
 
     private const CITY_IMAGES = [
-        'Berlin'     => 'https://cdn.aohostels.com/img/cities/webp/3.webp',
-        'Hamburg'    => 'https://cdn.aohostels.com/img/cities/webp/5.webp',
-        'Munich'     => 'https://cdn.aohostels.com/img/cities/webp/10.webp',
-        'Vienna'     => 'https://cdn.aohostels.com/img/cities/webp/13.webp',
-        'Prague'     => 'https://cdn.aohostels.com/img/cities/webp/7.webp',
-        'Amsterdam'  => 'https://cdn.aohostels.com/img/cities/webp/1.webp',
-        'London'     => 'https://cdn.aohostels.com/img/cities/webp/32.webp',
-        'Cologne'    => 'https://cdn.aohostels.com/img/cities/webp/19.webp',
-        'Salzburg'   => 'https://cdn.aohostels.com/img/cities/webp/20.webp',
-        'Budapest'   => 'https://cdn.aohostels.com/img/cities/webp/24.webp',
+        'Berlin' => 'https://cdn.aohostels.com/img/cities/webp/3.webp',
+        'Hamburg' => 'https://cdn.aohostels.com/img/cities/webp/5.webp',
+        'Munich' => 'https://cdn.aohostels.com/img/cities/webp/10.webp',
+        'Vienna' => 'https://cdn.aohostels.com/img/cities/webp/13.webp',
+        'Prague' => 'https://cdn.aohostels.com/img/cities/webp/7.webp',
+        'Amsterdam' => 'https://cdn.aohostels.com/img/cities/webp/1.webp',
+        'London' => 'https://cdn.aohostels.com/img/cities/webp/32.webp',
+        'Cologne' => 'https://cdn.aohostels.com/img/cities/webp/19.webp',
+        'Salzburg' => 'https://cdn.aohostels.com/img/cities/webp/20.webp',
+        'Budapest' => 'https://cdn.aohostels.com/img/cities/webp/24.webp',
         'Copenhagen' => 'https://cdn.aohostels.com/img/cities/webp/8.webp',
-        'Edinburgh'  => 'https://cdn.aohostels.com/img/cities/webp/25.webp',
-        'Brighton'   => 'https://cdn.aohostels.com/img/cities/webp/28.webp',
-        'Brussels'   => 'https://cdn.aohostels.com/img/cities/webp/30.webp',
-        'Florence'   => 'https://cdn.aohostels.com/img/cities/webp/27.webp',
-        'Milan'      => 'https://cdn.aohostels.com/img/cities/webp/31.webp',
-        'Venice'     => 'https://cdn.aohostels.com/img/cities/webp/12.webp',
-        'Frankfurt'  => 'https://cdn.aohostels.com/img/cities/webp/17.webp',
-        'Leipzig'    => 'https://cdn.aohostels.com/img/cities/webp/16.webp',
-        'Aachen'     => 'https://cdn.aohostels.com/img/cities/webp/1.webp',
-        'Antwerp'    => 'https://cdn.aohostels.com/img/cities/webp/29.webp',
-        'Bremen'     => 'https://cdn.aohostels.com/img/cities/webp/4.webp',
-        'Dortmund'   => 'https://cdn.aohostels.com/img/cities/webp/15.webp',
-        'Dresden'    => 'https://cdn.aohostels.com/img/cities/webp/9.webp',
+        'Edinburgh' => 'https://cdn.aohostels.com/img/cities/webp/25.webp',
+        'Brighton' => 'https://cdn.aohostels.com/img/cities/webp/28.webp',
+        'Brussels' => 'https://cdn.aohostels.com/img/cities/webp/30.webp',
+        'Florence' => 'https://cdn.aohostels.com/img/cities/webp/27.webp',
+        'Milan' => 'https://cdn.aohostels.com/img/cities/webp/31.webp',
+        'Venice' => 'https://cdn.aohostels.com/img/cities/webp/12.webp',
+        'Frankfurt' => 'https://cdn.aohostels.com/img/cities/webp/17.webp',
+        'Leipzig' => 'https://cdn.aohostels.com/img/cities/webp/16.webp',
+        'Aachen' => 'https://cdn.aohostels.com/img/cities/webp/1.webp',
+        'Antwerp' => 'https://cdn.aohostels.com/img/cities/webp/29.webp',
+        'Bremen' => 'https://cdn.aohostels.com/img/cities/webp/4.webp',
+        'Dortmund' => 'https://cdn.aohostels.com/img/cities/webp/15.webp',
+        'Dresden' => 'https://cdn.aohostels.com/img/cities/webp/9.webp',
         'Düsseldorf' => 'https://cdn.aohostels.com/img/cities/webp/14.webp',
-        'Graz'       => 'https://cdn.aohostels.com/img/cities/webp/6.webp',
-        'Nuremberg'  => 'https://cdn.aohostels.com/img/cities/webp/21.webp',
-        'Rotterdam'   => 'https://cdn.aohostels.com/img/cities/webp/26.webp',
-        'Stuttgart'   => 'https://cdn.aohostels.com/img/cities/webp/11.webp',
-        'Weimar'      => 'https://cdn.aohostels.com/img/cities/webp/22.webp',
-        'Warsaw'      => 'https://cdn.aohostels.com/img/cities/webp/23.webp',
+        'Graz' => 'https://cdn.aohostels.com/img/cities/webp/6.webp',
+        'Nuremberg' => 'https://cdn.aohostels.com/img/cities/webp/21.webp',
+        'Rotterdam' => 'https://cdn.aohostels.com/img/cities/webp/26.webp',
+        'Stuttgart' => 'https://cdn.aohostels.com/img/cities/webp/11.webp',
+        'Weimar' => 'https://cdn.aohostels.com/img/cities/webp/22.webp',
+        'Warsaw' => 'https://cdn.aohostels.com/img/cities/webp/23.webp',
     ];
 
     private const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800';
@@ -97,24 +100,24 @@ class PropertySeeder extends Seeder
             $tier = self::PRICE_TIERS[$city] ?? 1.0;
 
             Property::create([
-                'id'             => $propertyId,
-                'name'           => $data['name'],
-                'location'       => $city,
-                'address'        => $data['address'],
-                'latitude'       => $data['latitude'],
-                'longitude'      => $data['longitude'],
-                'check_in_time'  => '15:00:00',
+                'id' => $propertyId,
+                'name' => $data['name'],
+                'location' => $city,
+                'address' => $data['address'],
+                'latitude' => $data['latitude'],
+                'longitude' => $data['longitude'],
+                'check_in_time' => '15:00:00',
                 'check_out_time' => '10:00:00',
-                'total_rooms'    => $data['rooms'] ?? rand(60, 120),
-                'description'    => $data['description'],
-                'phone'          => $data['phone'],
-                'email'          => $data['email'],
-                'images'         => json_encode([[
+                'total_rooms' => $data['rooms'] ?? rand(60, 120),
+                'description' => $data['description'],
+                'phone' => $data['phone'],
+                'email' => $data['email'],
+                'images' => json_encode([[
                     'url' => self::CITY_IMAGES[$city] ?? self::FALLBACK_IMAGE,
                     'alt' => $data['name'],
                 ]]),
-                'rating'         => $data['rating'],
-                'review_count'   => $data['review_count'],
+                'rating' => $data['rating'],
+                'review_count' => $data['review_count'],
             ]);
 
             $this->seedRoomTypes($propertyId, $tier);
@@ -134,14 +137,14 @@ class PropertySeeder extends Seeder
 
         foreach ($types as $type) {
             RoomType::create([
-                'id'           => Str::uuid()->toString(),
-                'property_id'  => $propertyId,
-                'name'         => $type['name'],
-                'description'  => $type['description'],
-                'capacity'     => $type['capacity'],
-                'max_occupancy'=> $type['capacity'],
-                'base_price'   => $type['base_price'],
-                'amenities'    => json_encode(['Free WiFi', 'Lockers', 'Reading Light', 'Power Outlet']),
+                'id' => Str::uuid()->toString(),
+                'property_id' => $propertyId,
+                'name' => $type['name'],
+                'description' => $type['description'],
+                'capacity' => $type['capacity'],
+                'max_occupancy' => $type['capacity'],
+                'base_price' => $type['base_price'],
+                'amenities' => json_encode(['Free WiFi', 'Lockers', 'Reading Light', 'Power Outlet']),
             ]);
         }
     }
@@ -163,12 +166,12 @@ class PropertySeeder extends Seeder
 
         foreach ($amenities as $amenity) {
             Amenity::create([
-                'id'          => Str::uuid()->toString(),
+                'id' => Str::uuid()->toString(),
                 'property_id' => $propertyId,
-                'name'        => $amenity['name'],
-                'category'    => $amenity['category'],
-                'icon'        => $amenity['icon'],
-                'is_free'     => $amenity['is_free'],
+                'name' => $amenity['name'],
+                'category' => $amenity['category'],
+                'icon' => $amenity['icon'],
+                'is_free' => $amenity['is_free'],
             ]);
         }
     }
@@ -186,11 +189,11 @@ class PropertySeeder extends Seeder
 
         foreach ($extras as $extra) {
             Extra::create([
-                'id'          => Str::uuid()->toString(),
+                'id' => Str::uuid()->toString(),
                 'property_id' => $propertyId,
-                'name'        => $extra['name'],
-                'price'       => $extra['price'],
-                'price_type'  => $extra['price_type'],
+                'name' => $extra['name'],
+                'price' => $extra['price'],
+                'price_type' => $extra['price_type'],
             ]);
         }
     }
