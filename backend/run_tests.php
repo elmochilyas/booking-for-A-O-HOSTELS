@@ -98,19 +98,19 @@ $res = req('GET', "$BASE/properties/destinations");
 assertCode(200, $res, 'GET /properties/destinations');
 
 // Property detail by UUID
-if (!empty($PROP_ID)) {
+if (! empty($PROP_ID)) {
     $res = req('GET', "$BASE/properties/{$PROP_ID}");
     assertCode(200, $res, 'GET /properties/{uuid} — detail by UUID');
 }
 
 // Property detail by slug
-if (!empty($PROP_SLUG)) {
+if (! empty($PROP_SLUG)) {
     $res = req('GET', "$BASE/properties/{$PROP_SLUG}");
     assertCode(200, $res, 'GET /properties/{slug} — detail by slug');
 }
 
 // Room types for property
-if (!empty($PROP_ID)) {
+if (! empty($PROP_ID)) {
     $res = req('GET', "$BASE/properties/{$PROP_ID}/room-types");
     if (assertCode(200, $res, 'GET /properties/{id}/room-types')) {
         $rts = $res['body']['room_types'] ?? [];
@@ -238,7 +238,7 @@ if (assertCode(201, $res, 'POST /admin/properties — create')) {
 }
 
 // Update property
-if (!empty($NEW_PROP_ID)) {
+if (! empty($NEW_PROP_ID)) {
     $res = req('PUT', "$BASE/admin/properties/{$NEW_PROP_ID}", [
         'name' => 'Updated Test Property',
         'is_active' => true,
@@ -247,13 +247,13 @@ if (!empty($NEW_PROP_ID)) {
 }
 
 // KPIs
-if (!empty($ADMIN_PROP_ID)) {
+if (! empty($ADMIN_PROP_ID)) {
     $res = req('GET', "$BASE/admin/properties/{$ADMIN_PROP_ID}/kpis", [], auth('superadmin'));
     assertCode(200, $res, 'GET /admin/properties/{id}/kpis');
 }
 
 // Archive (delete = set is_active=false)
-if (!empty($NEW_PROP_ID)) {
+if (! empty($NEW_PROP_ID)) {
     $res = req('DELETE', "$BASE/admin/properties/{$NEW_PROP_ID}", [], auth('superadmin'));
     assertCode(200, $res, 'DELETE /admin/properties/{id} — archive');
 }
@@ -278,7 +278,7 @@ if (assertCode(200, $res, 'GET /admin/rooms')) {
 }
 
 // Filter by property
-if (!empty($ADMIN_PROP_ID)) {
+if (! empty($ADMIN_PROP_ID)) {
     $res = req('GET', "$BASE/admin/rooms?property={$ADMIN_PROP_ID}", [], auth('superadmin'));
     assertCode(200, $res, 'GET /admin/rooms?property={id} — filter by property');
 }
@@ -288,7 +288,7 @@ $res = req('GET', "$BASE/admin/rooms?status=available", [], auth('superadmin'));
 assertCode(200, $res, 'GET /admin/rooms?status=available — filter by status');
 
 // Update room status
-if (!empty($ROOM_ID)) {
+if (! empty($ROOM_ID)) {
     $res = req('PATCH', "$BASE/admin/rooms/{$ROOM_ID}/status", ['status' => 'maintenance'], auth('superadmin'));
     assertCode(200, $res, 'PATCH /admin/rooms/{id}/status — set maintenance');
 
@@ -394,7 +394,7 @@ if (assertCode(201, $res, 'POST /admin/promotions — create (field mapping test
     $PROMO_ID = $res['body']['data']['id'] ?? null;
 }
 
-if (!empty($PROMO_ID)) {
+if (! empty($PROMO_ID)) {
     $res = req('PUT', "$BASE/admin/promotions/{$PROMO_ID}", [
         'valid_from' => date('Y-m-d'),
         'valid_until' => date('Y-m-d', strtotime('+60 days')),
@@ -432,7 +432,7 @@ $res = req('POST', "$BASE/admin/extras", [
 ], auth('superadmin'));
 assertCode(422, $res, 'POST /admin/extras — price_type=one_time rejected (validation)');
 
-if (!empty($EXTRA_ID)) {
+if (! empty($EXTRA_ID)) {
     $res = req('PUT', "$BASE/admin/extras/{$EXTRA_ID}", [
         'price_type' => 'per_night',
     ], auth('superadmin'));
@@ -464,7 +464,7 @@ if (assertCode(200, $res, 'GET /admin/reviews')) {
 }
 
 // Test hidden and flagged status (previously caused DB constraint error)
-if (!empty($REVIEW_ID)) {
+if (! empty($REVIEW_ID)) {
     $res = req('PUT', "$BASE/admin/reviews/{$REVIEW_ID}/moderate", [
         'status' => 'hidden',
     ], auth('superadmin'));
@@ -491,7 +491,7 @@ if (assertCode(200, $res, 'GET /admin/email-templates (table now exists)')) {
     $TEMPLATE_ID = $res['body']['data'][0]['id'] ?? null;
 }
 
-if (!empty($TEMPLATE_ID)) {
+if (! empty($TEMPLATE_ID)) {
     $res = req('PUT', "$BASE/admin/email-templates/{$TEMPLATE_ID}", [
         'subject' => 'Updated Subject ' . time(),
     ], auth('superadmin'));
@@ -577,8 +577,8 @@ assertCode(200, $res, 'Superadmin can access role:superadmin|regional_admin|prop
 // FINAL SUMMARY
 // ═══════════════════════════════════════════════════════════════════════════
 
-$passed = count(array_filter($results, fn($r) => $r['status'] === 'PASS'));
-$failed = count(array_filter($results, fn($r) => $r['status'] === 'FAIL'));
+$passed = count(array_filter($results, fn ($r) => $r['status'] === 'PASS'));
+$failed = count(array_filter($results, fn ($r) => $r['status'] === 'FAIL'));
 $total = count($results);
 
 echo "\n\033[1m══════════════════════════════════════\033[0m\n";
