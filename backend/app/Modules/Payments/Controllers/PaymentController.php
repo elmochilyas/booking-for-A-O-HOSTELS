@@ -3,8 +3,8 @@
 namespace App\Modules\Payments\Controllers;
 
 use App\Modules\Payments\Services\PaymentService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class PaymentController
@@ -32,7 +32,7 @@ class PaymentController
             $request->boolean('is_deposit', true)
         );
 
-        if (!$result['success']) {
+        if (! $result['success']) {
             return response()->json($result, 400);
         }
 
@@ -51,7 +51,7 @@ class PaymentController
 
         $result = $this->paymentService->confirmPayment($request->payment_id);
 
-        if (!$result['success']) {
+        if (! $result['success']) {
             return response()->json($result, 400);
         }
 
@@ -81,7 +81,7 @@ class PaymentController
 
         $result = $this->paymentService->processRefund($request->payment_id);
 
-        if (!$result['success']) {
+        if (! $result['success']) {
             return response()->json($result, 400);
         }
 

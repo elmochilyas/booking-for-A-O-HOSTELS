@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
-use App\Models\Guest;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 
@@ -14,8 +13,8 @@ class InvoiceController extends Controller
     {
         $booking = Booking::with(['property', 'roomType', 'guest', 'payments'])
             ->find($bookingId);
-        
-        if (!$booking) {
+
+        if (! $booking) {
             return response()->json(['error' => 'Booking not found'], 404);
         }
 
@@ -40,8 +39,8 @@ class InvoiceController extends Controller
     {
         $booking = Booking::with(['property', 'roomType', 'guest', 'payments'])
             ->find($bookingId);
-        
-        if (!$booking) {
+
+        if (! $booking) {
             return response()->json(['error' => 'Booking not found'], 404);
         }
 

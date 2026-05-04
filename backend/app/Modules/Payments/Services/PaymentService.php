@@ -4,9 +4,9 @@ namespace App\Modules\Payments\Services;
 
 use App\Models\Booking;
 use App\Models\Payment;
-use Stripe\Stripe;
 use Stripe\PaymentIntent;
 use Stripe\Refund;
+use Stripe\Stripe;
 
 class PaymentService
 {
@@ -21,17 +21,17 @@ class PaymentService
     {
         $booking = Booking::find($bookingId);
 
-        if (!$booking) {
+        if (! $booking) {
             return ['success' => false, 'message' => 'Booking not found'];
         }
 
-        $amount = $isDeposit 
+        $amount = $isDeposit
             ? $this->calculateDeposit($booking->total_price)
             : $booking->total_price;
 
         try {
             $paymentIntent = PaymentIntent::create([
-                'amount' => (int)($amount * 100),
+                'amount' => (int) ($amount * 100),
                 'currency' => 'eur',
                 'metadata' => [
                     'booking_id' => $bookingId,
@@ -58,7 +58,7 @@ class PaymentService
                 ],
             ];
         } catch (\Exception $e) {
-            return ['success' => false, 'message' => 'Failed to create payment: ' . $e->getMessage()];
+            return ['success' => false, 'message' => 'Failed to create payment: '.$e->getMessage()];
         }
     }
 
@@ -66,7 +66,7 @@ class PaymentService
     {
         $payment = Payment::find($paymentId);
 
-        if (!$payment) {
+        if (! $payment) {
             return ['success' => false, 'message' => 'Payment not found'];
         }
 
@@ -113,6 +113,7 @@ class PaymentService
     public function getBalanceAmount(float $totalPrice): float
     {
         $deposit = $this->calculateDeposit($totalPrice);
+
         return round($totalPrice - $deposit, 2);
     }
 
@@ -120,7 +121,7 @@ class PaymentService
     {
         $payment = Payment::find($paymentId);
 
-        if (!$payment || $payment->status !== 'success') {
+        if (! $payment || $payment->status !== 'success') {
             return ['success' => false, 'message' => 'Payment not found or not eligible for refund'];
         }
 

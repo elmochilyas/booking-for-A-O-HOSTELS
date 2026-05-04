@@ -2,10 +2,9 @@
 
 namespace App\Modules\Bookings\Services;
 
-use App\Models\RoomType;
-use App\Models\Room;
 use App\Models\Booking;
-use Illuminate\Support\Facades\DB;
+use App\Models\Room;
+use App\Models\RoomType;
 use Illuminate\Support\Facades\Cache;
 
 class AvailabilityService
@@ -85,7 +84,7 @@ class AvailabilityService
         return $basePrice;
     }
 
-    public function clearCache(string $propertyId, string $checkIn = null, string $checkOut = null): void
+    public function clearCache(string $propertyId, ?string $checkIn = null, ?string $checkOut = null): void
     {
         if ($checkIn && $checkOut) {
             Cache::forget("availability:{$propertyId}:{$checkIn}:{$checkOut}:1");

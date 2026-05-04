@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\Extra;
 use App\Models\Room;
+use App\Models\RoomType;
 use App\Services\EmailService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -44,8 +46,8 @@ class BookingController extends Controller
     public function show(string $id): JsonResponse
     {
         $booking = Booking::with(['property', 'roomType', 'guest', 'payments', 'extras'])->find($id);
-        
-        if (!$booking) {
+
+        if (! $booking) {
             return response()->json(['error' => 'Booking not found'], 404);
         }
 
@@ -62,7 +64,6 @@ class BookingController extends Controller
             'check_in_date' => 'required|date|after_or_equal:today',
             'check_out_date' => 'required|date|after:check_in_date',
             'guest_count' => 'required|integer|min:1',
-            'guest_id' => 'required|uuid|exists:guests,id',
             'special_requests' => 'nullable|string|max:500',
             'extras' => 'nullable|array',
             'extras.*.id' => 'uuid|exists:extras,id',
@@ -73,8 +74,12 @@ class BookingController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+        $user = $request->user();
+        $guestId = $user->id;
+
         $data = $validator->validated();
         $data['id'] = Str::uuid()->toString();
+        $data['guest_id'] = $guestId;
 
         $conflict = $this->checkAvailability(
             $data['property_id'],
@@ -91,7 +96,7 @@ class BookingController extends Controller
                     $data['check_in_date'],
                     $data['check_out_date'],
                     $data['guest_count']
-                )
+                ),
             ], 409);
         }
 
@@ -137,19 +142,20 @@ class BookingController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => 'Failed to create booking: ' . $e->getMessage()], 500);
+
+            return response()->json(['error' => 'Failed to create booking: '.$e->getMessage()], 500);
         }
     }
 
     public function update(Request $request, string $id): JsonResponse
     {
         $booking = Booking::find($id);
-        
-        if (!$booking) {
+
+        if (! $booking) {
             return response()->json(['error' => 'Booking not found'], 404);
         }
 
-        if (!in_array($booking->status, ['pending', 'confirmed'])) {
+        if (! in_array($booking->status, ['pending', 'confirmed'])) {
             return response()->json(['error' => 'Cannot modify this booking'], 400);
         }
 
@@ -205,8 +211,8 @@ class BookingController extends Controller
     public function cancel(Request $request, string $id): JsonResponse
     {
         $booking = Booking::find($id);
-        
-        if (!$booking) {
+
+        if (! $booking) {
             return response()->json(['error' => 'Booking not found'], 404);
         }
 
@@ -238,8 +244,8 @@ class BookingController extends Controller
     public function checkIn(Request $request, string $id): JsonResponse
     {
         $booking = Booking::find($id);
-        
-        if (!$booking) {
+
+        if (! $booking) {
             return response()->json(['error' => 'Booking not found'], 404);
         }
 
@@ -271,8 +277,8 @@ class BookingController extends Controller
     public function checkOut(Request $request, string $id): JsonResponse
     {
         $booking = Booking::find($id);
-        
-        if (!$booking) {
+
+        if (! $booking) {
             return response()->json(['error' => 'Booking not found'], 404);
         }
 
@@ -307,7 +313,7 @@ class BookingController extends Controller
                     ->orWhereBetween('check_out_date', [$checkIn, $checkOut])
                     ->orWhere(function ($q) use ($checkIn, $checkOut) {
                         $q->where('check_in_date', '<=', $checkIn)
-                          ->where('check_out_date', '>=', $checkOut);
+                            ->where('check_out_date', '>=', $checkOut);
                     });
             });
 
@@ -327,7 +333,7 @@ class BookingController extends Controller
                     ->orWhereBetween('check_out_date', [$checkIn, $checkOut])
                     ->orWhere(function ($q) use ($checkIn, $checkOut) {
                         $q->where('check_in_date', '<=', $checkIn)
-                          ->where('check_out_date', '>=', $checkOut);
+                            ->where('check_out_date', '>=', $checkOut);
                     });
             })
             ->whereNotNull('room_id')
@@ -343,13 +349,13 @@ class BookingController extends Controller
 
     private function getAvailableAlternatives(string $propertyId, string $checkIn, string $checkOut, int $guests): array
     {
-        $roomTypes = \App\Models\RoomType::where('property_id', $propertyId)
+        $roomTypes = RoomType::where('property_id', $propertyId)
             ->where('capacity', '>=', $guests)
             ->get();
 
         $alternatives = [];
         foreach ($roomTypes as $roomType) {
-            if (!$this->checkAvailability($propertyId, $roomType->id, $checkIn, $checkOut)) {
+            if (! $this->checkAvailability($propertyId, $roomType->id, $checkIn, $checkOut)) {
                 $alternatives[] = [
                     'id' => $roomType->id,
                     'name' => $roomType->name,
@@ -364,12 +370,12 @@ class BookingController extends Controller
 
     private function calculateTotalPrice(string $propertyId, string $roomTypeId, string $checkIn, string $checkOut, array $extras): float
     {
-        $roomType = \App\Models\RoomType::find($roomTypeId);
+        $roomType = RoomType::find($roomTypeId);
         $basePrice = $this->calculatePrice($roomType->base_price ?? 0, $checkIn, $checkOut);
 
         $extrasPrice = 0;
         foreach ($extras as $extra) {
-            $extraModel = \App\Models\Extra::find($extra['id']);
+            $extraModel = Extra::find($extra['id']);
             if ($extraModel) {
                 $extrasPrice += $extraModel->price * ($extra['quantity'] ?? 1);
             }
@@ -381,19 +387,20 @@ class BookingController extends Controller
     private function calculatePrice(float $basePrice, string $checkIn, string $checkOut): float
     {
         $nights = max(1, (strtotime($checkOut) - strtotime($checkIn)) / (60 * 60 * 24));
+
         return $basePrice * $nights;
     }
 
     private function calculateRefund(Booking $booking): float
     {
         $nightsUntilCheckIn = (strtotime($booking->check_in_date) - time()) / (60 * 60 * 24);
-        
+
         if ($nightsUntilCheckIn >= 14) {
             return $booking->total_price;
         } elseif ($nightsUntilCheckIn >= 7) {
             return $booking->total_price * 0.5;
         }
-        
+
         return 0;
     }
 }

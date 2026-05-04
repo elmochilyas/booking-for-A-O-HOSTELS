@@ -4,8 +4,8 @@ namespace App\Modules\Properties\Controllers;
 
 use App\Models\Property;
 use App\Modules\Properties\Services\PropertyService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class PropertyController
@@ -51,7 +51,7 @@ class PropertyController
     {
         $property = $this->propertyService->getPropertyById($id);
 
-        if (!$property) {
+        if (! $property) {
             return response()->json(['message' => 'Property not found'], 404);
         }
 
@@ -62,7 +62,7 @@ class PropertyController
     {
         $property = Property::find($id);
 
-        if (!$property) {
+        if (! $property) {
             return response()->json(['message' => 'Property not found'], 404);
         }
 
@@ -90,7 +90,7 @@ class PropertyController
     {
         $property = Property::find($id);
 
-        if (!$property) {
+        if (! $property) {
             return response()->json(['message' => 'Property not found'], 404);
         }
 

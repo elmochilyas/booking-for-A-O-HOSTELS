@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
-use App\Models\Guest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -14,7 +13,7 @@ class GuestController extends Controller
     public function profile(Request $request): JsonResponse
     {
         $guest = $request->user();
-        
+
         return response()->json([
             'guest' => $guest->makeHidden(['password_hash']),
         ]);
@@ -47,7 +46,7 @@ class GuestController extends Controller
     public function bookings(Request $request): JsonResponse
     {
         $guest = $request->user();
-        
+
         $query = $booking = Booking::where('guest_id', $guest->id)
             ->with(['property', 'roomType']);
 
@@ -95,15 +94,25 @@ class GuestController extends Controller
 
     private function getLoyaltyTier(int $points): string
     {
-        if ($points >= 5000) return 'Gold';
-        if ($points >= 2000) return 'Silver';
+        if ($points >= 5000) {
+            return 'Gold';
+        }
+        if ($points >= 2000) {
+            return 'Silver';
+        }
+
         return 'Bronze';
     }
 
     private function getPointsToNextTier(int $points): ?int
     {
-        if ($points < 2000) return 2000 - $points;
-        if ($points < 5000) return 5000 - $points;
+        if ($points < 2000) {
+            return 2000 - $points;
+        }
+        if ($points < 5000) {
+            return 5000 - $points;
+        }
+
         return null;
     }
 
@@ -115,6 +124,6 @@ class GuestController extends Controller
             ['id' => 3, 'name' => 'Free night (base)', 'points' => 5000, 'discount' => 'full'],
         ];
 
-        return array_filter($rewards, fn($r) => $points >= $r['points']);
+        return array_filter($rewards, fn ($r) => $points >= $r['points']);
     }
 }

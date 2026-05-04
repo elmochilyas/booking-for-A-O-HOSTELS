@@ -4,13 +4,14 @@ namespace App\Modules\Admin\Services;
 
 use App\Models\AdminPermission;
 use App\Models\AdminRole;
-use App\Models\Staff;
 use App\Models\AuditLog;
-use App\Models\SystemConfig;
-use App\Models\Property;
 use App\Models\Booking;
 use App\Models\Guest;
 use App\Models\Payment;
+use App\Models\Property;
+use App\Models\Staff;
+use App\Models\SystemConfig;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -172,20 +173,20 @@ class AdminManagementService
         }
     }
 
-    public function getAllStaff(?array $filters = []): \Illuminate\Pagination\LengthAwarePaginator
+    public function getAllStaff(?array $filters = []): LengthAwarePaginator
     {
         $query = Staff::with(['property', 'adminRole']);
 
-        if (!empty($filters['role'])) {
+        if (! empty($filters['role'])) {
             $query->where('admin_role_id', $filters['role']);
         }
-        if (!empty($filters['property'])) {
+        if (! empty($filters['property'])) {
             $query->where('property_id', $filters['property']);
         }
-        if (!empty($filters['is_active'])) {
+        if (! empty($filters['is_active'])) {
             $query->where('is_active', $filters['is_active'] === 'true');
         }
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $query->where(function ($q) use ($filters) {
                 $q->where('first_name', 'like', "%{$filters['search']}%")
                     ->orWhere('last_name', 'like', "%{$filters['search']}%")
@@ -224,17 +225,39 @@ class AdminManagementService
         $oldData = $staff->toArray();
 
         $updateData = [];
-        if (isset($data['first_name'])) $updateData['first_name'] = $data['first_name'];
-        if (isset($data['last_name'])) $updateData['last_name'] = $data['last_name'];
-        if (isset($data['email'])) $updateData['email'] = $data['email'];
-        if (isset($data['password'])) $updateData['password_hash'] = Hash::make($data['password']);
-        if (isset($data['role'])) $updateData['role'] = $data['role'];
-        if (isset($data['property_id'])) $updateData['property_id'] = $data['property_id'];
-        if (isset($data['admin_role_id'])) $updateData['admin_role_id'] = $data['admin_role_id'];
-        if (isset($data['permissions'])) $updateData['permissions'] = $data['permissions'];
-        if (isset($data['assigned_properties'])) $updateData['assigned_properties'] = $data['assigned_properties'];
-        if (array_key_exists('is_active', $data)) $updateData['is_active'] = $data['is_active'];
-        if (array_key_exists('two_factor_enabled', $data)) $updateData['two_factor_enabled'] = $data['two_factor_enabled'];
+        if (isset($data['first_name'])) {
+            $updateData['first_name'] = $data['first_name'];
+        }
+        if (isset($data['last_name'])) {
+            $updateData['last_name'] = $data['last_name'];
+        }
+        if (isset($data['email'])) {
+            $updateData['email'] = $data['email'];
+        }
+        if (isset($data['password'])) {
+            $updateData['password_hash'] = Hash::make($data['password']);
+        }
+        if (isset($data['role'])) {
+            $updateData['role'] = $data['role'];
+        }
+        if (isset($data['property_id'])) {
+            $updateData['property_id'] = $data['property_id'];
+        }
+        if (isset($data['admin_role_id'])) {
+            $updateData['admin_role_id'] = $data['admin_role_id'];
+        }
+        if (isset($data['permissions'])) {
+            $updateData['permissions'] = $data['permissions'];
+        }
+        if (isset($data['assigned_properties'])) {
+            $updateData['assigned_properties'] = $data['assigned_properties'];
+        }
+        if (array_key_exists('is_active', $data)) {
+            $updateData['is_active'] = $data['is_active'];
+        }
+        if (array_key_exists('two_factor_enabled', $data)) {
+            $updateData['two_factor_enabled'] = $data['two_factor_enabled'];
+        }
 
         $staff->update($updateData);
         $staff->refresh();
@@ -259,11 +282,11 @@ class AdminManagementService
         return Staff::with(['property', 'adminRole'])->findOrFail($id);
     }
 
-    public function getAllProperties(?array $filters = []): \Illuminate\Pagination\LengthAwarePaginator
+    public function getAllProperties(?array $filters = []): LengthAwarePaginator
     {
         $query = Property::query();
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $query->where(function ($q) use ($filters) {
                 $q->where('name', 'like', "%{$filters['search']}%")
                     ->orWhere('location', 'like', "%{$filters['search']}%");
@@ -318,15 +341,15 @@ class AdminManagementService
 
         $totalBookings = $query->count();
         $confirmedBookings = $query->where('status', 'confirmed')->count();
-        
+
         $property = Property::findOrFail($propertyId);
         $totalRooms = $property->rooms()->count();
-        
+
         $nights = $query->sum(\DB::raw('DATEDIFF(check_out_date, check_in_date)'));
         $occupiedNights = $confirmedBookings * max(1, $nights / max(1, $totalBookings));
-        
+
         $occupancyRate = $totalRooms > 0 ? ($occupiedNights / max(1, $nights)) * 100 : 0;
-        
+
         $revenue = Payment::whereHas('booking', function ($q) use ($propertyId) {
             $q->where('property_id', $propertyId);
         })->where('status', 'success')->sum('amount');
@@ -341,23 +364,23 @@ class AdminManagementService
         ];
     }
 
-    public function getAllBookings(?array $filters = []): \Illuminate\Pagination\LengthAwarePaginator
+    public function getAllBookings(?array $filters = []): LengthAwarePaginator
     {
         $query = Booking::with(['guest', 'property', 'roomType']);
 
-        if (!empty($filters['property'])) {
+        if (! empty($filters['property'])) {
             $query->where('property_id', $filters['property']);
         }
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
-        if (!empty($filters['date_from'])) {
+        if (! empty($filters['date_from'])) {
             $query->where('check_in_date', '>=', $filters['date_from']);
         }
-        if (!empty($filters['date_to'])) {
+        if (! empty($filters['date_to'])) {
             $query->where('check_in_date', '<=', $filters['date_to']);
         }
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $query->whereHas('guest', function ($q) use ($filters) {
                 $q->where('first_name', 'like', "%{$filters['search']}%")
                     ->orWhere('last_name', 'like', "%{$filters['search']}%")
@@ -381,7 +404,7 @@ class AdminManagementService
         return $booking;
     }
 
-    public function cancelBooking(string $id, string $reason = null): Booking
+    public function cancelBooking(string $id, ?string $reason = null): Booking
     {
         return $this->updateBooking($id, [
             'status' => 'cancelled',
@@ -389,7 +412,7 @@ class AdminManagementService
         ]);
     }
 
-    public function processRefund(string $bookingId, ?float $amount = null, string $reason = null): Payment
+    public function processRefund(string $bookingId, ?float $amount = null, ?string $reason = null): Payment
     {
         $booking = Booking::findOrFail($bookingId);
         $payment = $booking->payments()->where('status', 'success')->firstOrFail();
@@ -402,7 +425,7 @@ class AdminManagementService
             'amount' => -$refundAmount,
             'payment_method' => $payment->payment_method,
             'status' => 'refunded',
-            'stripe_payment_id' => 'refund_' . Str::uuid()->toString(),
+            'stripe_payment_id' => 'refund_'.Str::uuid()->toString(),
         ]);
 
         AuditLog::log('refund_issued', 'payment', $refund->id, null, [
@@ -414,21 +437,21 @@ class AdminManagementService
         return $refund;
     }
 
-    public function getAllGuests(?array $filters = []): \Illuminate\Pagination\LengthAwarePaginator
+    public function getAllGuests(?array $filters = []): LengthAwarePaginator
     {
         $query = Guest::query();
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $query->where(function ($q) use ($filters) {
                 $q->where('first_name', 'like', "%{$filters['search']}%")
                     ->orWhere('last_name', 'like', "%{$filters['search']}%")
                     ->orWhere('email', 'like', "%{$filters['search']}%");
             });
         }
-        if (!empty($filters['is_loyalty_member'])) {
+        if (! empty($filters['is_loyalty_member'])) {
             $query->where('is_loyalty_member', $filters['is_loyalty_member'] === 'true');
         }
-        if (!empty($filters['is_banned'])) {
+        if (! empty($filters['is_banned'])) {
             $query->where('is_banned', $filters['is_banned'] === 'true');
         }
 
@@ -440,7 +463,7 @@ class AdminManagementService
         $guest = Guest::findOrFail($id);
         $oldData = $guest->toArray();
 
-        $guest->update(array_filter($data, fn($v) => $v !== null));
+        $guest->update(array_filter($data, fn ($v) => $v !== null));
         $guest->refresh();
 
         AuditLog::log('guest_updated', 'guest', $guest->id, $oldData, $guest->toArray());
@@ -448,7 +471,7 @@ class AdminManagementService
         return $guest;
     }
 
-    public function banGuest(string $id, string $reason = null): Guest
+    public function banGuest(string $id, ?string $reason = null): Guest
     {
         return $this->updateGuest($id, [
             'is_banned' => true,
@@ -485,7 +508,7 @@ class AdminManagementService
     public function exportGuestData(string $id): array
     {
         $guest = Guest::findOrFail($id);
-        
+
         return [
             'profile' => $guest->toArray(),
             'bookings' => $guest->bookings()->get()->toArray(),
@@ -499,7 +522,7 @@ class AdminManagementService
     public function deleteGuestData(string $id): void
     {
         $guest = Guest::findOrFail($id);
-        
+
         AuditLog::log('gdpr_delete', 'guest', $id, null, [
             'deleted_at' => now()->toIso8601String(),
             'email' => $guest->email,
@@ -508,20 +531,20 @@ class AdminManagementService
         $guest->delete();
     }
 
-    public function getAllPayments(?array $filters = []): \Illuminate\Pagination\LengthAwarePaginator
+    public function getAllPayments(?array $filters = []): LengthAwarePaginator
     {
         $query = Payment::with(['booking', 'booking.guest']);
 
-        if (!empty($filters['property'])) {
-            $query->whereHas('booking', fn($q) => $q->where('property_id', $filters['property']));
+        if (! empty($filters['property'])) {
+            $query->whereHas('booking', fn ($q) => $q->where('property_id', $filters['property']));
         }
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
-        if (!empty($filters['date_from'])) {
+        if (! empty($filters['date_from'])) {
             $query->where('created_at', '>=', $filters['date_from']);
         }
-        if (!empty($filters['date_to'])) {
+        if (! empty($filters['date_to'])) {
             $query->where('created_at', '<=', $filters['date_to']);
         }
 
@@ -533,7 +556,7 @@ class AdminManagementService
         $query = Payment::where('status', 'success');
 
         if ($propertyId) {
-            $query->whereHas('booking', fn($q) => $q->where('property_id', $propertyId));
+            $query->whereHas('booking', fn ($q) => $q->where('property_id', $propertyId));
         }
         if ($startDate) {
             $query->where('created_at', '>=', $startDate);
@@ -555,26 +578,26 @@ class AdminManagementService
         ];
     }
 
-    public function getAuditLogs(?array $filters = []): \Illuminate\Pagination\LengthAwarePaginator
+    public function getAuditLogs(?array $filters = []): LengthAwarePaginator
     {
         $query = AuditLog::with('staff');
 
-        if (!empty($filters['staff_id'])) {
+        if (! empty($filters['staff_id'])) {
             $query->where('staff_id', $filters['staff_id']);
         }
-        if (!empty($filters['action'])) {
+        if (! empty($filters['action'])) {
             $query->where('action', 'like', "%{$filters['action']}%");
         }
-        if (!empty($filters['entity_type'])) {
+        if (! empty($filters['entity_type'])) {
             $query->where('entity_type', $filters['entity_type']);
         }
-        if (!empty($filters['date_from'])) {
+        if (! empty($filters['date_from'])) {
             $query->where('created_at', '>=', $filters['date_from']);
         }
-        if (!empty($filters['date_to'])) {
+        if (! empty($filters['date_to'])) {
             $query->where('created_at', '<=', $filters['date_to']);
         }
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $query->where(function ($q) use ($filters) {
                 $q->where('action', 'like', "%{$filters['search']}%")
                     ->orWhere('entity_type', 'like', "%{$filters['search']}%");
@@ -587,12 +610,12 @@ class AdminManagementService
     public function getSystemConfig(?string $category = null): array
     {
         $query = SystemConfig::query();
-        
+
         if ($category) {
             $query->where('category', $category);
         }
 
-        return $query->get()->map(fn($c) => [
+        return $query->get()->map(fn ($c) => [
             'key' => $c->key,
             'value' => $c->is_encrypted ? '********' : $c->value,
             'type' => $c->type,

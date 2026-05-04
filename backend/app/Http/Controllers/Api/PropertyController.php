@@ -17,14 +17,14 @@ class PropertyController extends Controller
         $query = Property::with(['roomTypes', 'amenities']);
 
         if ($request->has('location') && $request->location) {
-            $query->where('location', 'like', '%' . $request->location . '%');
+            $query->where('location', 'like', '%'.$request->location.'%');
         }
 
         if ($request->has('check_in') && $request->check_in && $request->has('check_out') && $request->check_out) {
             $query->whereHas('roomTypes', function ($q) use ($request) {
                 $q->whereHas('availabilities', function ($aq) use ($request) {
                     $aq->whereBetween('date', [$request->check_in, $request->check_out])
-                      ->where('available', true);
+                        ->where('available', true);
                 });
             });
         }
@@ -74,7 +74,10 @@ class PropertyController extends Controller
 
     public function show(string $id): JsonResponse
     {
-        $property = Property::with(['roomTypes', 'amenities', 'reviews'])->find($id);
+        $property = Property::where('id', $id)
+            ->orWhere('slug', $id)
+            ->with(['roomTypes', 'amenities'])
+            ->first();
 
         if (! $property) {
             return response()->json(['error' => 'Property not found'], 404);

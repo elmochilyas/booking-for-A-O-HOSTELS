@@ -22,7 +22,7 @@ class SmsNotificationService
     public function sendBookingConfirmation(Booking $booking): bool
     {
         $message = sprintf(
-            "A&O Hostels: Your booking #%s is confirmed! %s to %s. See you soon!",
+            'A&O Hostels: Your booking #%s is confirmed! %s to %s. See you soon!',
             substr($booking->id, 0, 8),
             $booking->check_in_date,
             $booking->check_out_date
@@ -34,7 +34,7 @@ class SmsNotificationService
     public function sendCheckInReminder(Booking $booking): bool
     {
         $message = sprintf(
-            "A&O Hostels: Reminder - Your check-in is tomorrow (%s) at %s. See you soon!",
+            'A&O Hostels: Reminder - Your check-in is tomorrow (%s) at %s. See you soon!',
             $booking->check_in_date,
             $booking->property->check_in_time ?? '15:00'
         );
@@ -45,7 +45,7 @@ class SmsNotificationService
     public function sendCheckOutReminder(Booking $booking): bool
     {
         $message = sprintf(
-            "A&O Hostels: Reminder - Check-out today at %s. Thanks for staying with us!",
+            'A&O Hostels: Reminder - Check-out today at %s. Thanks for staying with us!',
             $booking->property->check_out_time ?? '10:00'
         );
 
@@ -55,7 +55,7 @@ class SmsNotificationService
     public function sendPaymentReceived(Booking $booking, float $amount): bool
     {
         $message = sprintf(
-            "A&O Hostels: Payment of €%.2f received for booking #%s. Thank you!",
+            'A&O Hostels: Payment of €%.2f received for booking #%s. Thank you!',
             $amount,
             substr($booking->id, 0, 8)
         );
@@ -70,8 +70,9 @@ class SmsNotificationService
 
     private function send(string $phone, string $message): bool
     {
-        if (!$this->client) {
+        if (! $this->client) {
             \Log::warning('Twilio not configured, SMS not sent');
+
             return false;
         }
 
@@ -80,9 +81,11 @@ class SmsNotificationService
                 'from' => config('services.twilio.from'),
                 'body' => $message,
             ]);
+
             return true;
         } catch (\Exception $e) {
             \Log::error("SMS send failed: {$e->getMessage()}");
+
             return false;
         }
     }

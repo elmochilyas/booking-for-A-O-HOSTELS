@@ -5,8 +5,6 @@ namespace App\Modules\Bookings\Services;
 use App\Models\Booking;
 use App\Models\Room;
 use App\Models\RoomType;
-use App\Models\Guest;
-use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -40,7 +38,7 @@ class BookingService
         $roomTypeId = $request->room_type_id;
 
         $roomType = RoomType::find($roomTypeId);
-        if (!$roomType || $roomType->capacity < $request->guest_count) {
+        if (! $roomType || $roomType->capacity < $request->guest_count) {
             return ['success' => false, 'message' => 'Room capacity exceeded'];
         }
 
@@ -51,7 +49,7 @@ class BookingService
             ->where('status', 'available')
             ->first();
 
-        if (!$availableRoom) {
+        if (! $availableRoom) {
             return ['success' => false, 'message' => 'No rooms available for selected dates'];
         }
 
@@ -85,7 +83,8 @@ class BookingService
             ];
         } catch (\Exception $e) {
             DB::rollBack();
-            return ['success' => false, 'message' => 'Failed to create booking: ' . $e->getMessage()];
+
+            return ['success' => false, 'message' => 'Failed to create booking: '.$e->getMessage()];
         }
     }
 
@@ -93,7 +92,7 @@ class BookingService
     {
         $booking = Booking::find($bookingId);
 
-        if (!$booking) {
+        if (! $booking) {
             return ['success' => false, 'message' => 'Booking not found'];
         }
 
@@ -110,7 +109,7 @@ class BookingService
     {
         $booking = Booking::find($bookingId);
 
-        if (!$booking) {
+        if (! $booking) {
             return ['success' => false, 'message' => 'Booking not found'];
         }
 
@@ -132,6 +131,7 @@ class BookingService
             return ['success' => true, 'message' => 'Booking cancelled successfully'];
         } catch (\Exception $e) {
             DB::rollBack();
+
             return ['success' => false, 'message' => 'Failed to cancel booking'];
         }
     }
@@ -150,11 +150,11 @@ class BookingService
             ->toArray();
     }
 
-    public function checkIn(string $bookingId, string $roomId = null): array
+    public function checkIn(string $bookingId, ?string $roomId = null): array
     {
         $booking = Booking::find($bookingId);
 
-        if (!$booking) {
+        if (! $booking) {
             return ['success' => false, 'message' => 'Booking not found'];
         }
 
@@ -178,7 +178,7 @@ class BookingService
     {
         $booking = Booking::find($bookingId);
 
-        if (!$booking) {
+        if (! $booking) {
             return ['success' => false, 'message' => 'Booking not found'];
         }
 

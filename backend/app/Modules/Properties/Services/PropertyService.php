@@ -3,21 +3,25 @@
 namespace App\Modules\Properties\Services;
 
 use App\Models\Property;
-use App\Models\RoomType;
 use App\Models\Room;
+use App\Models\RoomType;
 use Illuminate\Support\Facades\Cache;
 
 class PropertyService
 {
     public function getAllProperties(array $filters = [])
     {
-        $query = Property::query();
+        $query = Property::query()->withCount('rooms');
 
-        if (!empty($filters['location'])) {
-            $query->where('location', 'like', '%' . $filters['location'] . '%');
+        if (! empty($filters['location'])) {
+            $query->where('location', 'like', '%'.$filters['location'].'%');
         }
 
-        return $query->get();
+        return $query->get()->map(function ($property) {
+            $property->total_rooms = $property->rooms_count;
+
+            return $property;
+        });
     }
 
     public function getPropertyById(string $id): ?Property
@@ -36,6 +40,7 @@ class PropertyService
     {
         $property->update($data);
         Cache::forget("property:{$property->id}");
+
         return $property;
     }
 
@@ -66,6 +71,7 @@ class PropertyService
     {
         $roomType->update($data);
         Cache::forget("property:{$roomType->property_id}:roomtypes");
+
         return $roomType;
     }
 }

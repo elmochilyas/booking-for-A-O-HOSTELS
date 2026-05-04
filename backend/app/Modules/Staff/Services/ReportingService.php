@@ -3,8 +3,8 @@
 namespace App\Modules\Staff\Services;
 
 use App\Models\Booking;
-use App\Models\Property;
 use App\Models\Payment;
+use App\Models\Property;
 use Illuminate\Support\Facades\DB;
 
 class ReportingService
@@ -12,7 +12,7 @@ class ReportingService
     public function getOccupancyRate(string $propertyId, string $startDate, string $endDate): array
     {
         $totalRooms = Property::find($propertyId)?->total_rooms ?? 0;
-        
+
         $bookings = Booking::where('property_id', $propertyId)
             ->where('status', '!=', 'cancelled')
             ->whereBetween('check_in_date', [$startDate, $endDate])
@@ -43,9 +43,9 @@ class ReportingService
         $totalRevenue = Payment::whereHas('booking', function ($query) use ($propertyId) {
             $query->where('property_id', $propertyId);
         })
-        ->whereBetween('created_at', [$startDate, $endDate])
-        ->where('status', 'success')
-        ->sum('amount');
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->where('status', 'success')
+            ->sum('amount');
 
         $bookingCount = Booking::where('property_id', $propertyId)
             ->whereBetween('created_at', [$startDate, $endDate])
@@ -97,8 +97,8 @@ class ReportingService
             $query->where('property_id', $propertyId)
                 ->whereDate('created_at', $date);
         })
-        ->where('status', 'success')
-        ->sum('amount');
+            ->where('status', 'success')
+            ->sum('amount');
 
         return [
             'date' => $date,
@@ -111,7 +111,7 @@ class ReportingService
     public function getDashboardMetrics(string $propertyId): array
     {
         $today = date('Y-m-d');
-        
+
         $todayStats = $this->getDailyStats($propertyId, $today);
         $occupancy = $this->getOccupancyRate($propertyId, $today, date('Y-m-d', strtotime('+30 days')));
         $revenue = $this->getRevenueReport($propertyId, date('Y-m-01'), $today);
@@ -130,9 +130,9 @@ class ReportingService
     {
         $revenue = $this->getRevenueReport($propertyId, $startDate, $endDate);
         $stats = $this->getBookingStats($propertyId, $startDate, $endDate);
-        
+
         $occupiedNights = $stats['checked_in'] + $stats['completed'];
-        
+
         return $occupiedNights > 0 ? $revenue['total_revenue'] / $occupiedNights : 0;
     }
 
@@ -140,12 +140,12 @@ class ReportingService
     {
         $property = Property::find($propertyId);
         $totalRooms = $property?->total_rooms ?? 1;
-        
+
         $dateRange = (new \DateTime($startDate))->diff(new \DateTime($endDate))->days;
         $availableRoomNights = $totalRooms * $dateRange;
-        
+
         $revenue = $this->getRevenueReport($propertyId, $startDate, $endDate);
-        
+
         return $availableRoomNights > 0 ? $revenue['total_revenue'] / $availableRoomNights : 0;
     }
 }

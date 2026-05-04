@@ -3,8 +3,8 @@
 namespace App\Modules\Staff\Controllers;
 
 use App\Modules\Staff\Services\ReportingService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class ReportController

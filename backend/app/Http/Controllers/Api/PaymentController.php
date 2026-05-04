@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Payment;
-use App\Services\StripeService;
 use App\Services\EmailService;
+use App\Services\StripeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -33,7 +33,7 @@ class PaymentController extends Controller
         }
 
         $booking = Booking::find($request->booking_id);
-        
+
         if ($booking->status === 'cancelled') {
             return response()->json(['error' => 'Cannot pay for a cancelled booking'], 400);
         }
@@ -69,7 +69,7 @@ class PaymentController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to create payment intent: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Failed to create payment intent: '.$e->getMessage()], 500);
         }
     }
 
@@ -85,20 +85,20 @@ class PaymentController extends Controller
         }
 
         $payment = Payment::find($request->payment_id);
-        
+
         if ($payment->stripe_payment_id !== $request->payment_intent_id) {
             return response()->json(['error' => 'Payment intent mismatch'], 400);
         }
 
         try {
             $stripePayment = $this->stripeService->retrievePayment($request->payment_intent_id);
-            
+
             if ($stripePayment->status === 'succeeded') {
                 $payment->update(['status' => 'success']);
-                
+
                 $booking = $payment->booking;
                 $this->updateBookingPaymentStatus($booking, $payment);
-                
+
                 $this->emailService->sendPaymentConfirmation($booking, $payment);
 
                 return response()->json([
@@ -135,7 +135,7 @@ class PaymentController extends Controller
             ->orderBy('created_at', 'desc')
             ->first();
 
-        if (!$successfulPayment) {
+        if (! $successfulPayment) {
             return response()->json(['error' => 'No successful payment found'], 400);
         }
 
@@ -167,15 +167,15 @@ class PaymentController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Refund failed: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Refund failed: '.$e->getMessage()], 500);
         }
     }
 
     public function bookingPayments(string $bookingId): JsonResponse
     {
         $booking = Booking::with('payments')->find($bookingId);
-        
-        if (!$booking) {
+
+        if (! $booking) {
             return response()->json(['error' => 'Booking not found'], 404);
         }
 
