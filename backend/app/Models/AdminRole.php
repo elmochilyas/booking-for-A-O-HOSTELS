@@ -3,17 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class AdminRole extends Model
 {
     protected $table = 'admin_roles';
+
     public $timestamps = false;
+
     public $incrementing = false;
 
     protected $fillable = [
-        'name', 'slug', 'description', 'level', 'permissions', 
+        'name', 'slug', 'description', 'level', 'permissions',
         'is_system', 'property_id',
     ];
 

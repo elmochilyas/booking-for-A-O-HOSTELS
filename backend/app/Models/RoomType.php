@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class RoomType extends Model
 {
     protected $table = 'room_types';
+
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [

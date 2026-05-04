@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Amenity extends Model
 {
     protected $table = 'amenities';
+
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -32,7 +33,9 @@ class Amenity extends Model
 class Extra extends Model
 {
     protected $table = 'extras';
+
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -56,7 +59,9 @@ class Extra extends Model
 class BookingExtra extends Model
 {
     protected $table = 'booking_extras';
+
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -82,7 +87,9 @@ class BookingExtra extends Model
 class SeasonalPricing extends Model
 {
     protected $table = 'seasonal_pricing';
+
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -104,7 +111,9 @@ class SeasonalPricing extends Model
 class Promotion extends Model
 {
     protected $table = 'promotions';
+
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [

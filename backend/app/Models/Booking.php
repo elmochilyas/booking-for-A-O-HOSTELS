@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Booking extends Model
 {
     protected $table = 'bookings';
+
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [

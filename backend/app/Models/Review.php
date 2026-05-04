@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Review extends Model
 {
     protected $table = 'reviews';
+
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
