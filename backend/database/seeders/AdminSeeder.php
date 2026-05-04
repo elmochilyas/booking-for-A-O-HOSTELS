@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Staff;
 use App\Models\AdminRole;
+use App\Models\Staff;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -61,7 +61,7 @@ class AdminSeeder extends Seeder
                 'last_name' => 'Staff',
                 'email' => 'reception@ao.com',
                 'password_hash' => Hash::make('reception123'),
-                'role' => 'staff',
+                'role' => 'reception',
                 'is_active' => true,
             ],
         ];
