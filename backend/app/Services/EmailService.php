@@ -2,18 +2,18 @@
 
 namespace App\Services;
 
-use SendGrid\Mail\Mail;
-use SendGrid\Mail\ personalization;
-use SendGrid\Mail\Email;
-use SendGrid\Mail\Content;
-use App\Models\Guest;
 use App\Models\Booking;
+use App\Models\Guest;
 use Exception;
+use Illuminate\Support\Facades\Log;
+use SendGrid\Mail\Mail;
 
 class EmailService
 {
     private $sendGrid;
+
     private string $fromEmail;
+
     private string $fromName;
 
     public function __construct()
@@ -28,8 +28,8 @@ class EmailService
 
     public function sendVerificationEmail(Guest $guest, string $token): void
     {
-        $verificationUrl = env('APP_URL', 'http://localhost:3000') . '/verify-email?token=' . $token;
-        
+        $verificationUrl = env('APP_URL', 'http://localhost:3000').'/verify-email?token='.$token;
+
         $this->sendEmail(
             $guest->email,
             'Verify your A&O Hostels account',
@@ -43,8 +43,8 @@ class EmailService
 
     public function sendPasswordResetEmail(Guest $guest, string $token): void
     {
-        $resetUrl = env('APP_URL', 'http://localhost:3000') . '/reset-password?token=' . $token;
-        
+        $resetUrl = env('APP_URL', 'http://localhost:3000').'/reset-password?token='.$token;
+
         $this->sendEmail(
             $guest->email,
             'Reset your A&O Hostels password',
@@ -60,7 +60,7 @@ class EmailService
     {
         $this->sendEmail(
             $booking->guest->email,
-            'Booking Confirmation - ' . $booking->property->name,
+            'Booking Confirmation - '.$booking->property->name,
             'emails.booking_confirmation',
             [
                 'booking' => $booking,
@@ -74,7 +74,7 @@ class EmailService
     {
         $this->sendEmail(
             $booking->guest->email,
-            'Booking Modified - ' . $booking->property->name,
+            'Booking Modified - '.$booking->property->name,
             'emails.booking_modification',
             [
                 'booking' => $booking,
@@ -88,7 +88,7 @@ class EmailService
     {
         $this->sendEmail(
             $booking->guest->email,
-            'Booking Cancelled - ' . $booking->property->name,
+            'Booking Cancelled - '.$booking->property->name,
             'emails.cancellation',
             [
                 'booking' => $booking,
@@ -103,7 +103,7 @@ class EmailService
     {
         $this->sendEmail(
             $booking->guest->email,
-            'Check-in Confirmed - ' . $booking->property->name,
+            'Check-in Confirmed - '.$booking->property->name,
             'emails.checkin_confirmation',
             [
                 'booking' => $booking,
@@ -117,7 +117,7 @@ class EmailService
     {
         $this->sendEmail(
             $booking->guest->email,
-            'Thank you for staying at ' . $booking->property->name,
+            'Thank you for staying at '.$booking->property->name,
             'emails.checkout_thankyou',
             [
                 'booking' => $booking,
@@ -131,7 +131,7 @@ class EmailService
     {
         $this->sendEmail(
             $booking->guest->email,
-            'Payment Received - ' . $booking->property->name,
+            'Payment Received - '.$booking->property->name,
             'emails.payment_confirmation',
             [
                 'booking' => $booking,
@@ -146,7 +146,7 @@ class EmailService
     {
         $this->sendEmail(
             $booking->guest->email,
-            'Refund Processed - ' . $booking->property->name,
+            'Refund Processed - '.$booking->property->name,
             'emails.refund_confirmation',
             [
                 'booking' => $booking,
@@ -159,25 +159,26 @@ class EmailService
 
     private function sendEmail(string $to, string $subject, string $template, array $data = []): void
     {
-        if (!$this->sendGrid) {
-            \Illuminate\Support\Facades\Log::info("Email (mock): {$subject} to {$to}");
+        if (! $this->sendGrid) {
+            Log::info("Email (mock): {$subject} to {$to}");
+
             return;
         }
 
         try {
-            $email = new Mail();
+            $email = new Mail;
             $email->setFrom($this->fromEmail, $this->fromName);
             $email->setSubject($subject);
             $email->addTo($to);
-            
-            $htmlContent = view('emails.' . $template, $data)->render();
+
+            $htmlContent = view('emails.'.$template, $data)->render();
             $email->addContent('text/html', $htmlContent);
 
             $response = $this->sendGrid->send($email);
-            
-            \Illuminate\Support\Facades\Log::info("Email sent: {$subject} to {$to}, Status: " . $response->statusCode());
+
+            Log::info("Email sent: {$subject} to {$to}, Status: ".$response->statusCode());
         } catch (Exception $e) {
-            \Illuminate\Support\Facades\Log::error("Failed to send email: " . $e->getMessage());
+            Log::error('Failed to send email: '.$e->getMessage());
         }
     }
 }

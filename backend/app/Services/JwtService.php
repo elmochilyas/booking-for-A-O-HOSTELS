@@ -6,19 +6,44 @@ use App\Models\Guest;
 use App\Models\Staff;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use Illuminate\Support\Facades\Config;
 
 class JwtService
 {
     private string $secretKey;
+
     private int $ttl;
+
     private int $refreshTtl;
+
+    private static array $blacklistedTokens = [];
 
     public function __construct()
     {
         $this->secretKey = config('app.jwt_secret', env('JWT_SECRET', 'default-secret-key'));
         $this->ttl = config('app.jwt_ttl', 15);
         $this->refreshTtl = config('app.jwt_refresh_ttl', 20160);
+    }
+
+    public function blacklistToken(string $token, int $expiresAt): void
+    {
+        $key = hash('sha256', $token);
+        self::$blacklistedTokens[$key] = $expiresAt;
+    }
+
+    public function isBlacklisted(string $token): bool
+    {
+        $key = hash('sha256', $token);
+        if (isset(self::$blacklistedTokens[$key])) {
+            if (self::$blacklistedTokens[$key] < time()) {
+                unset(self::$blacklistedTokens[$key]);
+
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     public function generateToken(Guest $guest): string
@@ -63,6 +88,10 @@ class JwtService
 
     public function verifyToken(string $token): object
     {
+        if ($this->isBlacklisted($token)) {
+            throw new \Exception('Token has been revoked');
+        }
+
         return JWT::decode($token, new Key($this->secretKey, 'HS256'));
     }
 
@@ -93,7 +122,7 @@ class JwtService
     public function verifyEmailToken(string $token): object
     {
         $decoded = $this->verifyToken($token);
-        
+
         if ($decoded->type !== 'email_verify') {
             throw new \Exception('Invalid token type');
         }
@@ -104,7 +133,7 @@ class JwtService
     public function verifyPasswordResetToken(string $token): object
     {
         $decoded = $this->verifyToken($token);
-        
+
         if ($decoded->type !== 'password_reset') {
             throw new \Exception('Invalid token type');
         }

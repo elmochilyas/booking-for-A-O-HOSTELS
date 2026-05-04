@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Guest;
-use App\Services\JwtService;
 use App\Services\EmailService;
+use App\Services\JwtService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -16,14 +16,14 @@ class AuthController extends Controller
 {
     public function __construct(
         private JwtService $jwtService,
-        private EmailService $emailService
+        private EmailService $emailService,
     ) {}
 
     public function register(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|unique:guests,email',
-            'password' => 'required|string|min:8|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/',
+            'password' => 'required|string|min:8',
             'first_name' => 'required|string|max:100',
             'last_name' => 'required|string|max:100',
             'phone' => 'nullable|string|max:20',
@@ -36,7 +36,7 @@ class AuthController extends Controller
         }
 
         $data = $validator->validated();
-        
+
         $guest = Guest::create([
             'id' => Str::uuid()->toString(),
             'email' => $data['email'],
@@ -77,7 +77,7 @@ class AuthController extends Controller
 
         $guest = Guest::where('email', $request->email)->first();
 
-        if (!$guest || !Hash::check($request->password, $guest->password_hash)) {
+        if (! $guest || ! Hash::check($request->password, $guest->password_hash)) {
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
 
@@ -94,16 +94,16 @@ class AuthController extends Controller
     public function refresh(Request $request): JsonResponse
     {
         $refreshToken = $request->bearerToken();
-        
-        if (!$refreshToken) {
+
+        if (! $refreshToken) {
             return response()->json(['error' => 'Refresh token required'], 400);
         }
 
         try {
             $decoded = $this->jwtService->verifyToken($refreshToken);
             $guest = Guest::find($decoded->sub);
-            
-            if (!$guest) {
+
+            if (! $guest) {
                 return response()->json(['error' => 'User not found'], 404);
             }
 
@@ -122,8 +122,16 @@ class AuthController extends Controller
 
     public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
-        
+        $token = $request->bearerToken();
+
+        if ($token) {
+            try {
+                $decoded = $this->jwtService->verifyToken($token);
+                $this->jwtService->blacklistToken($token, $decoded->exp ?? (time() + 3600));
+            } catch (\Exception $e) {
+            }
+        }
+
         return response()->json(['message' => 'Logged out successfully']);
     }
 
@@ -140,8 +148,8 @@ class AuthController extends Controller
         try {
             $decoded = $this->jwtService->verifyEmailToken($request->token);
             $guest = Guest::find($decoded->sub);
-            
-            if (!$guest) {
+
+            if (! $guest) {
                 return response()->json(['error' => 'User not found'], 404);
             }
 
@@ -164,14 +172,14 @@ class AuthController extends Controller
         }
 
         $guest = Guest::where('email', $request->email)->first();
-        
+
         if ($guest) {
             $resetToken = $this->jwtService->generatePasswordResetToken($guest);
             $this->emailService->sendPasswordResetEmail($guest, $resetToken);
         }
 
         return response()->json([
-            'message' => 'If the email exists, a password reset link has been sent.'
+            'message' => 'If the email exists, a password reset link has been sent.',
         ]);
     }
 
@@ -189,8 +197,8 @@ class AuthController extends Controller
         try {
             $decoded = $this->jwtService->verifyPasswordResetToken($request->token);
             $guest = Guest::find($decoded->sub);
-            
-            if (!$guest) {
+
+            if (! $guest) {
                 return response()->json(['error' => 'User not found'], 404);
             }
 
