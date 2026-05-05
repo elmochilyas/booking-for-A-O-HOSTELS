@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert, TouchableOpacity, ImageBackground, Dimensions, FlatList, Pressable } from 'react-native';
+import React, { useState, useEffect, useMemo, useCallback, memo } from 'react';
+import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert, TouchableOpacity, ImageBackground, FlatList, Pressable, useWindowDimensions } from 'react-native';
 import { TextInput, Button, Text, Card, Surface } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/MainNavigator';
 import { Spacing, Colors, BorderRadius } from '../theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { propertiesApi } from '../services/api';
 
 type Props = {
@@ -52,9 +52,18 @@ const cityDescriptions: Record<string, string> = {
 
 const defaultImage = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CARD_WIDTH = SCREEN_WIDTH * 0.7;
-const CITY_CARD_WIDTH = (SCREEN_WIDTH - Spacing.lg * 2 - Spacing.md) / 2 - 4;
+// Fallback destinations when API is not available
+const fallbackDestinations: Destination[] = [
+  { id: '1', city: 'Berlin', country: 'Germany', properties: 245, priceFrom: 45, rating: 8.7, reviewCount: 18420, image: cityImages['Berlin'] || defaultImage, description: 'Vibrant art scene & historic landmarks', highlights: [] },
+  { id: '2', city: 'Munich', country: 'Germany', properties: 186, priceFrom: 62, rating: 8.9, reviewCount: 12350, image: cityImages['Munich'] || defaultImage, description: 'Bavarian charm & world-class breweries', highlights: [] },
+  { id: '3', city: 'Hamburg', country: 'Germany', properties: 156, priceFrom: 55, rating: 8.5, reviewCount: 9870, image: cityImages['Hamburg'] || defaultImage, description: 'Port city with stunning waterways', highlights: [] },
+  { id: '4', city: 'Frankfurt', country: 'Germany', properties: 134, priceFrom: 58, rating: 8.3, reviewCount: 7650, image: cityImages['Frankfurt'] || defaultImage, description: 'Financial hub with historic old town', highlights: [] },
+  { id: '5', city: 'Cologne', country: 'Germany', properties: 178, priceFrom: 49, rating: 8.4, reviewCount: 11200, image: cityImages['Cologne'] || defaultImage, description: 'Cathedral city on the Rhine', highlights: [] },
+  { id: '6', city: 'Dresden', country: 'Germany', properties: 89, priceFrom: 42, rating: 8.6, reviewCount: 5400, image: cityImages['Dresden'] || defaultImage, description: 'Elbe Florence with baroque architecture', highlights: [] },
+  { id: '7', city: 'Stuttgart', country: 'Germany', properties: 78, priceFrom: 52, rating: 8.2, reviewCount: 4200, image: cityImages['Stuttgart'] || defaultImage, description: 'Auto city & royal palaces', highlights: [] },
+  { id: '8', city: 'Leipzig', country: 'Germany', properties: 95, priceFrom: 38, rating: 8.5, reviewCount: 6100, image: cityImages['Leipzig'] || defaultImage, description: 'Creative hub with rich music heritage', highlights: [] },
+  { id: '9', city: 'Heidelberg', country: 'Germany', properties: 67, priceFrom: 65, rating: 9.0, reviewCount: 3800, image: cityImages['Heidelberg'] || defaultImage, description: 'Romantic old town & castle ruins', highlights: [] },
+];
 
 const formatDate = (date: Date): string => {
   const year = date.getFullYear();
@@ -64,6 +73,10 @@ const formatDate = (date: Date): string => {
 };
 
 export default function SearchScreen({ navigation }: Props) {
+  const { width: SCREEN_WIDTH } = useWindowDimensions();
+  const CARD_WIDTH = SCREEN_WIDTH * 0.7;
+  const CITY_CARD_WIDTH = (SCREEN_WIDTH - Spacing.lg * 2 - Spacing.md) / 2 - 4;
+
   const [location, setLocation] = useState('');
   const [checkInDate, setCheckInDate] = useState<Date | null>(null);
   const [checkOutDate, setCheckOutDate] = useState<Date | null>(null);
@@ -80,21 +93,21 @@ export default function SearchScreen({ navigation }: Props) {
   const fetchDestinations = async () => {
     try {
       const response = await propertiesApi.getDestinations();
-      const destData = (response.data.destinations || []).map((dest: any, index: number): Destination => ({
-        id: dest.city || String(index),
-        city: dest.city || '',
-        country: dest.country || 'Germany',
-        properties: dest.properties || 0,
-        priceFrom: dest.priceFrom || 0,
-        rating: dest.rating || 0,
-        reviewCount: dest.reviewCount || 0,
-        image: cityImages[dest.city] || defaultImage,
-        description: cityDescriptions[dest.city] || `Explore ${dest.city}`,
+      const destData = (response.data.destinations || []).map((dest: Record<string, unknown>, index: number): Destination => ({
+        id: (dest.city as string) || String(index),
+        city: (dest.city as string) || '',
+        country: (dest.country as string) || 'Germany',
+        properties: (dest.properties as number) || 0,
+        priceFrom: (dest.priceFrom as number) || 0,
+        rating: (dest.rating as number) || 0,
+        reviewCount: (dest.reviewCount as number) || 0,
+        image: cityImages[dest.city as string] || defaultImage,
+        description: cityDescriptions[dest.city as string] || `Explore ${dest.city}`,
         highlights: [],
       }));
       setDestinations(destData.length > 0 ? destData : fallbackDestinations);
-} catch (error: any) {
-      console.log('Failed to fetch destinations:', error);
+    } catch (error: unknown) {
+      console.log('Failed to fetch destinations:', error instanceof Error ? error.message : error);
       // Use fallback destinations when API fails
       setDestinations(fallbackDestinations);
     } finally {
@@ -102,29 +115,27 @@ export default function SearchScreen({ navigation }: Props) {
     }
   };
 
-// Fallback destinations when API is not available
-const fallbackDestinations: Destination[] = [
-  { id: '1', city: 'Berlin', country: 'Germany', properties: 245, priceFrom: 45, rating: 8.7, reviewCount: 18420, image: cityImages['Berlin'] || defaultImage, description: 'Vibrant art scene & historic landmarks', highlights: [] },
-  { id: '2', city: 'Munich', country: 'Germany', properties: 186, priceFrom: 62, rating: 8.9, reviewCount: 12350, image: cityImages['Munich'] || defaultImage, description: 'Bavarian charm & world-class breweries', highlights: [] },
-  { id: '3', city: 'Hamburg', country: 'Germany', properties: 156, priceFrom: 55, rating: 8.5, reviewCount: 9870, image: cityImages['Hamburg'] || defaultImage, description: 'Port city with stunning waterways', highlights: [] },
-  { id: '4', city: 'Frankfurt', country: 'Germany', properties: 134, priceFrom: 58, rating: 8.3, reviewCount: 7650, image: cityImages['Frankfurt'] || defaultImage, description: 'Financial hub with historic old town', highlights: [] },
-  { id: '5', city: 'Cologne', country: 'Germany', properties: 178, priceFrom: 49, rating: 8.4, reviewCount: 11200, image: cityImages['Cologne'] || defaultImage, description: 'Cathedral city on the Rhine', highlights: [] },
-  { id: '6', city: 'Dresden', country: 'Germany', properties: 89, priceFrom: 42, rating: 8.6, reviewCount: 5400, image: cityImages['Dresden'] || defaultImage, description: 'Elbe Florence with baroque architecture', highlights: [] },
-  { id: '7', city: 'Stuttgart', country: 'Germany', properties: 78, priceFrom: 52, rating: 8.2, reviewCount: 4200, image: cityImages['Stuttgart'] || defaultImage, description: 'Auto city & royal palaces', highlights: [] },
-  { id: '8', city: 'Leipzig', country: 'Germany', properties: 95, priceFrom: 38, rating: 8.5, reviewCount: 6100, image: cityImages['Leipzig'] || defaultImage, description: 'Creative hub with rich music heritage', highlights: [] },
-  { id: '9', city: 'Heidelberg', country: 'Germany', properties: 67, priceFrom: 65, rating: 9.0, reviewCount: 3800, image: cityImages['Heidelberg'] || defaultImage, description: 'Romantic old town & castle ruins', highlights: [] },
-];
+  const today = useMemo(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, []);
 
-const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrow = useMemo(() => {
+    const d = new Date(today);
+    d.setDate(d.getDate() + 1);
+    return d;
+  }, [today]);
 
   const minCheckInDate = today;
-  const minCheckOutDate = checkInDate ? new Date(checkInDate) : tomorrow;
+  const minCheckOutDate = useMemo(() => {
+    if (checkInDate) {
+      return new Date(checkInDate);
+    }
+    return tomorrow;
+  }, [checkInDate, tomorrow]);
 
-  const handleCheckInChange = (event: any, selectedDate?: Date) => {
+  const handleCheckInChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
     setShowCheckInPicker(false);
     if (selectedDate) {
       setCheckInDate(selectedDate);
@@ -136,7 +147,7 @@ const today = new Date();
     }
   };
 
-  const handleCheckOutChange = (event: any, selectedDate?: Date) => {
+  const handleCheckOutChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
     setShowCheckOutPicker(false);
     if (selectedDate) {
       setCheckOutDate(selectedDate);
@@ -178,7 +189,7 @@ const today = new Date();
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']} removeClippedSubviews={false}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <KeyboardAvoidingView 
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -287,16 +298,18 @@ const today = new Date();
                 />
               </View>
               
-              <Button 
-                mode="contained" 
-                onPress={handleSearch} 
-                style={styles.searchButton}
-                contentStyle={styles.buttonContent}
-                icon="magnify"
-                buttonColor={Colors.primary}
-              >
-                Search Properties
-              </Button>
+                <Button 
+                  mode="contained" 
+                  onPress={handleSearch} 
+                  style={styles.searchButton}
+                  contentStyle={styles.buttonContent}
+                  icon="magnify"
+                  buttonColor={Colors.primary}
+                  accessibilityLabel="Search properties"
+                  accessibilityRole="button"
+                >
+                  Search Properties
+                </Button>
             </Card.Content>
           </Surface>
 
@@ -322,11 +335,14 @@ const today = new Date();
                     <Pressable
                       onPress={() => handleDestinationSelect(item.city)}
                       style={({ pressed }) => [styles.featuredCard, { width: CARD_WIDTH }, pressed && styles.cardPressed]}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Select ${item.city}, ${item.country}`}
                     >
                       <ImageBackground
-                        source={{ uri: item.image }}
+                        source={{ uri: item.image || defaultImage }}
                         style={styles.featuredCardImage}
                         imageStyle={styles.featuredImageStyle}
+                        onError={() => console.log(`Failed to load image for ${item.city}`)}
                       >
                         <View style={styles.featuredOverlay}>
                           <View style={styles.ratingBadge}>
@@ -368,6 +384,8 @@ const today = new Date();
                           key={city.id}
                           onPress={() => handleDestinationSelect(city.city)}
                           style={({ pressed }) => [styles.cityCard, pressed && styles.cardPressed]}
+                          accessibilityRole="button"
+                          accessibilityLabel={`Select ${city.city}, ${city.country}`}
                         >
                           <ImageBackground
                             source={{ uri: city.image }}

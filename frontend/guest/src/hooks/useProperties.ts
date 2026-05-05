@@ -4,10 +4,20 @@ import { useQuery } from '@tanstack/react-query'
 import { propertiesService } from '@/services/properties.service'
 import type { Property, RoomType, PropertyAvailability, SearchFilters } from '@/types/property.types'
 
-export function useProperties(filters?: SearchFilters) {
+export function useProperties(filters?: SearchFilters, options?: { lightweight?: boolean }) {
   return useQuery<Property[]>({
-    queryKey: ['properties', filters],
-    queryFn: () => propertiesService.getAll(filters),
+    queryKey: ['properties', filters, options?.lightweight],
+    queryFn: async () => {
+      try {
+        if (options?.lightweight) {
+          return await propertiesService.getLightweight()
+        }
+        return await propertiesService.getAll(filters)
+      } catch (error) {
+        console.error('Error fetching properties:', error)
+        throw error
+      }
+    },
     staleTime: 1000 * 60 * 5,
   })
 }

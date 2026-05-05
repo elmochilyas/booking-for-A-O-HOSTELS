@@ -3,7 +3,7 @@ import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Text, Button, List, Avatar, Divider, ActivityIndicator, Switch } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/MainNavigator';
+import { RootStackParamList } from '../navigation/types';
 import { useAuthStore } from '../stores/authStore';
 import { useTheme } from '../theme/ThemeContext';
 import { Spacing, Colors } from '../theme';
@@ -69,7 +69,7 @@ export default function ProfileScreen({ navigation }: Props) {
       <Divider style={styles.divider} />
       
       <View style={styles.menu}>
-        <TouchableOpacity onPress={() => navigation.navigate('MainTabs', { screen: 'Bookings' } as any)}>
+        <TouchableOpacity onPress={() => navigation.navigate('MainTabs', { screen: 'Bookings' })}>
           <List.Item 
             title="My Bookings" 
             titleStyle={styles.menuTitle}

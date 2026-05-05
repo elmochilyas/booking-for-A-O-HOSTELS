@@ -14,13 +14,37 @@ type Props = {
 export default function LoginScreen({ navigation }: Props) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const { login, isLoading } = useAuthStore();
 
+  const handleEmailChange = (text: string) => {
+    setEmail(text);
+    if (emailError) setEmailError('');
+  };
+
+  const handlePasswordChange = (text: string) => {
+    setPassword(text);
+    if (passwordError) setPasswordError('');
+  };
+
   const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please enter email and password');
-      return;
+    let hasError = false;
+
+    if (!email) {
+      setEmailError('Email is required');
+      hasError = true;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setEmailError('Please enter a valid email');
+      hasError = true;
     }
+
+    if (!password) {
+      setPasswordError('Password is required');
+      hasError = true;
+    }
+
+    if (hasError) return;
 
     try {
       await login(email, password);
@@ -28,9 +52,9 @@ export default function LoginScreen({ navigation }: Props) {
         index: 0,
         routes: [{ name: 'MainTabs' }],
       });
-    } catch (error: any) {
-      const message = error.response?.data?.error || 'Login failed. Please try again.';
-      Alert.alert('Error', message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Login failed. Please try again.';
+      setPasswordError(message);
     }
   };
 
@@ -46,20 +70,24 @@ export default function LoginScreen({ navigation }: Props) {
               <TextInput
                 label="Email"
                 value={email}
-                onChangeText={setEmail}
+                onChangeText={handleEmailChange}
                 mode="outlined"
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoComplete="email"
                 style={styles.input}
+                error={!!emailError}
+                helperText={emailError}
               />
               <TextInput
                 label="Password"
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={handlePasswordChange}
                 mode="outlined"
                 secureTextEntry
                 style={styles.input}
+                error={!!passwordError}
+                helperText={passwordError}
                 right={<TextInput.Icon icon="eye" onPress={() => {}} />}
               />
               

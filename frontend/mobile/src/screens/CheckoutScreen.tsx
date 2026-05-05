@@ -28,6 +28,9 @@ export default function CheckoutScreen({ navigation, route }: Props) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [firstNameError, setFirstNameError] = useState('');
+  const [lastNameError, setLastNameError] = useState('');
+  const [emailError, setEmailError] = useState('');
   const [totalPrice, setTotalPrice] = useState(0);
   const [deposit, setDeposit] = useState(0);
 
@@ -76,9 +79,49 @@ export default function CheckoutScreen({ navigation, route }: Props) {
     return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
   };
 
+  const handleFirstNameChange = (text: string) => {
+    setFirstName(text);
+    if (firstNameError) setFirstNameError('');
+  };
+
+  const handleLastNameChange = (text: string) => {
+    setLastName(text);
+    if (lastNameError) setLastNameError('');
+  };
+
+  const handleEmailChange = (text: string) => {
+    setEmail(text);
+    if (emailError) setEmailError('');
+  };
+
   const handleProceedToPayment = async () => {
-    if (!firstName || !lastName || !email) {
-      Alert.alert('Error', 'Please fill in all required fields');
+    let hasError = false;
+
+    if (!firstName) {
+      setFirstNameError('First name is required');
+      hasError = true;
+    }
+
+    if (!lastName) {
+      setLastNameError('Last name is required');
+      hasError = true;
+    }
+
+    if (!email) {
+      setEmailError('Email is required');
+      hasError = true;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setEmailError('Please enter a valid email');
+      hasError = true;
+    }
+
+    if (hasError) return;
+
+    if (!isAuthenticated || !guest) {
+      Alert.alert('Login Required', 'Please log in to complete your booking', [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Log In', onPress: () => navigation.navigate('Login') },
+      ]);
       return;
     }
 
@@ -142,8 +185,9 @@ export default function CheckoutScreen({ navigation, route }: Props) {
           Alert.alert('Payment Failed', confirmResponse.data.message || 'Please try again');
         }
       }
-    } catch (error: any) {
-      Alert.alert('Error', error.response?.data?.message || 'Something went wrong');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Something went wrong';
+      Alert.alert('Error', errorMessage);
     } finally {
       setLoading(false);
     }
@@ -152,7 +196,7 @@ export default function CheckoutScreen({ navigation, route }: Props) {
   const nights = getNights();
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']} removeClippedSubviews={false}>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
         <Card style={styles.section}>
           <Card.Content>
@@ -161,21 +205,30 @@ export default function CheckoutScreen({ navigation, route }: Props) {
               <TextInput
                 label="First Name"
                 value={firstName}
-                onChangeText={setFirstName}
+                onChangeText={handleFirstNameChange}
                 mode="outlined"
                 style={[styles.input, styles.halfInput]}
+                error={!!firstNameError}
+                helperText={firstNameError}
               />
               <TextInput
                 label="Last Name"
                 value={lastName}
-                onChangeText={setLastName}
+                onChangeText={handleLastNameChange}
                 mode="outlined"
                 style={[styles.input, styles.halfInput]}
+                error={!!lastNameError}
+                helperText={lastNameError}
               />
             </View>
             <TextInput
               label="Email"
               value={email}
+              onChangeText={handleEmailChange}
+              mode="outlined"
+              style={styles.input}
+              error={!!emailError}
+              helperText={emailError}
               onChangeText={setEmail}
               mode="outlined"
               keyboardType="email-address"

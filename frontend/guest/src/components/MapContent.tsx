@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
-import type { LatLngExpression } from 'leaflet'
+import type { LatLngExpression, LatLngBoundsExpression } from 'leaflet'
 import L from 'leaflet'
 
 import 'leaflet/dist/leaflet.css'
@@ -23,6 +23,12 @@ interface MapContentProps {
   zoom?: number
 }
 
+// Restrict the map to Europe so users can't pan or zoom out to other continents
+const EUROPE_BOUNDS: LatLngBoundsExpression = [
+  [34, -25],
+  [72, 45],
+]
+
 function createCustomIcon() {
   return L.icon({
     iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
@@ -40,13 +46,31 @@ export default function MapContent({ markers, center = [50.5, 10], zoom = 4 }: M
 
   useEffect(() => {
     setMounted(true)
-    
+
     delete (L.Icon.Default.prototype as any)._getIconUrl
     L.Icon.Default.mergeOptions({
       iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
       iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
       shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
     })
+  }, [])
+
+  useEffect(() => {
+    const style = document.createElement('style')
+    style.textContent = `
+      .leaflet-tile {
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+      }
+      .leaflet-tile-container {
+        line-height: 0;
+      }
+    `
+    document.head.appendChild(style)
+    return () => {
+      document.head.removeChild(style)
+    }
   }, [])
 
   if (!mounted) {
@@ -57,16 +81,17 @@ export default function MapContent({ markers, center = [50.5, 10], zoom = 4 }: M
     )
   }
 
-  const defaultCenter: LatLngExpression = center
-  const defaultZoom = zoom
   const customIcon = createCustomIcon()
 
   return (
     <MapContainer
-      center={defaultCenter}
-      zoom={defaultZoom}
+      center={center as LatLngExpression}
+      zoom={zoom}
       style={{ height: '500px', width: '100%', borderRadius: '1rem' }}
       scrollWheelZoom={true}
+      maxBounds={EUROPE_BOUNDS}
+      maxBoundsViscosity={1.0}
+      minZoom={4}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

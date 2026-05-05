@@ -92,9 +92,9 @@ function transformProperty(p: BackendProperty): Property {
   // Generate slug from property name (e.g., "a&o Berlin Mitte" -> "ao-berlin-mitte")
   const slug = p.name
     .toLowerCase()
-    .replace(/[^a-z0-9\s&]/g, '')
-    .replace(/\s+/g, '-')
     .replace(/&/g, 'and')
+    .replace(/[^a-z0-9\s]/g, '')
+    .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .trim()
 
@@ -139,8 +139,13 @@ export const propertiesService = {
   },
 
   async getBySlug(slug: string) {
-    // Backend has no /properties/slug/{slug} — slug is the property ID
-    return propertiesService.getById(slug)
+    if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug)) {
+      return propertiesService.getById(slug)
+    }
+    const response = await api.get('/properties', { params: { slug } })
+    const raw: BackendProperty[] = response.data?.properties ?? response.data ?? []
+    if (raw.length === 0) throw new Error(`Property not found: ${slug}`)
+    return transformProperty(raw[0])
   },
 
   async getRoomTypes(id: string) {
@@ -160,5 +165,20 @@ export const propertiesService = {
     const response = await api.get('/properties', { params: filters })
     const raw: BackendProperty[] = response.data?.properties ?? response.data ?? []
     return raw.map(transformProperty)
+  },
+
+  async getLightweight() {
+    const response = await api.get('/properties', { params: { lightweight: 1 } })
+    const raw = response.data?.properties ?? response.data ?? []
+    return raw.map((p: any) => ({
+      id: p.id,
+      name: p.name,
+      city: p.location,
+      country: '',
+      latitude: parseFloat(p.latitude) || 0,
+      longitude: parseFloat(p.longitude) || 0,
+      starRating: parseFloat(p.rating) || 0,
+      priceFrom: 0,
+    }))
   },
 }

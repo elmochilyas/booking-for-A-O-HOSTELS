@@ -58,8 +58,8 @@ async function downloadInvoice(bookingId: string) {
   }
 }
 
-export default function BookingDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params)
+export default function BookingDetailPage({ params }: { params: { id: string } }) {
+  const { id } = params
   const router = useRouter()
   const queryClient = useQueryClient()
   const { data: booking, isLoading } = useBooking(id)

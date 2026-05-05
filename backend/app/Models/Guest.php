@@ -31,6 +31,7 @@ class Guest extends Model
         'email_verified_at', 'verification_token',
         'is_loyalty_member', 'loyalty_points',
         'notification_email', 'notification_sms',
+        'is_banned', 'ban_reason', 'banned_at',
     ];
 
     protected $hidden = [
@@ -45,10 +46,22 @@ class Guest extends Model
         'loyalty_points' => 'integer',
         'notification_email' => 'boolean',
         'notification_sms' => 'boolean',
+        'is_banned' => 'boolean',
+        'banned_at' => 'datetime',
     ];
 
     public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class, 'guest_id');
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class, 'guest_id');
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class, 'guest_id');
     }
 }

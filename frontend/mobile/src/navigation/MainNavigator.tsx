@@ -15,25 +15,7 @@ import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import NotificationPreferencesScreen from '../screens/NotificationPreferencesScreen';
 import { Colors } from '../theme';
-
-export type RootStackParamList = {
-  MainTabs: undefined;
-  Search: undefined;
-  PropertyList: { location?: string; checkIn?: string; checkOut?: string; guests?: number };
-  PropertyDetail: { propertyId: string; checkIn?: string; checkOut?: string; guests?: number };
-  RoomSelection: { propertyId: string; checkIn?: string; checkOut?: string; guests?: number };
-  Checkout: { roomId: string; propertyId?: string; checkIn?: string; checkOut?: string; guestCount?: number };
-  BookingConfirmation: { bookingId: string };
-  Login: undefined;
-  Register: undefined;
-  NotificationPreferences: undefined;
-};
-
-export type TabParamList = {
-  Home: undefined;
-  Bookings: undefined;
-  Profile: undefined;
-};
+import { RootStackParamList, TabParamList } from './types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();

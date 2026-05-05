@@ -1,11 +1,10 @@
 'use client'
 
-import { use } from 'react'
+import { use, useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Check, MapPin, Clock, Calendar, Download, User, Wifi } from 'lucide-react'
+import { Check, MapPin, Clock, Calendar, Download, User, Wifi, ArrowRight, Info, Settings, Bed, Home } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import { useBooking } from '@/hooks/useBooking'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatCurrency, formatDate } from '@/lib/utils'
@@ -65,9 +64,45 @@ async function downloadInvoice(bookingId: string) {
   }
 }
 
-export default function ConfirmationPage({ params }: { params: Promise<{ bookingId: string }> }) {
-  const { bookingId } = use(params)
+function Confetti() {
+  const pieces = Array.from({ length: 40 }, (_, i) => i)
+  const colors = ['#293a88', '#1E3A5F', '#4159a8', '#FFD700', '#4CAF50', '#2196F3']
+
+  return (
+    <div className="fixed inset-0 pointer-events-none overflow-hidden z-50">
+      {pieces.map((i) => (
+        <div
+          key={i}
+          className="absolute w-2.5 h-2.5 opacity-0"
+          style={{
+            left: `${Math.random() * 100}%`,
+            top: '-10px',
+            backgroundColor: colors[i % colors.length],
+            borderRadius: Math.random() > 0.5 ? '50%' : '2px',
+            animation: `confetti-fall ${1.5 + Math.random() * 2}s ease-in ${Math.random() * 1.5}s forwards`,
+            transform: `rotate(${Math.random() * 360}deg)`,
+          }}
+        />
+      ))}
+      <style>{`
+        @keyframes confetti-fall {
+          0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+          100% { opacity: 0; transform: translateY(100vh) rotate(${Math.random() * 720}deg); }
+        }
+      `}</style>
+    </div>
+  )
+}
+
+export default function ConfirmationPage({ params }: { params: { bookingId: string } }) {
+  const { bookingId } = params
   const { data: booking, isLoading } = useBooking(bookingId)
+  const [showConfetti, setShowConfetti] = useState(true)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowConfetti(false), 4000)
+    return () => clearTimeout(timer)
+  }, [])
 
   if (isLoading) {
     return (
@@ -91,149 +126,177 @@ export default function ConfirmationPage({ params }: { params: Promise<{ booking
   const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(booking.propertyName + ', ' + booking.propertyCity)}`
 
   return (
-    <div className="min-h-screen bg-muted/30 py-12">
+    <div className="min-h-screen bg-gradient-to-b from-green-50 via-white to-muted/20 py-12">
+      {showConfetti && <Confetti />}
+
       <div className="container mx-auto px-4 max-w-3xl">
-        {/* Success Banner */}
-        <Card className="mb-8 border-green-200 bg-green-50">
-          <CardContent className="p-8 text-center">
-            <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Check className="h-8 w-8 text-white" />
-            </div>
-            <h1 className="text-2xl font-bold mb-2">Booking Confirmed!</h1>
-            <p className="text-muted-foreground">
-              Your reservation is confirmed. A confirmation email has been sent to{' '}
-              <span className="font-medium">{booking.guestEmail}</span>.
-            </p>
-          </CardContent>
-        </Card>
+        {/* Success header */}
+        <div className="text-center mb-12 animate-scale-in">
+          <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
+            <Check className="h-12 w-12 text-white" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold mb-3">You&apos;re all set!</h1>
+          <p className="text-lg text-muted-foreground">
+            Confirmation sent to <span className="font-semibold text-foreground">{booking.guestEmail}</span>
+          </p>
+        </div>
 
-        {/* Booking Details */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="relative w-full md:w-48 h-40 rounded-lg overflow-hidden shrink-0">
-                <Image
-                  src={booking.propertyImage || 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400'}
-                  alt={booking.propertyName}
-                  fill
-                  className="object-cover"
-                />
+        {/* Boarding pass card - Enhanced */}
+        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden mb-10 animate-slide-up border border-gray-100">
+          {/* Top section */}
+          <div className="bg-gradient-to-r from-primary via-primary to-primary/80 p-8 text-white">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <svg className="w-10 h-10" viewBox="0 0 32 32" fill="none">
+                  <path d="M16 2L28 26H4L16 2Z" fill="white" />
+                  <path d="M16 8L22 22H10L16 8Z" fill="#4159a8" />
+                </svg>
+                <span className="text-3xl font-bold">a&o</span>
               </div>
-              <div className="flex-1">
-                <h2 className="text-xl font-bold mb-1">{booking.propertyName}</h2>
-                <div className="flex items-center gap-2 text-muted-foreground mb-4">
+              <div className="text-right">
+                <p className="text-white/60 text-xs uppercase tracking-widest">Status</p>
+                <span className="inline-block px-4 py-1.5 bg-green-500 text-white text-sm font-bold rounded-full shadow-lg">
+                  ✓ CONFIRMED
+                </span>
+              </div>
+            </div>
+            <div>
+              <p className="text-white/60 text-xs uppercase tracking-widest mb-2">Property</p>
+              <h2 className="text-3xl font-bold">{booking.propertyName}</h2>
+              <div className="flex items-center gap-3 text-white/80 mt-2">
+                <div className="p-1.5 bg-white/10 rounded-lg">
                   <MapPin className="h-4 w-4" />
-                  {booking.propertyCity}
                 </div>
-
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div>
-                    <span className="text-muted-foreground block">Booking ID</span>
-                    <p className="font-semibold font-mono">{booking.id}</p>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground block">Room Type</span>
-                    <p className="font-semibold">{booking.roomTypeName}</p>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground block">Check-in</span>
-                    <p className="font-semibold">{formatDate(booking.checkIn)}</p>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground block">Check-out</span>
-                    <p className="font-semibold">{formatDate(booking.checkOut)}</p>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground block">Guests</span>
-                    <p className="font-semibold">{booking.guests}</p>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground block">Status</span>
-                    <p className="font-semibold capitalize text-green-600">{booking.status}</p>
-                  </div>
-                </div>
+                {booking.propertyCity}
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* Check-in Instructions */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <h3 className="font-semibold text-lg mb-4">Check-in Instructions</h3>
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <Clock className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium">Check-in Time</p>
-                  <p className="text-sm text-muted-foreground">From 3:00 PM (15:00). Early check-in available if pre-booked.</p>
+          {/* Dashed tear-off separator */}
+          <div className="relative flex items-center my-2">
+            <div className="absolute -left-6 w-12 h-12 bg-gradient-to-b from-muted/50 to-white rounded-full border-4 border-white" />
+            <div className="flex-1 border-t-2 border-dashed border-gray-200 mx-6" />
+            <div className="absolute -right-6 w-12 h-12 bg-gradient-to-b from-muted/50 to-white rounded-full border-4 border-white" />
+          </div>
+
+          {/* Details section */}
+          <div className="p-8">
+            <div className="grid grid-cols-2 gap-8 mb-8">
+              <div>
+                <p className="text-muted-foreground text-xs uppercase tracking-widest mb-2">Check-in</p>
+                <p className="font-bold text-xl">{formatDate(booking.checkIn)}</p>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                  <Clock className="h-3.5 w-3.5" />
+                  From 3:00 PM
                 </div>
               </div>
-              <div className="flex items-start gap-3">
-                <User className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium">What to Bring</p>
-                  <p className="text-sm text-muted-foreground">Valid photo ID (passport or national ID card) and a credit card for incidentals deposit.</p>
+              <div>
+                <p className="text-muted-foreground text-xs uppercase tracking-widest mb-2">Check-out</p>
+                <p className="font-bold text-xl">{formatDate(booking.checkOut)}</p>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                  <Clock className="h-3.5 w-3.5" />
+                  By 11:00 AM
                 </div>
               </div>
-              <div className="flex items-start gap-3">
-                <Wifi className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium">Free WiFi</p>
-                  <p className="text-sm text-muted-foreground">Available throughout the property. Network details provided at reception.</p>
-                </div>
+              <div>
+                <p className="text-muted-foreground text-xs uppercase tracking-widest mb-2">Room Type</p>
+                <p className="font-bold text-lg">{booking.roomTypeName}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground text-xs uppercase tracking-widest mb-2">Guests</p>
+                <p className="font-bold text-lg">{booking.guests}</p>
               </div>
             </div>
 
-            <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="block mt-6">
-              <Button variant="outline" className="w-full sm:w-auto">
-                <MapPin className="h-4 w-4 mr-2" />
-                Get Directions
-              </Button>
-            </a>
-          </CardContent>
-        </Card>
+          {/* Barcode-style divider */}
+          <div className="relative flex items-center my-6">
+            <div className="absolute -left-6 w-12 h-12 bg-white rounded-full" />
+            <div className="flex-1 border-t-2 border-dashed border-gray-200" />
+            <div className="absolute -right-6 w-12 h-12 bg-white rounded-full" />
+          </div>
 
-        {/* Payment Summary */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <h3 className="font-semibold text-lg mb-4">Payment Summary</h3>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Total Price</span>
-                <span className="font-semibold">{formatCurrency(booking.totalPrice)}</span>
+          {/* Booking ID as barcode look */}
+          <div className="flex items-center justify-between px-4">
+            <div>
+              <p className="text-muted-foreground text-xs uppercase tracking-widest mb-2">Booking ID</p>
+              <p className="font-mono font-bold text-lg tracking-widest">{booking.id}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-muted-foreground text-xs uppercase tracking-widest mb-2">Total Paid</p>
+              <p className="font-bold text-2xl text-primary">{formatCurrency(booking.depositAmount || booking.totalPrice)}</p>
+            </div>
+          </div>
+
+          {/* Barcode visual */}
+          <div className="mt-6 flex gap-1 h-16 items-end justify-center opacity-20">
+            {Array.from({ length: 50 }, (_, i) => (
+              <div
+                key={i}
+                className="bg-foreground rounded-sm"
+                style={{
+                  width: `${Math.random() > 0.7 ? 2 : 1}px`,
+                  height: `${40 + Math.sin(i * 0.8) * 30}%`,
+                }}
+              />
+            ))}
+          </div>
+        </div>
+        </div>
+
+        {/* Instructions - Enhanced */}
+        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 border border-gray-100">
+          <h3 className="font-bold text-xl mb-6 flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Info className="h-5 w-5 text-primary" />
+            </div>
+            What to Know Before You Go
+          </h3>
+          <div className="space-y-4">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                <User className="h-5 w-5 text-primary" />
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Paid Now</span>
-                <span className="font-semibold text-green-600">{formatCurrency(booking.depositAmount || booking.totalPrice)}</span>
-              </div>
-              {booking.totalPrice - (booking.depositAmount || booking.totalPrice) > 0 && (
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Due at Hotel</span>
-                  <span className="font-semibold">{formatCurrency(booking.totalPrice - booking.depositAmount)}</span>
-                </div>
-              )}
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Payment Status</span>
-                <span className="font-semibold capitalize">{booking.paymentStatus}</span>
+              <div>
+                <p className="font-semibold text-sm">Required Documents</p>
+                <p className="text-sm text-muted-foreground mt-1">Valid photo ID (passport or national ID) + credit card for incidentals</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                <Clock className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="font-semibold text-sm">Check-in Time</p>
+                <p className="text-sm text-muted-foreground mt-1">From 3:00 PM. Early check-in available if pre-booked.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                <Wifi className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="font-semibold text-sm">Amenities</p>
+                <p className="text-sm text-muted-foreground mt-1">Free WiFi throughout the property. Details at reception.</p>
+              </div>
+            </div>
+          </div>
+          <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="block mt-6">
+            <Button variant="outline" className="rounded-full px-6 py-5 text-base hover:bg-primary hover:text-white transition-all duration-300">
+              <MapPin className="h-4 w-4 mr-2" />
+              Get Directions
+            </Button>
+          </a>
+        </div>
 
-        {/* Actions */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <Button
-            variant="outline"
-            className="flex-1"
-            onClick={() => downloadInvoice(booking.id)}
-          >
-            <Download className="h-4 w-4 mr-2" />
-            Download PDF
+        {/* Actions - Enhanced */}
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <Button variant="outline" className="rounded-xl h-14 text-base hover:bg-primary/10 transition-all duration-300" onClick={() => downloadInvoice(booking.id)}>
+            <Download className="h-5 w-5 mr-2" />
+            Download Invoice
           </Button>
           <Button
             variant="outline"
-            className="flex-1"
+            className="rounded-xl h-14 text-base hover:bg-primary/10 transition-all duration-300"
             onClick={() => downloadICS({
               id: booking.id,
               propertyName: booking.propertyName,
@@ -243,15 +306,43 @@ export default function ConfirmationPage({ params }: { params: Promise<{ booking
               roomTypeName: booking.roomTypeName,
             })}
           >
-            <Calendar className="h-4 w-4 mr-2" />
+            <Calendar className="h-5 w-5 mr-2" />
             Add to Calendar
           </Button>
         </div>
 
-        <div className="mt-8 text-center">
+        <div className="text-center space-y-6">
           <Link href={`/account/bookings/${booking.id}`}>
-            <Button>Manage This Booking</Button>
+            <Button size="lg" className="rounded-full px-10 py-6 text-base font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] transition-all duration-300">
+              <Settings className="h-5 w-5 mr-2" />
+              Manage This Booking
+            </Button>
           </Link>
+          <div className="flex items-center justify-center gap-6 text-sm">
+            <Link href="/hostels" className="text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-2 font-medium">
+              <Bed className="h-4 w-4" />
+              Book Another Hostel
+            </Link>
+            <span className="text-muted-foreground/30">|</span>
+            <Link href="/" className="text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-2 font-medium">
+              <Home className="h-4 w-4" />
+              Back to Home
+            </Link>
+          </div>
+        </div>
+
+        <div className="text-center space-y-4">
+          <Link href={`/account/bookings/${booking.id}`}>
+            <Button size="lg" className="rounded-full px-8">
+              Manage This Booking
+            </Button>
+          </Link>
+          <div>
+            <Link href="/hostels" className="text-sm text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1">
+              Book another hostel
+              <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
         </div>
       </div>
     </div>

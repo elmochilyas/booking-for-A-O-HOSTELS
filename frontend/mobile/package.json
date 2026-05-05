@@ -2,28 +2,29 @@
   "name": "ao-hostels-mobile",
   "version": "1.0.0",
   "main": "expo/AppEntry.js",
-  "scripts": {
+    "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "jest"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-community/datetimepicker": "^9.1.0",
+    "@react-native-community/netinfo": "^12.0.1",
     "@react-navigation/bottom-tabs": "^7.0.0",
     "@react-navigation/native": "^7.0.0",
     "@react-navigation/native-stack": "^7.0.0",
-    "@stripe/stripe-react-native": "0.63.0",
     "axios": "^1.7.0",
     "expo": "~55.0.0",
     "expo-asset": "55.0.16",
+    "expo-secure-store": "^55.0.13",
     "expo-status-bar": "~55.0.5",
     "react": "19.2.0",
-    "react-hook-form": "^7.53.0",
     "react-native": "0.83.6",
     "react-native-paper": "^5.12.0",
     "react-native-safe-area-context": "~5.6.2",
@@ -32,11 +33,14 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.0",
+    "@testing-library/react-native": "^13.3.3",
     "@types/react": "~19.2.10",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
+    "babel-jest": "^30.3.0",
     "eslint": "^9.0.0",
     "eslint-config-expo": "~55.0.0",
+    "jest": "^30.3.0",
     "typescript": "~5.9.2"
   },
   "overrides": {
