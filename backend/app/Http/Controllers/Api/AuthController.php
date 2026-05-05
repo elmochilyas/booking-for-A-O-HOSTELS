@@ -14,9 +14,9 @@ use App\Exceptions\EmailNotVerifiedException;
 use App\Exceptions\InvalidCredentialsException;
 use App\Exceptions\InvalidTokenException;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Api\Auth\LoginRequest;
 use App\Http\Requests\Api\Auth\RegisterRequest;
-use App\Http\Requests\Api\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Api\Auth\ResetPasswordRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -36,6 +36,7 @@ class AuthController extends Controller
         try {
             $validated = $request->validated();
             $result = $action->handle($validated['email'], $validated['password']);
+
             return response()->json($result);
         } catch (InvalidCredentialsException $e) {
             return response()->json(['error' => 'Invalid credentials'], 401);
@@ -54,6 +55,7 @@ class AuthController extends Controller
 
         try {
             $result = $action->handle($refreshToken);
+
             return response()->json($result);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Invalid refresh token'], 401);
@@ -76,6 +78,7 @@ class AuthController extends Controller
 
         try {
             $result = $action->handle($request->input('token'));
+
             return response()->json($result);
         } catch (InvalidTokenException $e) {
             return response()->json(['error' => 'Invalid or expired verification token'], 400);
@@ -85,6 +88,7 @@ class AuthController extends Controller
     public function forgotPassword(ForgotPasswordRequest $request, ForgotPasswordAction $action): JsonResponse
     {
         $result = $action->handle($request->validated()['email']);
+
         return response()->json($result);
     }
 
@@ -93,6 +97,7 @@ class AuthController extends Controller
         try {
             $validated = $request->validated();
             $result = $action->handle($validated['token'], $validated['password']);
+
             return response()->json($result);
         } catch (InvalidTokenException $e) {
             return response()->json(['error' => 'Invalid or expired reset token'], 400);

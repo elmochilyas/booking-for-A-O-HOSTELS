@@ -7,18 +7,19 @@ use App\DTO\CreatePropertyDTO;
 use App\Events\PropertyCreated;
 use App\Models\Property;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
-readonly class CreateProperty'
+readonly class CreateProperty
 {
     public function __construct(
         private PropertyRepositoryInterface $properties,
     ) {}
 
-    public function handle(CreatePropertyDTO $dto): Property'
+    public function handle(CreatePropertyDTO $dto): Property
     {
         return DB::transaction(function () use ($dto) {
             $property = $this->properties->create([
-                'id' => (string) \Illuminate\Support\Str::uuid(),
+                'id' => (string) Str::uuid(),
                 'name' => $dto->name,
                 'location' => $dto->location,
                 'address' => $dto->address,
@@ -30,11 +31,12 @@ readonly class CreateProperty'
                 'description' => $dto->description,
                 'phone' => $dto->phone,
                 'email' => $dto->email,
+                'status' => 'active',
             ]);
 
             PropertyCreated::dispatch($property);
 
-            return $property->load(['roomTypes', 'amenities']);
+            return $property->load('roomTypes');
         });
     }
 }

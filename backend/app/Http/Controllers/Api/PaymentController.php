@@ -4,9 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Actions\Payments\ConfirmPayment;
 use App\Actions\Payments\CreatePaymentIntent;
+use App\Actions\Payments\GetBookingPayments;
 use App\Actions\Payments\RefundPayment as RefundPaymentAction;
-use App\Contracts\Repositories\BookingRepositoryInterface;
-use App\Contracts\Repositories\PaymentRepositoryInterface;
 use App\DTO\ConfirmPaymentDTO;
 use App\Exceptions\InvalidBookingStatusException;
 use App\Http\Controllers\Controller;
@@ -14,24 +13,28 @@ use App\Http\Requests\Api\Payment\ConfirmPaymentRequest;
 use App\Http\Requests\Api\Payment\CreatePaymentIntentRequest;
 use App\Http\Requests\Api\Payment\RefundPaymentRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Routing\Attributes\Middleware;
 
+#[Middleware('auth.jwt')]
 class PaymentController extends Controller
 {
     public function __construct(
-        private PaymentRepositoryInterface $payments,
-        private BookingRepositoryInterface $bookings,
+        private CreatePaymentIntent $createPaymentIntent,
+        private ConfirmPayment $confirmPayment,
+        private RefundPaymentAction $refundPayment,
+        private GetBookingPayments $getBookingPayments,
     ) {}
 
-    public function createIntent(CreatePaymentIntentRequest $request, CreatePaymentIntent $action): JsonResponse
+    public function createIntent(CreatePaymentIntentRequest $request): JsonResponse
     {
         try {
-            $booking = $this->bookings->findOrFail($request->validated()['booking_id']);
+            $bookingId = $request->validated()['booking_id'];
             $depositPercentage = $request->validated()['deposit_percentage'] ?? 100;
-            $amount = $request->validated()['amount'] ?? ($booking->total_price * $depositPercentage / 100);
+            $amount = $request->validated()['amount'] ?? null;
 
-            $result = $action->handle(
-                $booking->id,
-                (float) $amount,
+            $result = $this->createPaymentIntent->handle(
+                $bookingId,
+                (float) ($amount ?? 0),
                 $request->validated()['payment_method'],
                 (int) $depositPercentage
             );
@@ -44,11 +47,11 @@ class PaymentController extends Controller
         }
     }
 
-    public function confirmPayment(ConfirmPaymentRequest $request, ConfirmPayment $action): JsonResponse
+    public function confirmPayment(ConfirmPaymentRequest $request): JsonResponse
     {
         try {
             $dto = ConfirmPaymentDTO::fromRequest($request);
-            $result = $action->handle($dto);
+            $result = $this->confirmPayment->handle($dto);
 
             return response()->json($result);
         } catch (\Exception $e) {
@@ -56,10 +59,10 @@ class PaymentController extends Controller
         }
     }
 
-    public function refund(string $bookingId, RefundPaymentRequest $request, RefundPaymentAction $action): JsonResponse
+    public function refund(string $bookingId, RefundPaymentRequest $request): JsonResponse
     {
         try {
-            $result = $action->handle(
+            $result = $this->refundPayment->handle(
                 $bookingId,
                 $request->validated()['amount'] ?? null,
                 $request->validated()['reason'] ?? null
@@ -73,11 +76,8 @@ class PaymentController extends Controller
 
     public function bookingPayments(string $bookingId): JsonResponse
     {
-        $booking = $this->bookings->findOrFail($bookingId);
+        $result = $this->getBookingPayments->handle($bookingId);
 
-        return response()->json([
-            'payments' => $booking->payments,
-            'total_paid' => $booking->payments()->where('status', 'success')->sum('amount'),
-        ]);
+        return response()->json($result);
     }
 }

@@ -1,0 +1,18 @@
+<?php
+
+namespace App\Actions\Properties;
+
+use App\Contracts\Repositories\PropertyRepositoryInterface;
+use App\Models\Property;
+
+readonly class GetProperty
+{
+    public function __construct(
+        private PropertyRepositoryInterface $properties,
+    ) {}
+
+    public function handle(string $id): Property
+    {
+        return $this->properties->findOrFail($id);
+    }
+}

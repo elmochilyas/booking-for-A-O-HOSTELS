@@ -3,23 +3,24 @@
 namespace App\Actions\Payments;
 
 use App\Contracts\Repositories\PaymentRepositoryInterface;
-use App\Events\PaymentProcessed;
-use App\Exceptions\InvalidPaymentStatusException;
-use Illuminate\Support\Facades\DB;
+use App\Exceptions\InvalidBookingStatusException;
+use App\Models\Booking;
+use App\Services\StripeService;
+use Illuminate\Support\Str;
 
 readonly class CreatePaymentIntent
 {
     public function __construct(
-        private \App\Services\StripeService $stripeService,
+        private StripeService $stripeService,
         private PaymentRepositoryInterface $payments,
     ) {}
 
     public function handle(string $bookingId, float $amount, string $paymentMethod, int $depositPercentage = 100): array
     {
-        $booking = \App\Models\Booking::findOrFail($bookingId);
+        $booking = Booking::findOrFail($bookingId);
 
         if ($booking->status === 'cancelled') {
-            throw new \App\Exceptions\InvalidBookingStatusException('Cannot pay for a cancelled booking');
+            throw new InvalidBookingStatusException('Cannot pay for a cancelled booking');
         }
 
         $finalAmount = $amount ?? ($booking->total_price * $depositPercentage / 100);
@@ -35,7 +36,7 @@ readonly class CreatePaymentIntent
             );
 
             $payment = $this->payments->create([
-                'id' => (string) \Illuminate\Support\Str::uuid(),
+                'id' => (string) Str::uuid(),
                 'booking_id' => $booking->id,
                 'amount' => $finalAmount,
                 'payment_method' => $paymentMethod,
@@ -51,7 +52,7 @@ readonly class CreatePaymentIntent
                 'currency' => 'eur',
             ];
         } catch (\Exception $e) {
-            throw new \Exception('Failed to create payment intent: ' . $e->getMessage());
+            throw new \Exception('Failed to create payment intent: '.$e->getMessage());
         }
     }
 }

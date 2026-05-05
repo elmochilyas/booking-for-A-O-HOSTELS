@@ -6,20 +6,19 @@ use App\Contracts\Repositories\BookingRepositoryInterface;
 use App\Contracts\Repositories\PaymentRepositoryInterface;
 use App\DTO\ConfirmPaymentDTO;
 use App\Events\PaymentProcessed;
-use App\Exceptions\InvalidPaymentStatusException;
-use App\Models\Payment;
-use Illuminate\Support\Facades\DB;
+use App\Services\EmailService;
+use App\Services\StripeService;
 
-readonly class ConfirmPayment'
+readonly class ConfirmPayment
 {
     public function __construct(
         private PaymentRepositoryInterface $payments,
         private BookingRepositoryInterface $bookings,
-        private \App\Services\StripeService $stripeService,
-        private \App\Services\EmailService $emailService,
+        private StripeService $stripeService,
+        private EmailService $emailService,
     ) {}
 
-    public function handle(ConfirmPaymentDTO $dto): array'
+    public function handle(ConfirmPaymentDTO $dto): array
     {
         $payment = $this->payments->findOrFail($dto->paymentId);
 
@@ -28,59 +27,39 @@ readonly class ConfirmPayment'
         }
 
         try {
-            $stripePayment = $this->stripeService->retrievePayment($dto->paymentIntentId);
+            $stripePayment = $this->stripeService->confirmPaymentIntent($dto->paymentIntentId);
 
             if ($stripePayment->status === 'succeeded') {
-                $this->payments->update($payment, [
-                    'status' => 'success',
-                ]);
+                $payment->update(['status' => 'success']);
 
-                $booking = $payment->booking;
-                $this->updateBookingPaymentStatus($booking, $payment);
+                $booking = $this->bookings->findOrFail($payment->booking_id);
+                $totalPaid = $booking->payments()->where('status', 'success')->sum('amount');
 
-                $this->emailService->sendPaymentConfirmation($booking, $payment);
+                if ($totalPaid >= $booking->total_price) {
+                    $booking->update([
+                        'payment_status' => 'paid',
+                        'status' => $booking->status === 'pending' ? 'confirmed' : $booking->status,
+                    ]);
+                }
 
-                PaymentProcessed::dispatch($payment->fresh());
-
+                PaymentProcessed::dispatch($booking);
+            } elseif ($stripePayment->status === 'requires_action') {
                 return [
-                    'message' => 'Payment successful',
-                    'payment' => $payment->fresh(),
+                    'requires_action' => true,
+                    'client_secret' => $stripePayment->client_secret,
                 ];
+            } else {
+                $payment->update(['status' => 'failed']);
+                throw new \Exception('Payment failed: '.$stripePayment->last_payment_error->message ?? 'Unknown error');
             }
 
             return [
-                'error' => 'Payment not completed',
-                'stripe_status' => $stripePayment->status,
+                'status' => $payment->status,
+                'booking_id' => $payment->booking_id,
             ];
         } catch (\Exception $e) {
-            throw new \Exception('Payment verification failed: ' . $e->getMessage());
-        }
-    }
-
-    private function updateBookingPaymentStatus(\App\Models\Booking $booking, Payment $payment): void'
-    {
-        $totalPaid = $booking->payments()
-            ->where('status', 'success')
-            ->sum('amount');
-
-        $totalPaid += $payment->amount;
-
-        if ($totalPaid >= $booking->total_price) {
-            $this->bookings->update($booking, [
-                'payment_status' => 'paid',
-                'status' => 'confirmed',
-            ]);
-        } else {
-            $percentage = ($totalPaid / $booking->total_price) * 100;
-            if ($percentage >= 50) {
-                $this->bookings->update($booking, [
-                    'payment_status' => 'partial',
-                ]);
-            } else {
-                $this->bookings->update($booking, [
-                    'payment_status' => 'pending',
-                ]);
-            }
+            $payment->update(['status' => 'failed']);
+            throw $e;
         }
     }
 }

@@ -5,60 +5,49 @@ namespace App\Actions\Payments;
 use App\Contracts\Repositories\BookingRepositoryInterface;
 use App\Contracts\Repositories\PaymentRepositoryInterface;
 use App\Events\PaymentRefunded;
-use Illuminate\Support\Facades\DB;
+use App\Services\EmailService;
+use App\Services\StripeService;
+use Illuminate\Support\Str;
 
-readonly class RefundPayment'
+readonly class RefundPayment
 {
     public function __construct(
         private PaymentRepositoryInterface $payments,
         private BookingRepositoryInterface $bookings,
-        private \App\Services\StripeService $stripeService,
-        private \App\Services\EmailService $emailService,
+        private StripeService $stripeService,
+        private EmailService $emailService,
     ) {}
 
-    public function handle(string $bookingId, ?float $amount = null, ?string $reason = null): array'
+    public function handle(string $bookingId, ?float $amount = null, ?string $reason = null): array
     {
         $booking = $this->bookings->findOrFail($bookingId);
-
-        $successfulPayment = $booking->payments()
-            ->where('status', 'success')
-            ->orderBy('created_at', 'desc')
-            ->first();
+        $successfulPayment = $booking->payments()->where('status', 'success')->first();
 
         if (! $successfulPayment) {
-            throw new \Exception('No successful payment found');
+            throw new \Exception('No successful payment found for this booking');
         }
 
         $refundAmount = $amount ?? $successfulPayment->amount;
+        $stripeRefund = $this->stripeService->refundPayment($successfulPayment->stripe_payment_id, $refundAmount, $reason);
 
-        try {
-            $refund = $this->stripeService->createRefund(
-                $successfulPayment->stripe_payment_id,
-                $refundAmount
-            );
+        $refundPayment = $this->payments->create([
+            'id' => (string) Str::uuid(),
+            'booking_id' => $bookingId,
+            'amount' => -$refundAmount,
+            'payment_method' => $successfulPayment->payment_method,
+            'status' => 'refunded',
+            'stripe_payment_id' => $stripeRefund->id,
+        ]);
 
-            $refundPayment = $this->payments->create([
-                'id' => (string) \Illuminate\Support\Str::uuid(),
-                'booking_id' => $booking->id,
-                'amount' => -$refundAmount,
-                'payment_method' => $successfulPayment->payment_method,
-                'status' => 'refunded',
-                'stripe_payment_id' => $refund->id,
-                'notes' => $reason ?? 'Refund processed',
-            ]);
+        $totalPaid = $booking->payments()->where('status', 'success')->sum('amount');
+        $booking->update(['payment_status' => $totalPaid > 0 ? 'partial' : 'pending']);
 
-            $booking->update(['payment_status' => 'refunded']);
+        PaymentRefunded::dispatch($booking, $refundAmount);
 
-            $this->emailService->sendRefundConfirmation($booking, $refundAmount);
-
-            PaymentRefunded::dispatch($refundPayment);
-
-            return [
-                'message' => 'Refund processed successfully',
-                'refund' => $refundPayment,
-            ];
-        } catch (\Exception $e) {
-            throw new \Exception('Refund failed: ' . $e->getMessage());
-        }
+        return [
+            'refund_id' => $refundPayment->id,
+            'amount' => $refundAmount,
+            'status' => 'success',
+        ];
     }
 }

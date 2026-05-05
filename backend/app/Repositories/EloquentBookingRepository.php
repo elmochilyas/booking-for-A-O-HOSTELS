@@ -4,9 +4,12 @@ namespace App\Repositories;
 
 use App\Contracts\Repositories\BookingRepositoryInterface;
 use App\Models\Booking;
+use App\Models\Extra;
 use App\Models\Room;
+use App\Models\RoomType;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 
 class EloquentBookingRepository implements BookingRepositoryInterface
 {
@@ -67,7 +70,7 @@ class EloquentBookingRepository implements BookingRepositoryInterface
                     ->orWhereBetween('check_out_date', [$checkIn, $checkOut])
                     ->orWhere(function ($q) use ($checkIn, $checkOut) {
                         $q->where('check_in_date', '<=', $checkIn)
-                          ->where('check_out_date', '>=', $checkOut);
+                            ->where('check_out_date', '>=', $checkOut);
                     });
             });
 
@@ -78,7 +81,7 @@ class EloquentBookingRepository implements BookingRepositoryInterface
         return $query->exists(); // Returns true if there ARE conflicting bookings (not available)
     }
 
-    public function findAvailableRoom(string $propertyId, string $roomTypeId, string $checkIn, string $checkOut): ?\App\Models\Room
+    public function findAvailableRoom(string $propertyId, string $roomTypeId, string $checkIn, string $checkOut): ?Room
     {
         $bookedRoomIds = Booking::where('property_id', $propertyId)
             ->where('room_type_id', $roomTypeId)
@@ -88,14 +91,14 @@ class EloquentBookingRepository implements BookingRepositoryInterface
                     ->orWhereBetween('check_out_date', [$checkIn, $checkOut])
                     ->orWhere(function ($q) use ($checkIn, $checkOut) {
                         $q->where('check_in_date', '<=', $checkIn)
-                          ->where('check_out_date', '>=', $checkOut);
+                            ->where('check_out_date', '>=', $checkOut);
                     });
             })
             ->whereNotNull('room_id')
             ->pluck('room_id')
             ->toArray();
 
-        return \App\Models\Room::where('property_id', $propertyId)
+        return Room::where('property_id', $propertyId)
             ->where('room_type_id', $roomTypeId)
             ->where('status', 'available')
             ->whereNotIn('id', $bookedRoomIds)
@@ -104,12 +107,12 @@ class EloquentBookingRepository implements BookingRepositoryInterface
 
     public function calculateTotalPrice(string $propertyId, string $roomTypeId, string $checkIn, string $checkOut, array $extras = []): float
     {
-        $roomType = \App\Models\RoomType::find($roomTypeId);
+        $roomType = RoomType::find($roomTypeId);
         $basePrice = $this->calculatePrice($roomType->base_price ?? 0, $checkIn, $checkOut);
 
         $extrasPrice = 0;
         foreach ($extras as $extra) {
-            $extraModel = \App\Models\Extra::find($extra['id']);
+            $extraModel = Extra::find($extra['id']);
             if ($extraModel) {
                 $extrasPrice += $extraModel->price * ($extra['quantity'] ?? 1);
             }
@@ -121,16 +124,17 @@ class EloquentBookingRepository implements BookingRepositoryInterface
     private function calculatePrice(float $basePrice, string $checkIn, string $checkOut): float
     {
         $nights = max(1, (strtotime($checkOut) - strtotime($checkIn)) / (60 * 60 * 24));
+
         return $basePrice * $nights;
     }
 
     public function getAvailableRooms(string $propertyId, string $checkIn, string $checkOut): array
     {
-        $roomTypes = \App\Models\RoomType::where('property_id', $propertyId)
+        $roomTypes = RoomType::where('property_id', $propertyId)
             ->with('rooms')
             ->get()
             ->filter(function ($roomType) use ($propertyId, $checkIn, $checkOut) {
-                return !$this->checkAvailability($propertyId, $roomType->id, $checkIn, $checkOut);
+                return ! $this->checkAvailability($propertyId, $roomType->id, $checkIn, $checkOut);
             })
             ->values();
 
@@ -157,6 +161,61 @@ class EloquentBookingRepository implements BookingRepositoryInterface
         }
 
         return $query->sum('total_amount');
+    }
+
+    public function countByPropertyAndStatus(string $propertyId, string $status, ?string $dateColumn = null, ?string $date = null): int
+    {
+        $query = Booking::where('property_id', $propertyId)->where('status', $status);
+
+        if ($dateColumn && $date) {
+            $query->where($dateColumn, $date);
+        }
+
+        return $query->count();
+    }
+
+    public function sumRevenueByPropertyAndDate(string $propertyId, array $statuses, string $date): float
+    {
+        return Booking::where('property_id', $propertyId)
+            ->whereIn('status', $statuses)
+            ->where('check_in_date', $date)
+            ->sum('total_price');
+    }
+
+    public function getByPropertyAndStatus(string $propertyId, string $status, string $dateColumn, string $date, array $with = []): Collection
+    {
+        $query = Booking::where('property_id', $propertyId)
+            ->where('status', $status)
+            ->where($dateColumn, $date);
+
+        if (! empty($with)) {
+            $query->with($with);
+        }
+
+        return $query->get();
+    }
+
+    public function countOccupiedRoomNights(string $propertyId, string $start, string $end): int
+    {
+        return Booking::where('property_id', $propertyId)
+            ->whereIn('status', ['confirmed', 'checked_in', 'completed'])
+            ->where(function ($query) use ($start, $end) {
+                $query->whereBetween('check_in_date', [$start, $end])
+                    ->orWhereBetween('check_out_date', [$start, $end])
+                    ->orWhere(function ($q) use ($start, $end) {
+                        $q->where('check_in_date', '<=', $start)
+                            ->where('check_out_date', '>=', $end);
+                    });
+            })
+            ->count();
+    }
+
+    public function countByPeriodAndStatus(string $propertyId, string $start, string $end, array $statuses): int
+    {
+        return Booking::where('property_id', $propertyId)
+            ->whereIn('status', $statuses)
+            ->whereBetween('check_in_date', [$start, $end])
+            ->count();
     }
 
     private function applyFilters(Builder $query, array $filters): Builder

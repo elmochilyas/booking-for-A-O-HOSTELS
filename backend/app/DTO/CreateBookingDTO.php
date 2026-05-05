@@ -10,17 +10,17 @@ use Carbon\Carbon;
 readonly class CreateBookingDTO
 {
     public function __construct(
-        public string           $propertyId,
-        public string           $roomTypeId,
-        public string           $guestId,
-        public Carbon           $checkInDate,
-        public Carbon           $checkOutDate,
-        public int              $guestCount,
-        public ?PaymentMethod  $paymentMethod = null,
-        public ?BookingSource  $source = null,
-        public ?string          $specialRequests = null,
-        public array            $extras = [],
-        public ?array          $guestDetails = null,
+        public string $propertyId,
+        public string $roomTypeId,
+        public string $guestId,
+        public Carbon $checkInDate,
+        public Carbon $checkOutDate,
+        public int $guestCount,
+        public ?PaymentMethod $paymentMethod = null,
+        public ?BookingSource $source = null,
+        public ?string $specialRequests = null,
+        public array $extras = [],
+        public ?array $guestDetails = null,
     ) {}
 
     public static function fromRequest(CreateBookingRequest $request): self

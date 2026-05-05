@@ -4,14 +4,14 @@ namespace App\Http\Requests\Api\Property;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreatePropertyRequest extends FormRequest'
+class CreatePropertyRequest extends FormRequest
 {
-    public function authorize(): bool'
+    public function authorize(): bool
     {
         return true;
     }
 
-    public function rules(): array'
+    public function rules(): array
     {
         return [
             'name' => ['required', 'string', 'max:255'],
@@ -28,7 +28,7 @@ class CreatePropertyRequest extends FormRequest'
         ];
     }
 
-    public function messages(): array'
+    public function messages(): array
     {
         return [
             'name.required' => 'Property name is required.',

@@ -3,7 +3,9 @@
 namespace App\Contracts\Repositories;
 
 use App\Models\Booking;
+use App\Models\Room;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 
 interface BookingRepositoryInterface
 {
@@ -23,7 +25,7 @@ interface BookingRepositoryInterface
 
     public function checkAvailability(string $roomTypeId, string $checkIn, string $checkOut, ?string $excludeBookingId = null): bool;
 
-    public function findAvailableRoom(string $propertyId, string $roomTypeId, string $checkIn, string $checkOut): ?\App\Models\Room;
+    public function findAvailableRoom(string $propertyId, string $roomTypeId, string $checkIn, string $checkOut): ?Room;
 
     public function calculateTotalPrice(string $propertyId, string $roomTypeId, string $checkIn, string $checkOut, array $extras = []): float;
 
@@ -32,4 +34,14 @@ interface BookingRepositoryInterface
     public function getByProperty(string $propertyId, array $filters = []): LengthAwarePaginator;
 
     public function getRevenueByPeriod(string $startDate, string $endDate, ?string $propertyId = null): float;
+
+    public function countByPropertyAndStatus(string $propertyId, string $status, ?string $dateColumn = null, ?string $date = null): int;
+
+    public function sumRevenueByPropertyAndDate(string $propertyId, array $statuses, string $date): float;
+
+    public function getByPropertyAndStatus(string $propertyId, string $status, string $dateColumn, string $date, array $with = []): Collection;
+
+    public function countOccupiedRoomNights(string $propertyId, string $start, string $end): int;
+
+    public function countByPeriodAndStatus(string $propertyId, string $start, string $end, array $statuses): int;
 }

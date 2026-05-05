@@ -16,9 +16,9 @@ class UpdateProfileRequest extends FormRequest
         return [
             'first_name' => ['sometimes', 'string', 'max:100'],
             'last_name' => ['sometimes', 'string', 'max:100'],
-            'phone' => ['sometimes', 'string', 'max:20'],
-            'date_of_birth' => ['sometimes', 'date', 'before:today'],
-            'preferences' => ['sometimes', 'array'],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'country' => ['nullable', 'string', 'max:100'],
+            'date_of_birth' => ['nullable', 'date'],
         ];
     }
 }

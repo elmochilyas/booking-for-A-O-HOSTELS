@@ -14,7 +14,7 @@ class ConfirmPaymentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'payment_id'        => ['required', 'uuid', 'exists:payments,id'],
+            'payment_id' => ['required', 'uuid', 'exists:payments,id'],
             'payment_intent_id' => ['required', 'string'],
         ];
     }
@@ -22,8 +22,8 @@ class ConfirmPaymentRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'payment_id.required'        => 'Payment is required.',
-            'payment_id.exists'          => 'Payment not found.',
+            'payment_id.required' => 'Payment is required.',
+            'payment_id.exists' => 'Payment not found.',
             'payment_intent_id.required' => 'Payment intent ID is required.',
         ];
     }

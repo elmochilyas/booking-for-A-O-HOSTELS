@@ -2,6 +2,8 @@
 
 namespace App\DTO;
 
+use App\Http\Requests\Api\Payment\ConfirmPaymentRequest;
+
 readonly class ConfirmPaymentDTO
 {
     public function __construct(
@@ -9,7 +11,7 @@ readonly class ConfirmPaymentDTO
         public string $paymentIntentId,
     ) {}
 
-    public static function fromRequest(\App\Http\Requests\Api\Payment\ConfirmPaymentRequest $request): self
+    public static function fromRequest(ConfirmPaymentRequest $request): self
     {
         return new self(
             paymentId: $request->validated('payment_id'),
@@ -20,7 +22,7 @@ readonly class ConfirmPaymentDTO
     public function toArray(): array
     {
         return [
-            'payment_id'        => $this->paymentId,
+            'payment_id' => $this->paymentId,
             'payment_intent_id' => $this->paymentIntentId,
         ];
     }

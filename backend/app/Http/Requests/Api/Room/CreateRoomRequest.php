@@ -2,9 +2,7 @@
 
 namespace App\Http\Requests\Api\Room;
 
-use App\Enums\RoomStatus;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class CreateRoomRequest extends FormRequest
 {
@@ -20,10 +18,7 @@ class CreateRoomRequest extends FormRequest
             'room_type_id' => ['required', 'uuid', 'exists:room_types,id'],
             'room_number' => ['required', 'string', 'max:20'],
             'floor' => ['sometimes', 'integer', 'min:0'],
-            'status' => ['sometimes', Rule::enum(RoomStatus::class)],
-            'features' => ['sometimes', 'array'],
-            'features.*' => ['string', 'max:100'],
-            'price_override' => ['sometimes', 'numeric', 'min:0'],
+            'status' => ['sometimes', Rule::in(['available', 'booked', 'maintenance', 'cleaning'])],
         ];
     }
 
@@ -31,8 +26,12 @@ class CreateRoomRequest extends FormRequest
     {
         return [
             'property_id.required' => 'Property is required.',
+            'property_id.exists' => 'Property not found.',
             'room_type_id.required' => 'Room type is required.',
+            'room_type_id.exists' => 'Room type not found.',
             'room_number.required' => 'Room number is required.',
+            'room_number.max' => 'Room number cannot exceed 20 characters.',
+            'floor.min' => 'Floor must be 0 or greater.',
         ];
     }
 }
