@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Property;
-use App\Models\RoomType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -26,7 +25,7 @@ class PropertyController extends Controller
             $query->where('location', 'like', '%'.$request->location.'%');
         }
 
-        if (!$lightweight) {
+        if (! $lightweight) {
             if ($request->has('check_in') && $request->check_in && $request->has('check_out') && $request->check_out) {
                 $query->whereHas('roomTypes', function ($q) use ($request) {
                     $q->whereHas('availabilities', function ($aq) use ($request) {
