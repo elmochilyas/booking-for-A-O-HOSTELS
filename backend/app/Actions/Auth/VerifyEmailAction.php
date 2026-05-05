@@ -3,11 +3,14 @@
 namespace App\Actions\Auth;
 
 use App\Contracts\Repositories\GuestRepositoryInterface;
+use App\Exceptions\InvalidTokenException;
+use App\Models\Guest;
+use App\Services\JwtService;
 
 readonly class VerifyEmailAction
 {
     public function __construct(
-        private \App\Services\JwtService $jwtService,
+        private JwtService $jwtService,
         private GuestRepositoryInterface $guests,
     ) {}
 
@@ -19,10 +22,10 @@ readonly class VerifyEmailAction
             $guest = $this->guests->findOrFail($decoded->sub);
         } catch (\Exception $e) {
             // Try verification token from database
-            $guest = \App\Models\Guest::where('verification_token', $token)->first();
+            $guest = Guest::where('verification_token', $token)->first();
 
             if (! $guest) {
-                throw new \App\Exceptions\InvalidTokenException('Invalid or expired verification token');
+                throw new InvalidTokenException('Invalid or expired verification token');
             }
         }
 

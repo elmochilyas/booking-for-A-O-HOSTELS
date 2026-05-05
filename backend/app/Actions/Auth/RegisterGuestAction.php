@@ -4,22 +4,24 @@ namespace App\Actions\Auth;
 
 use App\Contracts\Repositories\GuestRepositoryInterface;
 use App\DTO\CreateGuestDTO;
-use App\Models\Guest;
+use App\Services\EmailService;
+use App\Services\JwtService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 readonly class RegisterGuestAction
 {
     public function __construct(
         private GuestRepositoryInterface $guests,
-        private \App\Services\JwtService $jwtService,
-        private \App\Services\EmailService $emailService,
+        private JwtService $jwtService,
+        private EmailService $emailService,
     ) {}
 
     public function handle(CreateGuestDTO $dto): array
     {
         return DB::transaction(function () use ($dto) {
             $guest = $this->guests->create([
-                'id' => (string) \Illuminate\Support\Str::uuid(),
+                'id' => (string) Str::uuid(),
                 'first_name' => $dto->firstName,
                 'last_name' => $dto->lastName,
                 'email' => $dto->email,

@@ -9,6 +9,10 @@ use App\Actions\Auth\RefreshTokenAction;
 use App\Actions\Auth\RegisterGuestAction;
 use App\Actions\Auth\ResetPasswordAction;
 use App\Actions\Auth\VerifyEmailAction;
+use App\DTO\CreateGuestDTO;
+use App\Exceptions\EmailNotVerifiedException;
+use App\Exceptions\InvalidCredentialsException;
+use App\Exceptions\InvalidTokenException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Auth\LoginRequest;
 use App\Http\Requests\Api\Auth\RegisterRequest;
@@ -21,7 +25,7 @@ class AuthController extends Controller
 {
     public function register(RegisterRequest $request, RegisterGuestAction $action): JsonResponse
     {
-        $dto = \App\DTO\CreateGuestDTO::fromRequest($request);
+        $dto = CreateGuestDTO::fromRequest($request);
         $result = $action->handle($dto);
 
         return response()->json($result, 201);
@@ -30,11 +34,12 @@ class AuthController extends Controller
     public function login(LoginRequest $request, LoginGuestAction $action): JsonResponse
     {
         try {
-            $result = $action->handle($request->validated('email'), $request->validated('password'));
+            $validated = $request->validated();
+            $result = $action->handle($validated['email'], $validated['password']);
             return response()->json($result);
-        } catch (\App\Exceptions\InvalidCredentialsException $e) {
+        } catch (InvalidCredentialsException $e) {
             return response()->json(['error' => 'Invalid credentials'], 401);
-        } catch (\App\Exceptions\EmailNotVerifiedException $e) {
+        } catch (EmailNotVerifiedException $e) {
             return response()->json(['error' => 'Email not verified'], 403);
         }
     }
@@ -70,25 +75,26 @@ class AuthController extends Controller
         ]);
 
         try {
-            $result = $action->handle($request->validated('token'));
+            $result = $action->handle($request->input('token'));
             return response()->json($result);
-        } catch (\App\Exceptions\InvalidTokenException $e) {
+        } catch (InvalidTokenException $e) {
             return response()->json(['error' => 'Invalid or expired verification token'], 400);
         }
     }
 
     public function forgotPassword(ForgotPasswordRequest $request, ForgotPasswordAction $action): JsonResponse
     {
-        $result = $action->handle($request->validated('email'));
+        $result = $action->handle($request->validated()['email']);
         return response()->json($result);
     }
 
     public function resetPassword(ResetPasswordRequest $request, ResetPasswordAction $action): JsonResponse
     {
         try {
-            $result = $action->handle($request->validated('token'), $request->validated('password'));
+            $validated = $request->validated();
+            $result = $action->handle($validated['token'], $validated['password']);
             return response()->json($result);
-        } catch (\App\Exceptions\InvalidTokenException $e) {
+        } catch (InvalidTokenException $e) {
             return response()->json(['error' => 'Invalid or expired reset token'], 400);
         }
     }

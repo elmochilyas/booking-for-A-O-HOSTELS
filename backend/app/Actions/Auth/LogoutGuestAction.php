@@ -2,10 +2,12 @@
 
 namespace App\Actions\Auth;
 
+use App\Services\JwtService;
+
 readonly class LogoutGuestAction
 {
     public function __construct(
-        private \App\Services\JwtService $jwtService,
+        private JwtService $jwtService,
     ) {}
 
     public function handle(string $token): array

@@ -3,12 +3,14 @@
 namespace App\Actions\Auth;
 
 use App\Contracts\Repositories\GuestRepositoryInterface;
+use App\Services\EmailService;
+use App\Services\JwtService;
 
 readonly class ForgotPasswordAction
 {
     public function __construct(
-        private \App\Services\JwtService $jwtService,
-        private \App\Services\EmailService $emailService,
+        private JwtService $jwtService,
+        private EmailService $emailService,
         private GuestRepositoryInterface $guests,
     ) {}
 

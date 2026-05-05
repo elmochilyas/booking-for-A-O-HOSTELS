@@ -3,11 +3,12 @@
 namespace App\Actions\Auth;
 
 use App\Contracts\Repositories\GuestRepositoryInterface;
+use App\Services\JwtService;
 
 readonly class RefreshTokenAction
 {
     public function __construct(
-        private \App\Services\JwtService $jwtService,
+        private JwtService $jwtService,
         private GuestRepositoryInterface $guests,
     ) {}
 
