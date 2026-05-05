@@ -23,7 +23,7 @@ class CreateBookingRequest extends FormRequest
             'check_out_date' => ['required', 'date', 'after:check_in_date'],
             'guest_count' => ['required', 'integer', 'min:1', 'max:10'],
             'special_requests' => ['sometimes', 'string', 'max:500'],
-            'payment_method' => ['required', Rule::enum(PaymentMethod::class)],
+            'payment_method' => ['sometimes', Rule::enum(PaymentMethod::class)],
             'source' => ['sometimes', Rule::enum(BookingSource::class)],
             'extras' => ['sometimes', 'array'],
             'extras.*' => ['uuid', 'exists:extras,id'],

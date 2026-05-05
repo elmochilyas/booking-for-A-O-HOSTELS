@@ -10,17 +10,17 @@ use Carbon\Carbon;
 readonly class CreateBookingDTO
 {
     public function __construct(
-        public string $propertyId,
-        public string $roomTypeId,
-        public string $guestId,
-        public Carbon $checkInDate,
-        public Carbon $checkOutDate,
-        public int $guestCount,
-        public PaymentMethod $paymentMethod,
-        public ?BookingSource $source = null,
-        public ?string $specialRequests = null,
-        public array $extras = [],
-        public ?array $guestDetails = null,
+        public string           $propertyId,
+        public string           $roomTypeId,
+        public string           $guestId,
+        public Carbon           $checkInDate,
+        public Carbon           $checkOutDate,
+        public int              $guestCount,
+        public ?PaymentMethod  $paymentMethod = null,
+        public ?BookingSource  $source = null,
+        public ?string          $specialRequests = null,
+        public array            $extras = [],
+        public ?array          $guestDetails = null,
     ) {}
 
     public static function fromRequest(CreateBookingRequest $request): self
@@ -32,7 +32,7 @@ readonly class CreateBookingDTO
             checkInDate: new Carbon($request->validated('check_in_date')),
             checkOutDate: new Carbon($request->validated('check_out_date')),
             guestCount: $request->validated('guest_count'),
-            paymentMethod: PaymentMethod::from($request->validated('payment_method')),
+            paymentMethod: $request->validated('payment_method') ? PaymentMethod::from($request->validated('payment_method')) : null,
             source: $request->validated('source') ? BookingSource::from($request->validated('source')) : null,
             specialRequests: $request->validated('special_requests'),
             extras: $request->validated('extras', []),

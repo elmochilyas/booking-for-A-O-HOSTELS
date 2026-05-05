@@ -21,7 +21,13 @@ interface BookingRepositoryInterface
 
     public function findByGuest(string $guestId, array $filters = []): LengthAwarePaginator;
 
-    public function checkAvailability(string $roomTypeId, string $checkIn, string $checkOut): bool;
+    public function checkAvailability(string $roomTypeId, string $checkIn, string $checkOut, ?string $excludeBookingId = null): bool;
+
+    public function findAvailableRoom(string $propertyId, string $roomTypeId, string $checkIn, string $checkOut): ?\App\Models\Room;
+
+    public function calculateTotalPrice(string $propertyId, string $roomTypeId, string $checkIn, string $checkOut, array $extras = []): float;
+
+    public function getAvailableRooms(string $propertyId, string $checkIn, string $checkOut): array;
 
     public function getByProperty(string $propertyId, array $filters = []): LengthAwarePaginator;
 

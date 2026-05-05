@@ -58,26 +58,83 @@ class EloquentBookingRepository implements BookingRepositoryInterface
         return $query->latest()->paginate($filters['per_page'] ?? 15);
     }
 
-    public function checkAvailability(string $roomTypeId, string $checkIn, string $checkOut): bool
+    public function checkAvailability(string $roomTypeId, string $checkIn, string $checkOut, ?string $excludeBookingId = null): bool
     {
-        // Check if room type has available rooms for the given dates
-        $bookedRooms = Booking::where('room_type_id', $roomTypeId)
-            ->whereIn('status', ['confirmed', 'checked_in'])
+        $query = Booking::where('room_type_id', $roomTypeId)
+            ->whereIn('status', ['confirmed', 'pending', 'checked_in'])
             ->where(function ($query) use ($checkIn, $checkOut) {
                 $query->whereBetween('check_in_date', [$checkIn, $checkOut])
                     ->orWhereBetween('check_out_date', [$checkIn, $checkOut])
                     ->orWhere(function ($q) use ($checkIn, $checkOut) {
                         $q->where('check_in_date', '<=', $checkIn)
-                            ->where('check_out_date', '>=', $checkOut);
+                          ->where('check_out_date', '>=', $checkOut);
+                    });
+            });
+
+        if ($excludeBookingId) {
+            $query->where('id', '!=', $excludeBookingId);
+        }
+
+        return $query->exists(); // Returns true if there ARE conflicting bookings (not available)
+    }
+
+    public function findAvailableRoom(string $propertyId, string $roomTypeId, string $checkIn, string $checkOut): ?\App\Models\Room
+    {
+        $bookedRoomIds = Booking::where('property_id', $propertyId)
+            ->where('room_type_id', $roomTypeId)
+            ->whereIn('status', ['confirmed', 'pending', 'checked_in'])
+            ->where(function ($query) use ($checkIn, $checkOut) {
+                $query->whereBetween('check_in_date', [$checkIn, $checkOut])
+                    ->orWhereBetween('check_out_date', [$checkIn, $checkOut])
+                    ->orWhere(function ($q) use ($checkIn, $checkOut) {
+                        $q->where('check_in_date', '<=', $checkIn)
+                          ->where('check_out_date', '>=', $checkOut);
                     });
             })
-            ->count();
+            ->whereNotNull('room_id')
+            ->pluck('room_id')
+            ->toArray();
 
-        $totalRooms = Room::where('room_type_id', $roomTypeId)
+        return \App\Models\Room::where('property_id', $propertyId)
+            ->where('room_type_id', $roomTypeId)
             ->where('status', 'available')
-            ->count();
+            ->whereNotIn('id', $bookedRoomIds)
+            ->first();
+    }
 
-        return $bookedRooms < $totalRooms;
+    public function calculateTotalPrice(string $propertyId, string $roomTypeId, string $checkIn, string $checkOut, array $extras = []): float
+    {
+        $roomType = \App\Models\RoomType::find($roomTypeId);
+        $basePrice = $this->calculatePrice($roomType->base_price ?? 0, $checkIn, $checkOut);
+
+        $extrasPrice = 0;
+        foreach ($extras as $extra) {
+            $extraModel = \App\Models\Extra::find($extra['id']);
+            if ($extraModel) {
+                $extrasPrice += $extraModel->price * ($extra['quantity'] ?? 1);
+            }
+        }
+
+        return $basePrice + $extrasPrice;
+    }
+
+    private function calculatePrice(float $basePrice, string $checkIn, string $checkOut): float
+    {
+        $nights = max(1, (strtotime($checkOut) - strtotime($checkIn)) / (60 * 60 * 24));
+        return $basePrice * $nights;
+    }
+
+    public function getAvailableRooms(string $propertyId, string $checkIn, string $checkOut): array
+    {
+        $roomTypes = \App\Models\RoomType::where('property_id', $propertyId)
+            ->with('rooms')
+            ->get()
+            ->filter(function ($roomType) use ($propertyId, $checkIn, $checkOut) {
+                return !$this->checkAvailability($propertyId, $roomType->id, $checkIn, $checkOut);
+            })
+            ->values();
+
+        return $roomTypes->toArray();
     }
 
     public function getByProperty(string $propertyId, array $filters = []): LengthAwarePaginator
