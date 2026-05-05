@@ -22,12 +22,14 @@ class EloquentPaymentRepository implements PaymentRepositoryInterface
     public function create(array $data): Payment
     {
         $payment = Payment::create($data);
+
         return $payment->load(['booking']);
     }
 
     public function update(Payment $payment, array $data): Payment
     {
         $payment->update($data);
+
         return $payment->fresh(['booking', 'booking.guest']);
     }
 
@@ -59,7 +61,7 @@ class EloquentPaymentRepository implements PaymentRepositoryInterface
             ->where('status', 'completed');
 
         if ($propertyId) {
-            $query->whereHas('booking', fn($q) => $q->where('property_id', $propertyId));
+            $query->whereHas('booking', fn ($q) => $q->where('property_id', $propertyId));
         }
 
         return $query->sum('amount');
@@ -79,10 +81,10 @@ class EloquentPaymentRepository implements PaymentRepositoryInterface
     private function applyFilters(Builder $query, array $filters): Builder
     {
         return $query
-            ->when($filters['status'] ?? null, fn($q, $v) => $q->where('status', $v))
-            ->when($filters['booking_id'] ?? null, fn($q, $v) => $q->where('booking_id', $v))
-            ->when($filters['payment_method'] ?? null, fn($q, $v) => $q->where('payment_method', $v))
-            ->when($filters['from'] ?? null, fn($q, $v) => $q->whereDate('created_at', '>=', $v))
-            ->when($filters['to'] ?? null, fn($q, $v) => $q->whereDate('created_at', '<=', $v));
+            ->when($filters['status'] ?? null, fn ($q, $v) => $q->where('status', $v))
+            ->when($filters['booking_id'] ?? null, fn ($q, $v) => $q->where('booking_id', $v))
+            ->when($filters['payment_method'] ?? null, fn ($q, $v) => $q->where('payment_method', $v))
+            ->when($filters['from'] ?? null, fn ($q, $v) => $q->whereDate('created_at', '>=', $v))
+            ->when($filters['to'] ?? null, fn ($q, $v) => $q->whereDate('created_at', '<=', $v));
     }
 }

@@ -5,6 +5,7 @@ namespace App\Actions\Bookings;
 use App\Contracts\Repositories\BookingRepositoryInterface;
 use App\Enums\BookingStatus;
 use App\Events\GuestCheckedOut;
+use App\Exceptions\InvalidBookingStatusException;
 use App\Models\Booking;
 
 readonly class CheckOutBooking
@@ -16,7 +17,7 @@ readonly class CheckOutBooking
     public function handle(Booking $booking, ?string $notes = null): Booking
     {
         if ($booking->status !== BookingStatus::CHECKED_IN) {
-            throw new \App\Exceptions\InvalidBookingStatusException('Booking must be checked in before check-out.');
+            throw new InvalidBookingStatusException('Booking must be checked in before check-out.');
         }
 
         $updatedBooking = $this->bookings->update($booking, [

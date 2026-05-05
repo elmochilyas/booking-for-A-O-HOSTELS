@@ -16,7 +16,7 @@ readonly class UpdateProfile
     {
         $data = $dto->toArray();
 
-        if (!empty($data)) {
+        if (! empty($data)) {
             $guest = $this->guests->update($guest, $data);
         }
 

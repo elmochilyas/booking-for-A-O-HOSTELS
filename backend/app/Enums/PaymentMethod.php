@@ -4,20 +4,20 @@ namespace App\Enums;
 
 enum PaymentMethod: string
 {
-    case CARD           = 'card';
-    case CASH           = 'cash';
-    case WALLET         = 'wallet';
-    case BANK_TRANSFER  = 'bank_transfer';
-    case STRIPE         = 'stripe';
+    case CARD = 'card';
+    case CASH = 'cash';
+    case WALLET = 'wallet';
+    case BANK_TRANSFER = 'bank_transfer';
+    case STRIPE = 'stripe';
 
     public function label(): string
     {
-        return match($this) {
-            self::CARD          => 'Credit / Debit Card',
-            self::CASH          => 'Cash',
-            self::WALLET        => 'Digital Wallet',
+        return match ($this) {
+            self::CARD => 'Credit / Debit Card',
+            self::CASH => 'Cash',
+            self::WALLET => 'Digital Wallet',
             self::BANK_TRANSFER => 'Bank Transfer',
-            self::STRIPE        => 'Stripe',
+            self::STRIPE => 'Stripe',
         };
     }
 

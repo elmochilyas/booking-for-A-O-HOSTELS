@@ -4,20 +4,20 @@ namespace App\Enums;
 
 enum RoomStatus: string
 {
-    case AVAILABLE   = 'available';
-    case OCCUPIED    = 'occupied';
+    case AVAILABLE = 'available';
+    case OCCUPIED = 'occupied';
     case MAINTENANCE = 'maintenance';
-    case CLEANING    = 'cleaning';
-    case RESERVED    = 'reserved';
+    case CLEANING = 'cleaning';
+    case RESERVED = 'reserved';
 
     public function label(): string
     {
-        return match($this) {
-            self::AVAILABLE   => 'Available',
-            self::OCCUPIED    => 'Occupied',
+        return match ($this) {
+            self::AVAILABLE => 'Available',
+            self::OCCUPIED => 'Occupied',
             self::MAINTENANCE => 'Maintenance',
-            self::CLEANING    => 'Cleaning',
-            self::RESERVED    => 'Reserved',
+            self::CLEANING => 'Cleaning',
+            self::RESERVED => 'Reserved',
         };
     }
 
@@ -28,12 +28,12 @@ enum RoomStatus: string
 
     public function color(): string
     {
-        return match($this) {
-            self::AVAILABLE   => 'green',
-            self::OCCUPIED    => 'red',
+        return match ($this) {
+            self::AVAILABLE => 'green',
+            self::OCCUPIED => 'red',
             self::MAINTENANCE => 'orange',
-            self::CLEANING    => 'yellow',
-            self::RESERVED    => 'blue',
+            self::CLEANING => 'yellow',
+            self::RESERVED => 'blue',
         };
     }
 }

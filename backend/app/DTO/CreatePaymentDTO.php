@@ -3,17 +3,18 @@
 namespace App\DTO;
 
 use App\Enums\PaymentMethod;
+use App\Http\Requests\Api\Payment\CreatePaymentRequest;
 
 readonly class CreatePaymentDTO
 {
     public function __construct(
-        public string           $bookingId,
-        public float            $amount,
-        public PaymentMethod    $paymentMethod,
-        public ?array           $paymentDetails = null,
+        public string $bookingId,
+        public float $amount,
+        public PaymentMethod $paymentMethod,
+        public ?array $paymentDetails = null,
     ) {}
 
-    public static function fromRequest(\App\Http\Requests\Api\Payment\CreatePaymentRequest $request): self
+    public static function fromRequest(CreatePaymentRequest $request): self
     {
         return new self(
             bookingId: $request->validated('booking_id'),
@@ -26,9 +27,9 @@ readonly class CreatePaymentDTO
     public function toArray(): array
     {
         return [
-            'booking_id'     => $this->bookingId,
-            'amount'          => $this->amount,
-            'payment_method'  => $this->paymentMethod->value,
+            'booking_id' => $this->bookingId,
+            'amount' => $this->amount,
+            'payment_method' => $this->paymentMethod->value,
             'payment_details' => $this->paymentDetails,
         ];
     }

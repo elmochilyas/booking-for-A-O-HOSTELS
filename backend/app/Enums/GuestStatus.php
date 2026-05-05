@@ -4,16 +4,16 @@ namespace App\Enums;
 
 enum GuestStatus: string
 {
-    case ACTIVE    = 'active';
+    case ACTIVE = 'active';
     case SUSPENDED = 'suspended';
-    case BANNED    = 'banned';
+    case BANNED = 'banned';
 
     public function label(): string
     {
-        return match($this) {
-            self::ACTIVE    => 'Active',
+        return match ($this) {
+            self::ACTIVE => 'Active',
             self::SUSPENDED => 'Suspended',
-            self::BANNED    => 'Banned',
+            self::BANNED => 'Banned',
         };
     }
 
@@ -29,10 +29,10 @@ enum GuestStatus: string
 
     public function color(): string
     {
-        return match($this) {
-            self::ACTIVE    => 'green',
+        return match ($this) {
+            self::ACTIVE => 'green',
             self::SUSPENDED => 'yellow',
-            self::BANNED    => 'red',
+            self::BANNED => 'red',
         };
     }
 }

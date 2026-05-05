@@ -4,24 +4,24 @@ namespace App\Enums;
 
 enum StaffRole: string
 {
-    case SUPERADMIN     = 'superadmin';
+    case SUPERADMIN = 'superadmin';
     case REGIONAL_ADMIN = 'regional_admin';
     case PROPERTY_ADMIN = 'property_admin';
-    case MANAGER        = 'manager';
-    case ADMIN          = 'admin';
-    case RECEPTION      = 'reception';
-    case STAFF          = 'staff';
+    case MANAGER = 'manager';
+    case ADMIN = 'admin';
+    case RECEPTION = 'reception';
+    case STAFF = 'staff';
 
     public function label(): string
     {
-        return match($this) {
-            self::SUPERADMIN     => 'Super Admin',
+        return match ($this) {
+            self::SUPERADMIN => 'Super Admin',
             self::REGIONAL_ADMIN => 'Regional Admin',
             self::PROPERTY_ADMIN => 'Property Admin',
-            self::MANAGER        => 'Manager',
-            self::ADMIN          => 'Admin',
-            self::RECEPTION      => 'Reception',
-            self::STAFF          => 'Staff',
+            self::MANAGER => 'Manager',
+            self::ADMIN => 'Admin',
+            self::RECEPTION => 'Reception',
+            self::STAFF => 'Staff',
         };
     }
 
@@ -38,14 +38,14 @@ enum StaffRole: string
 
     public function hierarchyLevel(): int
     {
-        return match($this) {
-            self::SUPERADMIN     => 100,
+        return match ($this) {
+            self::SUPERADMIN => 100,
             self::REGIONAL_ADMIN => 80,
             self::PROPERTY_ADMIN => 60,
-            self::MANAGER        => 50,
-            self::ADMIN          => 40,
-            self::RECEPTION      => 30,
-            self::STAFF          => 20,
+            self::MANAGER => 50,
+            self::ADMIN => 40,
+            self::RECEPTION => 30,
+            self::STAFF => 20,
         };
     }
 

@@ -3,19 +3,20 @@
 namespace App\DTO;
 
 use App\Enums\BookingStatus;
+use App\Http\Requests\Api\Booking\UpdateBookingRequest;
 use Carbon\Carbon;
 
 readonly class UpdateBookingDTO
 {
     public function __construct(
-        public ?Carbon        $checkInDate = null,
-        public ?Carbon        $checkOutDate = null,
-        public ?int           $guestCount = null,
-        public ?string        $specialRequests = null,
+        public ?Carbon $checkInDate = null,
+        public ?Carbon $checkOutDate = null,
+        public ?int $guestCount = null,
+        public ?string $specialRequests = null,
         public ?BookingStatus $status = null,
     ) {}
 
-    public static function fromRequest(\App\Http\Requests\Api\Booking\UpdateBookingRequest $request): self
+    public static function fromRequest(UpdateBookingRequest $request): self
     {
         return new self(
             checkInDate: $request->validated('check_in_date') ? new Carbon($request->validated('check_in_date')) : null,
@@ -29,11 +30,11 @@ readonly class UpdateBookingDTO
     public function toArray(): array
     {
         return array_filter([
-            'check_in_date'   => $this->checkInDate?->toDateString(),
-            'check_out_date'  => $this->checkOutDate?->toDateString(),
-            'guest_count'     => $this->guestCount,
+            'check_in_date' => $this->checkInDate?->toDateString(),
+            'check_out_date' => $this->checkOutDate?->toDateString(),
+            'guest_count' => $this->guestCount,
             'special_requests' => $this->specialRequests,
-            'status'          => $this->status?->value,
-        ], fn($value) => !is_null($value));
+            'status' => $this->status?->value,
+        ], fn ($value) => ! is_null($value));
     }
 }

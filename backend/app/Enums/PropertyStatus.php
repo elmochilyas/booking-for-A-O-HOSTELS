@@ -4,15 +4,15 @@ namespace App\Enums;
 
 enum PropertyStatus: string
 {
-    case ACTIVE      = 'active';
-    case INACTIVE    = 'inactive';
+    case ACTIVE = 'active';
+    case INACTIVE = 'inactive';
     case MAINTENANCE = 'maintenance';
 
     public function label(): string
     {
-        return match($this) {
-            self::ACTIVE      => 'Active',
-            self::INACTIVE    => 'Inactive',
+        return match ($this) {
+            self::ACTIVE => 'Active',
+            self::INACTIVE => 'Inactive',
             self::MAINTENANCE => 'Maintenance',
         };
     }
@@ -24,9 +24,9 @@ enum PropertyStatus: string
 
     public function color(): string
     {
-        return match($this) {
-            self::ACTIVE      => 'green',
-            self::INACTIVE    => 'red',
+        return match ($this) {
+            self::ACTIVE => 'green',
+            self::INACTIVE => 'red',
             self::MAINTENANCE => 'orange',
         };
     }

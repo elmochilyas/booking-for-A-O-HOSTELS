@@ -5,13 +5,13 @@ namespace App\ValueObjects;
 readonly class Money
 {
     public function __construct(
-        public readonly int    $amount,   // in cents
+        public readonly int $amount,   // in cents
         public readonly string $currency = 'USD',
     ) {}
 
     public function formatted(): string
     {
-        return number_format($this->amount / 100, 2) . ' ' . $this->currency;
+        return number_format($this->amount / 100, 2).' '.$this->currency;
     }
 
     public function add(self $other): self
@@ -60,7 +60,7 @@ readonly class Money
     public function toArray(): array
     {
         return [
-            'amount'   => $this->amount,
+            'amount' => $this->amount,
             'currency' => $this->currency,
         ];
     }

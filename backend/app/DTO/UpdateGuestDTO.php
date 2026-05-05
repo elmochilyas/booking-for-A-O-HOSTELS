@@ -2,6 +2,8 @@
 
 namespace App\DTO;
 
+use App\Http\Requests\Api\Guest\UpdateProfileRequest;
+
 readonly class UpdateGuestDTO
 {
     public function __construct(
@@ -9,10 +11,10 @@ readonly class UpdateGuestDTO
         public ?string $lastName = null,
         public ?string $phone = null,
         public ?string $dateOfBirth = null,
-        public ?array  $preferences = null,
+        public ?array $preferences = null,
     ) {}
 
-    public static function fromRequest(\App\Http\Requests\Api\Guest\UpdateProfileRequest $request): self
+    public static function fromRequest(UpdateProfileRequest $request): self
     {
         return new self(
             firstName: $request->validated('first_name'),
@@ -26,11 +28,11 @@ readonly class UpdateGuestDTO
     public function toArray(): array
     {
         return array_filter([
-            'first_name'     => $this->firstName,
-            'last_name'      => $this->lastName,
-            'phone'          => $this->phone,
-            'date_of_birth'  => $this->dateOfBirth,
-            'preferences'    => $this->preferences,
-        ], fn($value) => !is_null($value));
+            'first_name' => $this->firstName,
+            'last_name' => $this->lastName,
+            'phone' => $this->phone,
+            'date_of_birth' => $this->dateOfBirth,
+            'preferences' => $this->preferences,
+        ], fn ($value) => ! is_null($value));
     }
 }

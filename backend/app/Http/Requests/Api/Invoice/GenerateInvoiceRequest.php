@@ -15,7 +15,7 @@ class GenerateInvoiceRequest extends FormRequest
     {
         return [
             'booking_id' => ['required', 'uuid', 'exists:bookings,id'],
-            'format'     => ['sometimes', 'string', Rule::in(['pdf', 'html'])],
+            'format' => ['sometimes', 'string', Rule::in(['pdf', 'html'])],
         ];
     }
 }

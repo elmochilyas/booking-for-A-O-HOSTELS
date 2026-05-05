@@ -15,9 +15,9 @@ class UpdateProfileRequest extends FormRequest
     {
         return [
             'first_name' => ['sometimes', 'string', 'max:100'],
-            'last_name'  => ['sometimes', 'string', 'max:100'],
-            'phone'      => ['sometimes', 'string', 'max:20'],
-            'email'      => ['sometimes', 'email', 'max:255'],
+            'last_name' => ['sometimes', 'string', 'max:100'],
+            'phone' => ['sometimes', 'string', 'max:20'],
+            'email' => ['sometimes', 'email', 'max:255'],
         ];
     }
 }

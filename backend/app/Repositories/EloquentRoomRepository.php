@@ -22,12 +22,14 @@ class EloquentRoomRepository implements RoomRepositoryInterface
     public function create(array $data): Room
     {
         $room = Room::create($data);
+
         return $room->load(['roomType', 'property']);
     }
 
     public function update(Room $room, array $data): Room
     {
         $room->update($data);
+
         return $room->fresh(['roomType', 'property']);
     }
 
@@ -58,14 +60,14 @@ class EloquentRoomRepository implements RoomRepositoryInterface
 
     public function checkAvailability(string $roomId, string $checkIn, string $checkOut): bool
     {
-        return !Booking::where('room_id', $roomId)
+        return ! Booking::where('room_id', $roomId)
             ->whereIn('status', ['confirmed', 'checked_in'])
             ->where(function ($query) use ($checkIn, $checkOut) {
                 $query->whereBetween('check_in_date', [$checkIn, $checkOut])
                     ->orWhereBetween('check_out_date', [$checkIn, $checkOut])
                     ->orWhere(function ($q) use ($checkIn, $checkOut) {
                         $q->where('check_in_date', '<=', $checkIn)
-                          ->where('check_out_date', '>=', $checkOut);
+                            ->where('check_out_date', '>=', $checkOut);
                     });
             })
             ->exists();
@@ -86,8 +88,8 @@ class EloquentRoomRepository implements RoomRepositoryInterface
     private function applyFilters(Builder $query, array $filters): Builder
     {
         return $query
-            ->when($filters['status'] ?? null, fn($q, $v) => $q->where('status', $v))
-            ->when($filters['room_type_id'] ?? null, fn($q, $v) => $q->where('room_type_id', $v))
-            ->when($filters['floor'] ?? null, fn($q, $v) => $q->where('floor', $v));
+            ->when($filters['status'] ?? null, fn ($q, $v) => $q->where('status', $v))
+            ->when($filters['room_type_id'] ?? null, fn ($q, $v) => $q->where('room_type_id', $v))
+            ->when($filters['floor'] ?? null, fn ($q, $v) => $q->where('floor', $v));
     }
 }

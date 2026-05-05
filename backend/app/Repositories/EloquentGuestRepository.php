@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Contracts\Repositories\GuestRepositoryInterface;
+use App\Enums\LoyaltyTier;
 use App\Models\Guest;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -22,12 +23,14 @@ class EloquentGuestRepository implements GuestRepositoryInterface
     public function create(array $data): Guest
     {
         $guest = Guest::create($data);
+
         return $guest->load(['bookings']);
     }
 
     public function update(Guest $guest, array $data): Guest
     {
         $guest->update($data);
+
         return $guest->fresh(['bookings', 'loyaltyPoints']);
     }
 
@@ -59,17 +62,18 @@ class EloquentGuestRepository implements GuestRepositoryInterface
     public function getLoyaltyTier(string $guestId): string
     {
         $guest = $this->findOrFail($guestId);
-        return \App\Enums\LoyaltyTier::fromPoints($guest->loyalty_points)->value;
+
+        return LoyaltyTier::fromPoints($guest->loyalty_points)->value;
     }
 
     private function applyFilters(Builder $query, array $filters): Builder
     {
         return $query
-            ->when($filters['status'] ?? null, fn($q, $v) => $q->where('status', $v))
-            ->when($filters['email'] ?? null, fn($q, $v) => $q->where('email', $v))
-            ->when($filters['from'] ?? null, fn($q, $v) => $q->whereDate('created_at', '>=', $v))
-            ->when($filters['to'] ?? null, fn($q, $v) => $q->whereDate('created_at', '<=', $v))
-            ->when($filters['search'] ?? null, fn($q, $v) => $q->where(function ($query) use ($v) {
+            ->when($filters['status'] ?? null, fn ($q, $v) => $q->where('status', $v))
+            ->when($filters['email'] ?? null, fn ($q, $v) => $q->where('email', $v))
+            ->when($filters['from'] ?? null, fn ($q, $v) => $q->whereDate('created_at', '>=', $v))
+            ->when($filters['to'] ?? null, fn ($q, $v) => $q->whereDate('created_at', '<=', $v))
+            ->when($filters['search'] ?? null, fn ($q, $v) => $q->where(function ($query) use ($v) {
                 $query->where('first_name', 'like', "%{$v}%")
                     ->orWhere('last_name', 'like', "%{$v}%")
                     ->orWhere('email', 'like', "%{$v}%");

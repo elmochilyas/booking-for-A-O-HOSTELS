@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Contracts\Repositories\BookingRepositoryInterface;
 use App\Models\Booking;
+use App\Models\Room;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -22,12 +23,14 @@ class EloquentBookingRepository implements BookingRepositoryInterface
     public function create(array $data): Booking
     {
         $booking = Booking::create($data);
+
         return $booking->load(['guest', 'room', 'property']);
     }
 
     public function update(Booking $booking, array $data): Booking
     {
         $booking->update($data);
+
         return $booking->fresh(['guest', 'room', 'property', 'payments']);
     }
 
@@ -65,12 +68,12 @@ class EloquentBookingRepository implements BookingRepositoryInterface
                     ->orWhereBetween('check_out_date', [$checkIn, $checkOut])
                     ->orWhere(function ($q) use ($checkIn, $checkOut) {
                         $q->where('check_in_date', '<=', $checkIn)
-                          ->where('check_out_date', '>=', $checkOut);
+                            ->where('check_out_date', '>=', $checkOut);
                     });
             })
             ->count();
 
-        $totalRooms = \App\Models\Room::where('room_type_id', $roomTypeId)
+        $totalRooms = Room::where('room_type_id', $roomTypeId)
             ->where('status', 'available')
             ->count();
 
@@ -102,11 +105,11 @@ class EloquentBookingRepository implements BookingRepositoryInterface
     private function applyFilters(Builder $query, array $filters): Builder
     {
         return $query
-            ->when($filters['status'] ?? null, fn($q, $v) => $q->where('status', $v))
-            ->when($filters['property_id'] ?? null, fn($q, $v) => $q->where('property_id', $v))
-            ->when($filters['guest_id'] ?? null, fn($q, $v) => $q->where('guest_id', $v))
-            ->when($filters['from'] ?? null, fn($q, $v) => $q->whereDate('created_at', '>=', $v))
-            ->when($filters['to'] ?? null, fn($q, $v) => $q->whereDate('created_at', '<=', $v))
-            ->when($filters['search'] ?? null, fn($q, $v) => $q->where('booking_number', 'like', "%{$v}%"));
+            ->when($filters['status'] ?? null, fn ($q, $v) => $q->where('status', $v))
+            ->when($filters['property_id'] ?? null, fn ($q, $v) => $q->where('property_id', $v))
+            ->when($filters['guest_id'] ?? null, fn ($q, $v) => $q->where('guest_id', $v))
+            ->when($filters['from'] ?? null, fn ($q, $v) => $q->whereDate('created_at', '>=', $v))
+            ->when($filters['to'] ?? null, fn ($q, $v) => $q->whereDate('created_at', '<=', $v))
+            ->when($filters['search'] ?? null, fn ($q, $v) => $q->where('booking_number', 'like', "%{$v}%"));
     }
 }

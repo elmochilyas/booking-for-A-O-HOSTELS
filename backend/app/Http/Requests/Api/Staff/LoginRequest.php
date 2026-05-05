@@ -14,7 +14,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email'    => ['required', 'email', 'max:255'],
+            'email' => ['required', 'email', 'max:255'],
             'password' => ['required', 'string'],
             'property_id' => ['sometimes', 'uuid', 'exists:properties,id'],
         ];
@@ -23,7 +23,7 @@ class LoginRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'email.required'    => 'Email address is required.',
+            'email.required' => 'Email address is required.',
             'password.required' => 'Password is required.',
         ];
     }

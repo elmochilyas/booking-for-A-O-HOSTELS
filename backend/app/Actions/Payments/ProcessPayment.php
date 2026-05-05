@@ -2,13 +2,15 @@
 
 namespace App\Actions\Payments;
 
-use App\Contracts\Repositories\PaymentRepositoryInterface;
 use App\Contracts\Repositories\BookingRepositoryInterface;
+use App\Contracts\Repositories\PaymentRepositoryInterface;
 use App\DTO\CreatePaymentDTO;
+use App\Enums\BookingStatus;
 use App\Enums\PaymentStatus;
 use App\Events\PaymentProcessed;
 use App\Models\Payment;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 readonly class ProcessPayment
 {
@@ -21,18 +23,18 @@ readonly class ProcessPayment
     {
         $payment = DB::transaction(function () use ($dto) {
             $payment = $this->payments->create([
-                'id'            => (string) \Illuminate\Support\Str::uuid(),
-                'booking_id'    => $dto->bookingId,
-                'amount'         => $dto->amount,
+                'id' => (string) Str::uuid(),
+                'booking_id' => $dto->bookingId,
+                'amount' => $dto->amount,
                 'payment_method' => $dto->paymentMethod->value,
-                'status'         => PaymentStatus::PENDING,
+                'status' => PaymentStatus::PENDING,
                 'payment_details' => $dto->paymentDetails,
             ]);
 
             // Update booking status
             $booking = $this->bookings->findOrFail($dto->bookingId);
             $this->bookings->update($booking, [
-                'status' => \App\Enums\BookingStatus::CONFIRMED,
+                'status' => BookingStatus::CONFIRMED,
             ]);
 
             return $payment->load('booking');

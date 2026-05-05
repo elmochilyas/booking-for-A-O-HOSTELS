@@ -4,20 +4,20 @@ namespace App\Enums;
 
 enum BookingStatus: string
 {
-    case PENDING    = 'pending';
-    case CONFIRMED  = 'confirmed';
+    case PENDING = 'pending';
+    case CONFIRMED = 'confirmed';
     case CHECKED_IN = 'checked_in';
-    case COMPLETED  = 'completed';
-    case CANCELLED  = 'cancelled';
+    case COMPLETED = 'completed';
+    case CANCELLED = 'cancelled';
 
     public function label(): string
     {
-        return match($this) {
-            self::PENDING    => 'Pending',
-            self::CONFIRMED  => 'Confirmed',
+        return match ($this) {
+            self::PENDING => 'Pending',
+            self::CONFIRMED => 'Confirmed',
             self::CHECKED_IN => 'Checked In',
-            self::COMPLETED  => 'Completed',
-            self::CANCELLED  => 'Cancelled',
+            self::COMPLETED => 'Completed',
+            self::CANCELLED => 'Cancelled',
         };
     }
 
@@ -28,12 +28,12 @@ enum BookingStatus: string
 
     public function color(): string
     {
-        return match($this) {
-            self::PENDING    => 'yellow',
-            self::CONFIRMED  => 'blue',
+        return match ($this) {
+            self::PENDING => 'yellow',
+            self::CONFIRMED => 'blue',
             self::CHECKED_IN => 'green',
-            self::COMPLETED  => 'gray',
-            self::CANCELLED  => 'red',
+            self::COMPLETED => 'gray',
+            self::CANCELLED => 'red',
         };
     }
 }

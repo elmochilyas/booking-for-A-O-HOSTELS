@@ -7,7 +7,7 @@ readonly class Address
     public function __construct(
         public readonly string $address,
         public readonly string $city,
-        public readonly ?string $state = null,
+        public readonly ?string $state,
         public readonly string $country,
         public readonly ?string $postalCode = null,
         public readonly ?float $latitude = null,
@@ -45,12 +45,12 @@ readonly class Address
     public function toArray(): array
     {
         return [
-            'address'   => $this->address,
-            'city'      => $this->city,
-            'state'     => $this->state,
-            'country'   => $this->country,
+            'address' => $this->address,
+            'city' => $this->city,
+            'state' => $this->state,
+            'country' => $this->country,
             'postal_code' => $this->postalCode,
-            'latitude'  => $this->latitude,
+            'latitude' => $this->latitude,
             'longitude' => $this->longitude,
         ];
     }

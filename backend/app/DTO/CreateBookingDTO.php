@@ -4,25 +4,26 @@ namespace App\DTO;
 
 use App\Enums\BookingSource;
 use App\Enums\PaymentMethod;
+use App\Http\Requests\Api\Booking\CreateBookingRequest;
 use Carbon\Carbon;
 
 readonly class CreateBookingDTO
 {
     public function __construct(
-        public string        $propertyId,
-        public string        $roomTypeId,
-        public string        $guestId,
-        public Carbon        $checkInDate,
-        public Carbon        $checkOutDate,
-        public int           $guestCount,
+        public string $propertyId,
+        public string $roomTypeId,
+        public string $guestId,
+        public Carbon $checkInDate,
+        public Carbon $checkOutDate,
+        public int $guestCount,
         public PaymentMethod $paymentMethod,
         public ?BookingSource $source = null,
-        public ?string       $specialRequests = null,
-        public array         $extras = [],
-        public ?array        $guestDetails = null,
+        public ?string $specialRequests = null,
+        public array $extras = [],
+        public ?array $guestDetails = null,
     ) {}
 
-    public static function fromRequest(\App\Http\Requests\Api\Booking\CreateBookingRequest $request): self
+    public static function fromRequest(CreateBookingRequest $request): self
     {
         return new self(
             propertyId: $request->validated('property_id'),

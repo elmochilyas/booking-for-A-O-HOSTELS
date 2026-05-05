@@ -4,8 +4,10 @@ namespace App\Actions\Guests;
 
 use App\Contracts\Repositories\GuestRepositoryInterface;
 use App\DTO\CreateGuestDTO;
+use App\Enums\GuestStatus;
 use App\Models\Guest;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 readonly class RegisterGuest
 {
@@ -17,16 +19,16 @@ readonly class RegisterGuest
     {
         $guest = DB::transaction(function () use ($dto) {
             $guest = $this->guests->create([
-                'id'            => (string) \Illuminate\Support\Str::uuid(),
-                'first_name'    => $dto->firstName,
-                'last_name'     => $dto->lastName,
-                'email'         => $dto->email,
-                'password'      => bcrypt($dto->password),
-                'phone'         => $dto->phone,
+                'id' => (string) Str::uuid(),
+                'first_name' => $dto->firstName,
+                'last_name' => $dto->lastName,
+                'email' => $dto->email,
+                'password' => bcrypt($dto->password),
+                'phone' => $dto->phone,
                 'date_of_birth' => $dto->dateOfBirth,
                 'loyalty_points' => 0,
-                'status'         => \App\Enums\GuestStatus::ACTIVE,
-                'source'         => $dto->source?->value,
+                'status' => GuestStatus::ACTIVE,
+                'source' => $dto->source?->value,
             ]);
 
             return $guest;

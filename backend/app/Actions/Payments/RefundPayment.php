@@ -3,7 +3,9 @@
 namespace App\Actions\Payments;
 
 use App\Contracts\Repositories\PaymentRepositoryInterface;
+use App\Enums\PaymentStatus;
 use App\Events\PaymentRefunded;
+use App\Exceptions\InvalidPaymentStatusException;
 use App\Models\Payment;
 
 readonly class RefundPayment
@@ -14,8 +16,8 @@ readonly class RefundPayment
 
     public function handle(Payment $payment, array $data): Payment
     {
-        if ($payment->status !== \App\Enums\PaymentStatus::COMPLETED) {
-            throw new \App\Exceptions\InvalidPaymentStatusException('Only completed payments can be refunded.');
+        if ($payment->status !== PaymentStatus::COMPLETED) {
+            throw new InvalidPaymentStatusException('Only completed payments can be refunded.');
         }
 
         $refundedPayment = $this->payments->refund($payment, $data);

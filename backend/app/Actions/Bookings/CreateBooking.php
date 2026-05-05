@@ -7,8 +7,10 @@ use App\Contracts\Repositories\PropertyRepositoryInterface;
 use App\DTO\CreateBookingDTO;
 use App\Enums\BookingStatus;
 use App\Events\BookingCreated;
+use App\Exceptions\RoomNotAvailableException;
 use App\Models\Booking;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 readonly class CreateBooking
 {
@@ -20,23 +22,23 @@ readonly class CreateBooking
     public function handle(CreateBookingDTO $dto): Booking
     {
         // Business validation
-        if (!$this->properties->checkAvailability($dto->roomTypeId, $dto->checkInDate->toDateString(), $dto->checkOutDate->toDateString())) {
-            throw new \App\Exceptions\RoomNotAvailableException('Selected room is not available for the chosen dates.');
+        if (! $this->properties->checkAvailability($dto->roomTypeId, $dto->checkInDate->toDateString(), $dto->checkOutDate->toDateString())) {
+            throw new RoomNotAvailableException('Selected room is not available for the chosen dates.');
         }
 
         $booking = DB::transaction(function () use ($dto) {
             $booking = $this->bookings->create([
-                'id'             => (string) \Illuminate\Support\Str::uuid(),
-                'property_id'    => $dto->propertyId,
-                'room_type_id'   => $dto->roomTypeId,
-                'guest_id'       => $dto->guestId,
-                'check_in_date'  => $dto->checkInDate,
+                'id' => (string) Str::uuid(),
+                'property_id' => $dto->propertyId,
+                'room_type_id' => $dto->roomTypeId,
+                'guest_id' => $dto->guestId,
+                'check_in_date' => $dto->checkInDate,
                 'check_out_date' => $dto->checkOutDate,
-                'guest_count'    => $dto->guestCount,
-                'status'          => BookingStatus::PENDING,
-                'source'          => $dto->source?->value,
+                'guest_count' => $dto->guestCount,
+                'status' => BookingStatus::PENDING,
+                'source' => $dto->source?->value,
                 'special_requests' => $dto->specialRequests,
-                'nights'          => $dto->getNights(),
+                'nights' => $dto->getNights(),
             ]);
 
             // Load relationships

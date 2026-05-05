@@ -15,7 +15,7 @@ class ChangePasswordRequest extends FormRequest
     {
         return [
             'current_password' => ['required', 'string'],
-            'password'         => ['required', 'string', 'min:8', 'max:100', 'confirmed'],
+            'password' => ['required', 'string', 'min:8', 'max:100', 'confirmed'],
         ];
     }
 
@@ -23,8 +23,8 @@ class ChangePasswordRequest extends FormRequest
     {
         return [
             'current_password.required' => 'Current password is required.',
-            'password.confirmed'       => 'New password confirmation does not match.',
-            'password.min'             => 'Password must be at least 8 characters.',
+            'password.confirmed' => 'New password confirmation does not match.',
+            'password.min' => 'Password must be at least 8 characters.',
         ];
     }
 }

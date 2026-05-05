@@ -33,8 +33,8 @@ readonly class DateRange
     {
         return [
             'start_date' => $this->startDate->format('Y-m-d'),
-            'end_date'   => $this->endDate->format('Y-m-d'),
-            'nights'     => $this->nights(),
+            'end_date' => $this->endDate->format('Y-m-d'),
+            'nights' => $this->nights(),
         ];
     }
 
