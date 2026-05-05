@@ -18,23 +18,74 @@ export default function RegisterScreen({ navigation }: Props) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [firstNameError, setFirstNameError] = useState('');
+  const [lastNameError, setLastNameError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const { register, isLoading } = useAuthStore();
 
+  const handleFirstNameChange = (text: string) => {
+    setFirstName(text);
+    if (firstNameError) setFirstNameError('');
+  };
+
+  const handleLastNameChange = (text: string) => {
+    setLastName(text);
+    if (lastNameError) setLastNameError('');
+  };
+
+  const handleEmailChange = (text: string) => {
+    setEmail(text);
+    if (emailError) setEmailError('');
+  };
+
+  const handlePasswordChange = (text: string) => {
+    setPassword(text);
+    if (passwordError) setPasswordError('');
+    if (confirmPasswordError && text === confirmPassword) setConfirmPasswordError('');
+  };
+
+  const handleConfirmPasswordChange = (text: string) => {
+    setConfirmPassword(text);
+    if (confirmPasswordError) setConfirmPasswordError('');
+  };
+
   const handleRegister = async () => {
-    if (!firstName || !lastName || !email || !password) {
-      Alert.alert('Error', 'Please fill in all required fields');
-      return;
+    let hasError = false;
+
+    if (!firstName) {
+      setFirstNameError('First name is required');
+      hasError = true;
+    }
+
+    if (!lastName) {
+      setLastNameError('Last name is required');
+      hasError = true;
+    }
+
+    if (!email) {
+      setEmailError('Email is required');
+      hasError = true;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setEmailError('Please enter a valid email');
+      hasError = true;
+    }
+
+    if (!password) {
+      setPasswordError('Password is required');
+      hasError = true;
+    } else if (password.length < 8) {
+      setPasswordError('Password must be at least 8 characters');
+      hasError = true;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
-      return;
+      setConfirmPasswordError('Passwords do not match');
+      hasError = true;
     }
 
-    if (password.length < 8) {
-      Alert.alert('Error', 'Password must be at least 8 characters');
-      return;
-    }
+    if (hasError) return;
 
     try {
       await register({
@@ -43,14 +94,13 @@ export default function RegisterScreen({ navigation }: Props) {
         first_name: firstName,
         last_name: lastName,
       });
-      Alert.alert('Success', 'Registration successful! Welcome to A&O!');
       navigation.reset({
         index: 0,
         routes: [{ name: 'MainTabs' }],
       });
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Registration failed. Please try again.';
-      Alert.alert('Error', errorMessage);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Registration failed. Please try again.';
+      setPasswordError(errorMessage);
     }
   };
 
@@ -67,38 +117,46 @@ export default function RegisterScreen({ navigation }: Props) {
                 <TextInput
                   label="First Name *"
                   value={firstName}
-                  onChangeText={setFirstName}
+                  onChangeText={handleFirstNameChange}
                   mode="outlined"
                   style={[styles.input, styles.halfInput]}
+                  error={!!firstNameError}
+                  helperText={firstNameError}
                 />
                 <TextInput
                   label="Last Name *"
                   value={lastName}
-                  onChangeText={setLastName}
+                  onChangeText={handleLastNameChange}
                   mode="outlined"
                   style={[styles.input, styles.halfInput]}
+                  error={!!lastNameError}
+                  helperText={lastNameError}
                 />
               </View>
               
               <TextInput
                 label="Email *"
                 value={email}
-                onChangeText={setEmail}
+                onChangeText={handleEmailChange}
                 mode="outlined"
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoComplete="email"
                 style={styles.input}
+                error={!!emailError}
+                helperText={emailError}
               />
               
               <TextInput
                 label="Password *"
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={handlePasswordChange}
                 mode="outlined"
                 secureTextEntry={!showPassword}
                 right={<TextInput.Icon icon={showPassword ? "eye-off" : "eye"} onPress={() => setShowPassword(!showPassword)} />}
                 style={styles.input}
+                error={!!passwordError}
+                helperText={passwordError}
               >
                 <HelperText type="info" visible={password.length > 0 && password.length < 8}>
                   Password must be at least 8 characters
@@ -108,10 +166,12 @@ export default function RegisterScreen({ navigation }: Props) {
               <TextInput
                 label="Confirm Password *"
                 value={confirmPassword}
-                onChangeText={setConfirmPassword}
+                onChangeText={handleConfirmPasswordChange}
                 mode="outlined"
                 secureTextEntry={!showPassword}
                 style={styles.input}
+                error={!!confirmPasswordError}
+                helperText={confirmPasswordError}
               />
               
               <HelperText type="error" visible={confirmPassword.length > 0 && password !== confirmPassword}>

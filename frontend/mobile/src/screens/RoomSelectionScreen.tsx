@@ -40,7 +40,8 @@ export default function RoomSelectionScreen({ navigation, route }: Props) {
     setLoading(true);
     try {
       const response = await propertiesApi.getRoomTypes(propertyId);
-      setRooms(response.data.data || response.data.roomTypes || []);
+      // API returns { data: RoomType[] } as defined in the TypeScript interface
+      setRooms(response.data.data || []);
     } catch {
       setRooms([]);
     } finally {
@@ -64,7 +65,7 @@ export default function RoomSelectionScreen({ navigation, route }: Props) {
     return Colors.error;
   };
 
-  const renderRoom = ({ item }: { item: RoomType }) => (
+  const renderRoom = useCallback(({ item }: { item: RoomType }) => (
     <Card style={styles.card}>
       <Card.Content>
         <View style={styles.roomHeader}>

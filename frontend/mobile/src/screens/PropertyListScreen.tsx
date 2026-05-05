@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, memo } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity, RefreshControl, ImageBackground, Dimensions } from 'react-native';
 import { Text, Card, Chip, ActivityIndicator, Button, Surface } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -50,16 +50,26 @@ export default function PropertyListScreen({ navigation, route }: Props) {
     setError(null);
     try {
       const response = await propertiesApi.getAll({ location, checkIn, checkOut, guests });
-      setProperties(response.data.properties || response.data.data || []);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load properties. Please try again.');
+      // API returns { data: Property[] } as defined in the TypeScript interface
+      setProperties(response.data.data || []);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load properties. Please try again.';
+      setError(errorMessage);
       setProperties([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const renderProperty = ({ item }: { item: Property }) => {
+  const ITEM_HEIGHT = 280; // Approximate height of each property card
+
+  const getItemLayout = useMemo(() => (data: any, index: number) => ({
+    length: ITEM_HEIGHT,
+    offset: ITEM_HEIGHT * index,
+    index,
+  }), []);
+
+  const renderProperty = useCallback(({ item }: { item: Property }) => {
     const getImageUri = () => {
       if (item.images && item.images.length > 0) {
         const firstImage = item.images[0];
@@ -77,6 +87,8 @@ export default function PropertyListScreen({ navigation, route }: Props) {
     <TouchableOpacity 
       onPress={() => navigation.navigate('PropertyDetail', { propertyId: item.id, checkIn, checkOut, guests })}
       activeOpacity={0.9}
+      accessibilityRole="button"
+      accessibilityLabel={`View ${item.name} in ${item.location}`}
     >
       <Surface style={styles.card} elevation={2}>
         <View style={styles.imageContainer}>
@@ -85,6 +97,7 @@ export default function PropertyListScreen({ navigation, route }: Props) {
               source={{ uri: imageUri }}
               style={styles.propertyImage}
               imageStyle={styles.propertyImageStyle}
+              onError={() => console.log(`Failed to load image`)}
             >
               <View style={styles.imageOverlay}>
                 <View style={styles.topBadges}>
@@ -129,7 +142,7 @@ export default function PropertyListScreen({ navigation, route }: Props) {
       </Surface>
     </TouchableOpacity>
     );
-  };
+  }, [navigation, checkIn, checkOut, guests]);
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -164,6 +177,10 @@ export default function PropertyListScreen({ navigation, route }: Props) {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
+          getItemLayout={getItemLayout}
+          initialNumToRender={10}
+          maxToRenderPerBatch={5}
+          windowSize={5}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}

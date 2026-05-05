@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Property;
-use App\Models\RoomType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -14,25 +13,49 @@ class PropertyController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Property::with(['roomTypes', 'amenities']);
+        $lightweight = $request->boolean('lightweight');
+
+        if ($lightweight) {
+            $query = Property::select(['id', 'name', 'location', 'latitude', 'longitude', 'rating', 'review_count']);
+        } else {
+            $query = Property::with(['roomTypes', 'amenities']);
+        }
 
         if ($request->has('location') && $request->location) {
             $query->where('location', 'like', '%'.$request->location.'%');
         }
 
-        if ($request->has('check_in') && $request->check_in && $request->has('check_out') && $request->check_out) {
-            $query->whereHas('roomTypes', function ($q) use ($request) {
-                $q->whereHas('availabilities', function ($aq) use ($request) {
-                    $aq->whereBetween('date', [$request->check_in, $request->check_out])
-                        ->where('available', true);
+        if (! $lightweight) {
+            if ($request->has('check_in') && $request->check_in && $request->has('check_out') && $request->check_out) {
+                $query->whereHas('roomTypes', function ($q) use ($request) {
+                    $q->whereHas('availabilities', function ($aq) use ($request) {
+                        $aq->whereBetween('date', [$request->check_in, $request->check_out])
+                            ->where('available', true);
+                    });
                 });
-            });
+            }
+
+            if ($request->has('guests') && $request->guests) {
+                $query->whereHas('roomTypes', function ($q) use ($request) {
+                    $q->where('capacity', '>=', (int) $request->guests);
+                });
+            }
         }
 
-        if ($request->has('guests') && $request->guests) {
-            $query->whereHas('roomTypes', function ($q) use ($request) {
-                $q->where('capacity', '>=', (int) $request->guests);
-            });
+        // Return paginated response if per_page is specified, otherwise return all
+        if ($request->has('per_page')) {
+            $perPage = $request->get('per_page', 20);
+            $properties = $query->paginate($perPage);
+
+            return response()->json([
+                'properties' => $properties->items(),
+                'pagination' => [
+                    'total' => $properties->total(),
+                    'per_page' => $properties->perPage(),
+                    'current_page' => $properties->currentPage(),
+                    'last_page' => $properties->lastPage(),
+                ],
+            ]);
         }
 
         $properties = $query->get();
@@ -48,20 +71,18 @@ class PropertyController extends Controller
             ->selectRaw('COUNT(*) as properties_count')
             ->selectRaw('AVG(rating) as avg_rating')
             ->selectRaw('SUM(review_count) as total_reviews')
+            ->selectRaw('MIN(room_types.base_price) as lowest_price')
+            ->leftJoin('room_types', 'properties.id', '=', 'room_types.property_id')
             ->groupBy('location')
             ->orderByDesc('properties_count')
             ->get();
 
         $destinationData = $destinations->map(function ($dest) {
-            $lowestPrice = RoomType::whereHas('property', function ($query) use ($dest) {
-                $query->where('location', $dest->location);
-            })->min('base_price');
-
             return [
                 'city' => $dest->location,
                 'country' => 'Germany',
                 'properties' => $dest->properties_count,
-                'priceFrom' => (int) ($lowestPrice ?? 0),
+                'priceFrom' => (int) ($dest->lowest_price ?? 0),
                 'rating' => round($dest->avg_rating ?? 0, 1),
                 'reviewCount' => (int) ($dest->total_reviews ?? 0),
             ];

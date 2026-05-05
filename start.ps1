@@ -141,6 +141,15 @@ function Start-Admin {
 function Start-Guest {
     Banner "GUEST WEBSITE  (Next.js -> http://localhost:3001)"
 
+    # Clear cache BEFORE Push-Location so we're in the right directory
+    Banner "Clearing Next.js cache..."
+    if (Test-Path "$GUEST\.next") {
+        Remove-Item -Path "$GUEST\.next" -Recurse -Force
+        Ok "Cache cleared from $GUEST\.next"
+    } else {
+        Info "No cache to clear"
+    }
+
     Push-Location $GUEST
     if (-not (Test-Path "node_modules")) {
         Info "Installing npm packages..."

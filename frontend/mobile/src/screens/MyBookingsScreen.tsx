@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, memo } from 'react';
 import { View, FlatList, StyleSheet, Alert, RefreshControl } from 'react-native';
 import { Text, Card, Button, Chip, Divider, ActivityIndicator, List } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -97,7 +97,15 @@ export default function MyBookingsScreen({ navigation }: Props) {
     );
   };
 
-  const renderBooking = ({ item }: { item: Booking }) => {
+  const ITEM_HEIGHT = 200; // Approximate height of each booking card
+
+  const getItemLayout = useMemo(() => (data: any, index: number) => ({
+    length: ITEM_HEIGHT,
+    offset: ITEM_HEIGHT * index,
+    index,
+  }), []);
+
+  const renderBooking = useCallback(({ item }: { item: Booking }) => {
     const statusConfig = getStatusConfig(item.status);
     const propertyName = item.property_name || item.property;
     const location = item.property_location || item.location;
@@ -224,6 +232,10 @@ export default function MyBookingsScreen({ navigation }: Props) {
           keyExtractor={(item) => item.id} 
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
+          getItemLayout={getItemLayout}
+          initialNumToRender={10}
+          maxToRenderPerBatch={5}
+          windowSize={5}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}

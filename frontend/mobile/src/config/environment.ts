@@ -36,7 +36,7 @@ const getApiUrl = (): string => {
 
 export const environment: EnvironmentConfig = {
   apiUrl: getApiUrl(),
-  stripePublishableKey: 'pk_test_xxx',
+  stripePublishableKey: process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_xxx',
 };
 
 export const config = environment;

@@ -65,8 +65,13 @@ Route::prefix('payments')->group(function () {
 Route::prefix('guest')->middleware(['auth.jwt'])->group(function () {
     Route::get('/profile', [GuestController::class, 'profile']);
     Route::put('/profile', [GuestController::class, 'updateProfile']);
+    Route::post('/change-password', [GuestController::class, 'changePassword']);
+    Route::put('/notifications', [GuestController::class, 'updateNotifications']);
+    Route::delete('/account', [GuestController::class, 'deleteAccount']);
     Route::get('/bookings', [GuestController::class, 'bookings']);
     Route::get('/loyalty', [GuestController::class, 'loyalty']);
+    Route::post('/loyalty/join', [GuestController::class, 'joinLoyalty']);
+    Route::post('/loyalty/redeem', [GuestController::class, 'redeemLoyaltyPoints']);
 });
 
 Route::prefix('staff')->group(function () {

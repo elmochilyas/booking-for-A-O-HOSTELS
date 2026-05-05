@@ -384,16 +384,16 @@ class AdminController extends Controller
         return response()->json([
             'data' => $guests->map(fn ($g) => [
                 'id' => $g->id,
-                'first_name' => $g->first_name,
-                'last_name' => $g->last_name,
+                'firstName' => $g->first_name,
+                'lastName' => $g->last_name,
                 'email' => $g->email,
                 'phone' => $g->phone,
                 'country' => $g->country,
-                'is_loyalty_member' => $g->is_loyalty_member,
-                'loyalty_points' => $g->loyalty_points,
-                'is_banned' => $g->is_banned,
-                'bookings_count' => $g->bookings()->count(),
-                'created_at' => $g->created_at,
+                'isLoyaltyMember' => (bool) $g->is_loyalty_member,
+                'loyaltyPoints' => $g->loyalty_points,
+                'isBanned' => (bool) ($g->is_banned ?? false),
+                'bookingsCount' => $g->bookings()->count(),
+                'memberSince' => $g->created_at?->toDateString(),
             ]),
             'pagination' => [
                 'current_page' => $guests->currentPage(),
@@ -418,7 +418,17 @@ class AdminController extends Controller
 
         return response()->json([
             'message' => 'Guest updated successfully',
-            'data' => $guest,
+            'data' => [
+                'id' => $guest->id,
+                'firstName' => $guest->first_name,
+                'lastName' => $guest->last_name,
+                'email' => $guest->email,
+                'phone' => $guest->phone,
+                'country' => $guest->country,
+                'isLoyaltyMember' => (bool) $guest->is_loyalty_member,
+                'loyaltyPoints' => $guest->loyalty_points,
+                'isBanned' => (bool) ($guest->is_banned ?? false),
+            ],
         ]);
     }
 
@@ -429,7 +439,14 @@ class AdminController extends Controller
 
         return response()->json([
             'message' => 'Guest banned successfully',
-            'data' => $guest,
+            'data' => [
+                'id' => $guest->id,
+                'firstName' => $guest->first_name,
+                'lastName' => $guest->last_name,
+                'email' => $guest->email,
+                'isBanned' => (bool) $guest->is_banned,
+                'banReason' => $guest->ban_reason,
+            ],
         ]);
     }
 
@@ -439,7 +456,13 @@ class AdminController extends Controller
 
         return response()->json([
             'message' => 'Guest unbanned successfully',
-            'data' => $guest,
+            'data' => [
+                'id' => $guest->id,
+                'firstName' => $guest->first_name,
+                'lastName' => $guest->last_name,
+                'email' => $guest->email,
+                'isBanned' => (bool) $guest->is_banned,
+            ],
         ]);
     }
 

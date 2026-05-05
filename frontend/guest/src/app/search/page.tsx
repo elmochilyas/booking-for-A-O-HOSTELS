@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useState, useMemo } from 'react'
+import { Suspense, useState, useMemo, useCallback, useRef } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -31,6 +31,7 @@ function SearchContent() {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
   
   const location = searchParams.get('location') || ''
   const checkIn = searchParams.get('check_in') || ''
@@ -52,6 +53,25 @@ function SearchContent() {
     checkOut,
     guests: parseInt(guests),
   })
+
+  const updateFilterUrl = useCallback((amenities: string[], min?: string, max?: string, rating?: string) => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
+    }
+    
+    debounceTimerRef.current = setTimeout(() => {
+      const params = new URLSearchParams(searchParams.toString())
+      if (min) params.set('min_price', min)
+      else params.delete('min_price')
+      if (max) params.set('max_price', max)
+      else params.delete('max_price')
+      if (amenities.length > 0) params.set('amenities', amenities.join(','))
+      else params.delete('amenities')
+      if (rating) params.set('rating', rating)
+      else params.delete('rating')
+      router.push(`${pathname}?${params.toString()}`, { scroll: false })
+    }, 500)
+  }, [searchParams, pathname, router])
 
   const filteredProperties = useMemo(() => {
     if (!properties) return []
@@ -76,19 +96,6 @@ function SearchContent() {
       : [...selectedAmenities, value]
     setSelectedAmenities(newAmenities)
     updateFilterUrl(newAmenities, minPrice, maxPrice, minRating)
-  }
-
-  function updateFilterUrl(amenities: string[], min?: string, max?: string, rating?: string) {
-    const params = new URLSearchParams(searchParams.toString())
-    if (min) params.set('min_price', min)
-    else params.delete('min_price')
-    if (max) params.set('max_price', max)
-    else params.delete('max_price')
-    if (amenities.length > 0) params.set('amenities', amenities.join(','))
-    else params.delete('amenities')
-    if (rating) params.set('rating', rating)
-    else params.delete('rating')
-    router.push(`${pathname}?${params.toString()}`, { scroll: false })
   }
 
   function handlePriceChange(type: 'min' | 'max', value: string) {
@@ -361,6 +368,19 @@ function SearchContent() {
                 ))}
               </div>
             ) : filteredProperties.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-6">
+                  <MapPin className="h-12 w-12 text-muted-foreground" />
+                </div>
+                <h3 className="text-xl font-bold text-foreground mb-2">No hostels found</h3>
+                <p className="text-muted-foreground mb-6 max-w-md">
+                  Try adjusting your filters or search for a different destination
+                </p>
+                <Button onClick={clearFilters} variant="outline">
+                  Clear Filters
+                </Button>
+              </div>
+            ) : (
               <div className="space-y-4">
                 {filteredProperties.map((property) => (
                   <Link key={property.id} href={`/hostels/${property.slug}`} className="group">
@@ -436,7 +456,7 @@ function SearchContent() {
                   </Link>
                 ))}
               </div>
-            ) : null}
+            )}
           </div>
         </div>
       </div>

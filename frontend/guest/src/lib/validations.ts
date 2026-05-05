@@ -44,6 +44,21 @@ export const guestDetailsSchema = z.object({
   specialRequests: z.string().optional(),
   createAccount: z.boolean().optional(),
   password: z.string().optional(),
+}).superRefine((data, ctx) => {
+  if (data.createAccount && !data.password) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Password is required when creating an account',
+      path: ['password'],
+    })
+  }
+  if (data.password && data.password.length < 6) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Password must be at least 6 characters',
+      path: ['password'],
+    })
+  }
 })
 
 export const contactSchema = z.object({

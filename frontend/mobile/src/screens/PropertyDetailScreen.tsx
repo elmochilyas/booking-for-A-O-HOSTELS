@@ -55,7 +55,7 @@ export default function PropertyDetailScreen({ navigation, route }: Props) {
       const response = await propertiesApi.getById(propertyId);
       setProperty(response.data.property);
       setAmenities(response.data.property.amenities || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       Alert.alert('Error', 'Failed to load property details');
       navigation.goBack();
     } finally {
@@ -105,7 +105,7 @@ export default function PropertyDetailScreen({ navigation, route }: Props) {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']} removeClippedSubviews={false}>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
       <View style={styles.header}>
         <Text variant="headlineMedium" style={styles.title}>{property.name}</Text>

@@ -93,7 +93,7 @@ const cityInfo: Record<string, CityData> = {
   },
   frankfurt: {
     name: 'Frankfurt', tagline: 'Finance, culture and apple wine',
-    heroImage: 'https://images.unsplash.com/photo-1577465882459-7a78d84b7264?w=1200',
+    heroImage: 'https://images.unsplash.com/photo-1467803738586-46b7eb7b16a1?w=1200',
     transport: 'Frankfurt\'s RMV network covers the whole region. The Tagesticket (day ticket) is excellent value. The U-Bahn takes you from the airport to the centre in 11 minutes.',
     attractions: [
       { name: 'Römerberg (Medieval Old Town)', distance: '20 min U-Bahn' },
@@ -298,7 +298,7 @@ const cityInfo: Record<string, CityData> = {
   },
   brussels: {
     name: 'Brussels', tagline: 'Waffles, chocolate and the heart of Europe',
-    heroImage: 'https://images.unsplash.com/photo-1559570278-7e2b6a9d4944?w=1200',
+    heroImage: 'https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=1200',
     transport: 'STIB/MIVB metro, trams and buses cover Brussels. The Brussels Card includes unlimited transport and free museum entry. Walking between the main sights is very feasible.',
     attractions: [
       { name: 'Grand-Place (UNESCO)', distance: '15 min metro' },
@@ -366,7 +366,7 @@ const cityInfo: Record<string, CityData> = {
   },
   brighton: {
     name: 'Brighton', tagline: 'Seaside freedom, pride and the quirky south',
-    heroImage: 'https://images.unsplash.com/photo-1567447803219-ccf5aa54d30b?w=1200',
+    heroImage: 'https://images.unsplash.com/photo-1529655683826-aba9b3e77383?w=1200',
     transport: 'Brighton is very walkable. Trains from London Victoria and London Bridge take just 55 minutes. Local buses cover the surrounding areas.',
     attractions: [
       { name: 'Brighton Palace Pier', distance: '5 min walk' },
@@ -400,7 +400,7 @@ const cityInfo: Record<string, CityData> = {
   },
   antwerp: {
     name: 'Antwerp', tagline: 'Diamonds, fashion and Flemish masters',
-    heroImage: 'https://images.unsplash.com/photo-1559570278-7e2b6a9d4944?w=1200',
+    heroImage: 'https://images.unsplash.com/photo-1467803738586-46b7eb7b16a1?w=1200',
     transport: 'De Lijn trams and buses serve the whole city. Antwerp is also very bike-friendly. The city centre is compact and largely pedestrianised.',
     attractions: [
       { name: 'Cathedral of Our Lady', distance: '20 min walk' },
@@ -570,8 +570,8 @@ const cityInfo: Record<string, CityData> = {
   },
 }
 
-export default function CityGuidePage({ params }: { params: Promise<{ city: string }> }) {
-  const { city } = use(params)
+export default function CityGuidePage({ params }: { params: { city: string } }) {
+  const { city } = params
   const info = cityInfo[city] ?? cityInfo.berlin
   const { data: properties } = usePropertySearch({ location: info.name })
 

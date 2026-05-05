@@ -514,7 +514,10 @@ class AdminManagementService
             'bookings' => $guest->bookings()->get()->toArray(),
             'reviews' => $guest->reviews()->get()->toArray(),
             'payments' => $guest->payments()->get()->toArray(),
-            'loyalty_points' => $guest->loyaltyPoints()->get()->toArray(),
+            'loyalty_points' => [
+                'current_balance' => $guest->loyalty_points,
+                'is_member' => $guest->is_loyalty_member,
+            ],
             'exported_at' => now()->toIso8601String(),
         ];
     }

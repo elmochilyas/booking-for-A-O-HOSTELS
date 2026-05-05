@@ -1,8 +1,12 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, Platform } from 'react-native';
 import { Text, Switch, List, Divider, Card } from 'react-native-paper';
 import { Spacing, Colors, BorderRadius } from '../theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+// TODO: Implement actual push notification functionality
+// Requires: expo-notifications package, backend token registration, and notification handling
+// For now, this is UI-only with local state
 
 export default function NotificationPreferencesScreen() {
   const [emailBookings, setEmailBookings] = React.useState(true);
@@ -13,9 +17,9 @@ export default function NotificationPreferencesScreen() {
   const [pushNotifications, setPushNotifications] = React.useState(true);
 
   const NotificationSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
-    <Card style={styles.section}>
+    <Card style={styles.section} accessibilityRole="none">
       <Card.Content>
-        <Text variant="titleMedium" style={styles.sectionTitle}>{title}</Text>
+        <Text variant="titleMedium" style={styles.sectionTitle} accessibilityRole="header">{title}</Text>
         {children}
       </Card.Content>
     </Card>
