@@ -1,0 +1,18 @@
+{
+  "name": "A-O-HOSTELS Booking Platform",
+  "structure": {
+    "backend": "backend/ - Laravel 12 API (PHP 8.2+)",
+    "frontend_admin": "frontend/admin/ - Next.js 14 admin panel (port 3000)",
+    "frontend_guest": "frontend/guest/ - Next.js 14 guest website (port 3001)",
+    "frontend_mobile": "frontend/mobile/ - Expo/React Native mobile app"
+  },
+  "commands": {
+    "backend_test": "cd backend; ./vendor/bin/phpunit",
+    "backend_lint": "cd backend; ./vendor/bin/pint",
+    "frontend_dev": "cd frontend/[admin|guest|mobile]; npm run dev",
+    "start_all": ".\\start.ps1"
+  },
+  "api_url": "http://ao-api.test/api",
+  "branch_convention": "feature/TASK-XXX-description or fix/TASK-XXX-description",
+  "commit_convention": "TASK-XXX: Description"
+}
