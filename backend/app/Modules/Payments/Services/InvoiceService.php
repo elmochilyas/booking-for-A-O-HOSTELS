@@ -19,7 +19,7 @@ class InvoiceService
         }
 
         $payments = Payment::where('booking_id', $bookingId)
-            ->where('status', 'success')
+            ->where('status', 'completed')
             ->get();
 
         $invoiceNumber = $this->generateInvoiceNumber($bookingId);

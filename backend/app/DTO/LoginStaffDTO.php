@@ -18,4 +18,12 @@ readonly class LoginStaffDTO
             password: $request->validated('password'),
         );
     }
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            email: $data['email'] ?? '',
+            password: $data['password'] ?? '',
+        );
+    }
 }

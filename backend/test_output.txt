@@ -1,0 +1,920 @@
+﻿
+  [44;1m INFO [49;22m <?php> namespace Tests\Unit\Actions; use App\Actions\Bookings\CreateBooking; use App\Actions\Auth\RegisterGuestAction; use Illuminate\Foundation\Testing\RefreshDatabase; uses(RefreshDatabase::class)->in('Unit/Actions'); test('CreateBooking action has handle method', function () { expect(class_exists(CreateBooking::class))->toBeTrue(); expect(method_exists(CreateBooking::class, 'handle'))->toBeTrue(); }); test('RegisterGuestAction action has handle method', function () { expect(class_exists(RegisterGuestAction::class))->toBeTrue(); expect(method_exists(RegisterGuestAction::class, 'handle'))->toBeTrue(); });
+
+
+<?php>
+
+test('simple test', function () {
+    expect(true)->toBeTrue();
+});
+<?php>
+
+namespace Tests\Unit\DTO;
+
+use App\DTO\CreateBookingDTO;
+use App\DTO\RegisterGuestDTO;
+use App\Enums\PaymentMethod;
+
+test('CreateBookingDTO is readonly class', function () {
+    $reflection = new ReflectionClass(CreateBookingDTO::class);
+    expect($reflection->isReadonly())->toBeTrue();
+});
+
+test('RegisterGuestDTO is readonly class', function () {
+    $reflection = new ReflectionClass(RegisterGuestDTO::class);
+    expect($reflection->isReadonly())->toBeTrue();
+});
+
+<?php>
+
+namespace Tests\Unit\Repositories;
+
+use App\Contracts\Repositories\BookingRepositoryInterface;
+use App\Contracts\Repositories\PropertyRepositoryInterface;
+
+test('BookingRepository implements BookingRepositoryInterface', function () {
+    $repo = app(BookingRepositoryInterface::class);
+    expect($repo)->toBeInstanceOf(BookingRepositoryInterface::class);
+});
+
+test('PropertyRepository implements PropertyRepositoryInterface', function () {
+    $repo = app(PropertyRepositoryInterface::class);
+    expect($repo)->toBeInstanceOf(PropertyRepositoryInterface::class);
+});.
+
+   PASS  Tests\Unit\ExampleTest
+  Ô£ô that true is true                                                                                            0.01s  
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+
+   PASS  Tests\Feature\AuthApiTest
+  Ô£ô guest can register                                                                                           2.96s  
+  Ô£ô registration fails with invalid email                                                                        0.06s  
+  Ô£ô guest can login with valid credentials                                                                       0.05s  
+  Ô£ô login fails with invalid password                                                                            0.05s  
+  Ô£ô login fails for unverified email                                                                             0.05s  
+  Ô£ô can verify email with valid token                                                                            0.06s  
+  Ô£ô cannot access protected routes without token                                                                 0.05s  
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+
+   PASS  Tests\Feature\BookingApiTest
+  Ô£ô search availability returns available rooms                                                                  0.09s  
+  Ô£ô create booking requires authentication                                                                       0.06s  
+  Ô£ô booking creation with valid data                                                                             0.15s  
+  Ô£ô cannot create booking for unavailable dates                                                                  0.07s  
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+
+   PASS  Tests\Feature\ExampleTest
+  Ô£ô the application returns a successful response                                                                0.06s  
+
+  Tests:    13 passed (24 assertions)
+  Duration: 4.20s
+

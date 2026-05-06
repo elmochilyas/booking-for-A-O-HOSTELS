@@ -8,6 +8,8 @@ return [
     'allowed_origins' => [
         'http://localhost:3000',  // admin panel
         'http://localhost:3001',  // guest website
+        'http://ao-api.test',      // backend via Herd
+        'https://ao-api.test',     // backend via Herd (HTTPS)
     ],
 
     'allowed_origins_patterns' => [],

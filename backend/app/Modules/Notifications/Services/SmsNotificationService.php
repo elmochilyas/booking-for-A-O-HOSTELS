@@ -11,10 +11,10 @@ class SmsNotificationService
 
     public function __construct()
     {
-        if (config('services.twilio.sid') && config('services.twilio.token')) {
+        if (config('services.twilio.sid', as: 'string') && config('services.twilio.token', as: 'string')) {
             $this->client = new Client(
-                config('services.twilio.sid'),
-                config('services.twilio.token')
+                config('services.twilio.sid', as: 'string'),
+                config('services.twilio.token', as: 'string')
             );
         }
     }
@@ -78,7 +78,7 @@ class SmsNotificationService
 
         try {
             $this->client->messages->create($phone, [
-                'from' => config('services.twilio.from'),
+                'from' => config('services.twilio.from', as: 'string'),
                 'body' => $message,
             ]);
 

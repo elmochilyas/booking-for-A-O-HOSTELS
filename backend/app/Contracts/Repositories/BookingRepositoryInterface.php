@@ -44,4 +44,6 @@ interface BookingRepositoryInterface
     public function countOccupiedRoomNights(string $propertyId, string $start, string $end): int;
 
     public function countByPeriodAndStatus(string $propertyId, string $start, string $end, array $statuses): int;
+
+    public function getQuery(): \Illuminate\Database\Eloquent\Builder;
 }

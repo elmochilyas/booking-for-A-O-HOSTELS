@@ -1,0 +1,1156 @@
+﻿
+  [44;1m INFO [49;22m <?php> namespace Tests\Unit\Actions; use App\Actions\Bookings\CreateBooking; use App\Actions\Auth\RegisterGuestAction; use Illuminate\Foundation\Testing\RefreshDatabase; uses(RefreshDatabase::class)->in('Unit/Actions'); test('CreateBooking action has handle method', function () { expect(class_exists(CreateBooking::class))->toBeTrue(); expect(method_exists(CreateBooking::class, 'handle'))->toBeTrue(); }); test('RegisterGuestAction action has handle method', function () { expect(class_exists(RegisterGuestAction::class))->toBeTrue(); expect(method_exists(RegisterGuestAction::class, 'handle'))->toBeTrue(); });
+
+
+<?php>
+
+test('simple test', function () {
+    expect(true)->toBeTrue();
+});
+<?php>
+
+namespace Tests\Unit\DTO;
+
+use App\DTO\CreateBookingDTO;
+use App\DTO\RegisterGuestDTO;
+use App\Enums\PaymentMethod;
+
+test('CreateBookingDTO is readonly class', function () {
+    $reflection = new ReflectionClass(CreateBookingDTO::class);
+    expect($reflection->isReadonly())->toBeTrue();
+});
+
+test('RegisterGuestDTO is readonly class', function () {
+    $reflection = new ReflectionClass(RegisterGuestDTO::class);
+    expect($reflection->isReadonly())->toBeTrue();
+});
+
+<?php>
+
+namespace Tests\Unit\Repositories;
+
+use App\Contracts\Repositories\BookingRepositoryInterface;
+use App\Contracts\Repositories\PropertyRepositoryInterface;
+
+test('BookingRepository implements BookingRepositoryInterface', function () {
+    $repo = app(BookingRepositoryInterface::class);
+    expect($repo)->toBeInstanceOf(BookingRepositoryInterface::class);
+});
+
+test('PropertyRepository implements PropertyRepositoryInterface', function () {
+    $repo = app(PropertyRepositoryInterface::class);
+    expect($repo)->toBeInstanceOf(PropertyRepositoryInterface::class);
+});.
+
+   PASS  Tests\Unit\ExampleTest
+  Ô£ô that true is true                                                                                            0.01s  
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+
+   FAIL  Tests\Feature\AuthApiTest
+  Ô¿» guest can register                                                                                           4.97s  
+  Ô£ô registration fails with invalid email                                                                        0.05s  
+  Ô¿» guest can login with valid credentials                                                                       0.04s  
+  Ô¿» login fails with invalid password                                                                            0.05s  
+  Ô¿» login fails for unverified email                                                                             0.04s  
+  Ô¿» can verify email with valid token                                                                            0.05s  
+  Ô£ô cannot access protected routes without token                                                                 0.05s  
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+
+   FAIL  Tests\Feature\BookingApiTest
+  Ô¿» search availability returns available rooms
+  Ô¿» create booking requires authentication
+  Ô¿» booking creation with valid data
+  Ô¿» cannot create booking for unavailable dates
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+
+   PASS  Tests\Feature\ExampleTest
+  Ô£ô the application returns a successful response                                                                0.06s  
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ  
+   FAILED  Tests\Feature\AuthApiTest > guest can register                                                               
+  Expected response status code [201] but received 500.
+Failed asserting that 500 is identical to 201.
+
+The following exception occurred during the last request:
+
+Illuminate\Database\Eloquent\MassAssignmentException: Add [id] to fillable property to allow mass assignment on [App\Models\Guest]. in C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:694
+Stack trace:
+#0 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php(783): Illuminate\Database\Eloquent\Model->fill(Array)
+#1 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php(1782): Illuminate\Database\Eloquent\Model->newInstance(Array)
+#2 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php(1223): Illuminate\Database\Eloquent\Builder->newModelInstance(Array)
+#3 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Support\Traits\ForwardsCalls.php(23): Illuminate\Database\Eloquent\Builder->create(Array)
+#4 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php(2803): Illuminate\Database\Eloquent\Model->forwardCallTo(Object(Illuminate\Database\Eloquent\Builder), 'create', Array)
+#5 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php(2819): Illuminate\Database\Eloquent\Model->__call('create', Array)
+#6 C:\Users\admin\Herd\AO\backend\app\Repositories\EloquentGuestRepository.php(25): Illuminate\Database\Eloquent\Model::__callStatic('create', Array)
+#7 C:\Users\admin\Herd\AO\backend\app\Actions\Auth\RegisterGuestAction.php(23): App\Repositories\EloquentGuestRepository->create(Array)
+#8 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Concerns\ManagesTransactions.php(35): App\Actions\Auth\RegisterGuestAction->{closure:App\Actions\Auth\RegisterGuestAction::handle():22}(Object(Illuminate\Database\SQLiteConnection))
+#9 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\DatabaseManager.php(496): Illuminate\Database\Connection->transaction(Object(Closure))
+#10 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php(363): Illuminate\Database\DatabaseManager->__call('transaction', Array)
+#11 C:\Users\admin\Herd\AO\backend\app\Actions\Auth\RegisterGuestAction.php(22): Illuminate\Support\Facades\Facade::__callStatic('transaction', Array)
+#12 C:\Users\admin\Herd\AO\backend\app\Http\Controllers\Api\AuthController.php(31): App\Actions\Auth\RegisterGuestAction->handle(Object(App\DTO\CreateGuestDTO))
+#13 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Controller.php(54): App\Http\Controllers\Api\AuthController->register(Object(App\Http\Requests\Api\Auth\RegisterRequest), Object(App\Actions\Auth\RegisterGuestAction))
+#14 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\ControllerDispatcher.php(43): Illuminate\Routing\Controller->callAction('register', Array)
+#15 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Route.php(269): Illuminate\Routing\ControllerDispatcher->dispatch(Object(Illuminate\Routing\Route), Object(App\Http\Controllers\Api\AuthController), 'register')
+#16 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Route.php(215): Illuminate\Routing\Route->runController()
+#17 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Router.php(822): Illuminate\Routing\Route->run()
+#18 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(180): Illuminate\Routing\Router->{closure:Illuminate\Routing\Router::runRouteWithinStack():821}(Object(Illuminate\Http\Request))
+#19 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Middleware\SubstituteBindings.php(52): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}(Object(Illuminate\Http\Request))
+#20 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Routing\Middleware\SubstituteBindings->handle(Object(Illuminate\Http\Request), Object(Closure))
+#21 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#22 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Router.php(821): Illuminate\Pipeline\Pipeline->then(Object(Closure))
+#23 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Router.php(800): Illuminate\Routing\Router->runRouteWithinStack(Object(Illuminate\Routing\Route), Object(Illuminate\Http\Request))
+#24 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Router.php(764): Illuminate\Routing\Router->runRoute(Object(Illuminate\Http\Request), Object(Illuminate\Routing\Route))
+#25 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Router.php(753): Illuminate\Routing\Router->dispatchToRoute(Object(Illuminate\Http\Request))
+#26 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(200): Illuminate\Routing\Router->dispatch(Object(Illuminate\Http\Request))
+#27 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(180): Illuminate\Foundation\Http\Kernel->{closure:Illuminate\Foundation\Http\Kernel::dispatchToRouter():197}(Object(Illuminate\Http\Request))
+#28 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}(Object(Illuminate\Http\Request))
+#29 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull.php(31): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle(Object(Illuminate\Http\Request), Object(Closure))
+#30 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull->handle(Object(Illuminate\Http\Request), Object(Closure))
+#31 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#32 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TrimStrings.php(51): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle(Object(Illuminate\Http\Request), Object(Closure))
+#33 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\TrimStrings->handle(Object(Illuminate\Http\Request), Object(Closure))
+#34 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Http\Middleware\ValidatePostSize.php(27): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#35 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\ValidatePostSize->handle(Object(Illuminate\Http\Request), Object(Closure))
+#36 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance.php(109): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#37 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance->handle(Object(Illuminate\Http\Request), Object(Closure))
+#38 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Http\Middleware\TrustProxies.php(58): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#39 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\TrustProxies->handle(Object(Illuminate\Http\Request), Object(Closure))
+#40 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks.php(22): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#41 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks->handle(Object(Illuminate\Http\Request), Object(Closure))
+#42 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Http\Middleware\ValidatePathEncoding.php(28): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#43 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\ValidatePathEncoding->handle(Object(Illuminate\Http\Request), Object(Closure))
+#44 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Http\Middleware\HandleCors.php(74): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#45 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\HandleCors->handle(Object(Illuminate\Http\Request), Object(Closure))
+#46 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#47 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(175): Illuminate\Pipeline\Pipeline->then(Object(Closure))
+#48 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(144): Illuminate\Foundation\Http\Kernel->sendRequestThroughRouter(Object(Illuminate\Http\Request))
+#49 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php(607): Illuminate\Foundation\Http\Kernel->handle(Object(Illuminate\Http\Request))
+#50 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php(573): Illuminate\Foundation\Testing\TestCase->call('POST', '/api/auth/regis...', Array, Array, Array, Array, '{"email":"newus...')
+#51 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php(411): Illuminate\Foundation\Testing\TestCase->json('POST', '/api/auth/regis...', Array, Array, 0)
+#52 C:\Users\admin\Herd\AO\backend\tests\Feature\AuthApiTest.php(15): Illuminate\Foundation\Testing\TestCase->postJson('/api/auth/regis...', Array)
+#53 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestCase.php(1332): Tests\Feature\AuthApiTest->test_guest_can_register()
+#54 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestCase.php(519): PHPUnit\Framework\TestCase->runTest()
+#55 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestRunner\TestRunner.php(99): PHPUnit\Framework\TestCase->runBare()
+#56 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestCase.php(359): PHPUnit\Framework\TestRunner->run(Object(Tests\Feature\AuthApiTest))
+#57 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestCase->run()
+#58 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+#59 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+#60 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\TextUI\TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+#61 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\TextUI\Application.php(229): PHPUnit\TextUI\TestRunner->run(Object(PHPUnit\TextUI\Configuration\Configuration), Object(PHPUnit\Runner\ResultCache\DefaultResultCache), Object(PHPUnit\Framework\TestSuite))
+#62 C:\Users\admin\Herd\AO\backend\vendor\pestphp\pest\src\Kernel.php(103): PHPUnit\TextUI\Application->run(Array)
+#63 C:\Users\admin\Herd\AO\backend\vendor\pestphp\pest\bin\pest(184): Pest\Kernel->handle(Array, Array)
+#64 C:\Users\admin\Herd\AO\backend\vendor\pestphp\pest\bin\pest(192): {closure:C:\Users\admin\Herd\AO\backend\vendor\pestphp\pest\bin\pest:18}()
+#65 C:\Users\admin\Herd\AO\backend\vendor\bin\pest(119): include('C:\\Users\\admin\\...')
+#66 {main}
+
+----------------------------------------------------------------------------------
+
+Add [id] to fillable property to allow mass assignment on [App\Models\Guest].
+
+  at tests\Feature\AuthApiTest.php:23
+     19Ôûò             'first_name' => 'John',
+     20Ôûò             'last_name' => 'Doe',
+     21Ôûò         ]);
+     22Ôûò 
+  Ô×£  23Ôûò         $response->assertStatus(201);
+     24Ôûò         $response->assertJsonStructure(['message', 'guest', 'access_token']);
+     25Ôûò         $this->assertDatabaseHas('guests', ['email' => 'newuser@example.com']);
+     26Ôûò     }
+     27Ôûò
+
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ  
+   FAILED  Tests\Feature\AuthApiTest > guest can login with valid credentials                 MassAssignmentException   
+  Add [email] to fillable property to allow mass assignment on [App\Models\Guest].
+
+  at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:694
+    690Ôûò             } elseif ($totallyGuarded || static::preventsSilentlyDiscardingAttributes()) {
+    691Ôûò                 if (isset(static::$discardedAttributeViolationCallback)) {
+    692Ôûò                     call_user_func(static::$discardedAttributeViolationCallback, $this, [$key]);
+    693Ôûò                 } else {
+  Ô×£ 694Ôûò                     throw new MassAssignmentException(sprintf(
+    695Ôûò                         'Add [%s] to fillable property to allow mass assignment on [%s].',
+    696Ôûò                         $key, get_class($this)
+    697Ôûò                     ));
+    698Ôûò                 }
+
+  1   vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:694
+  2   vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:783
+
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ  
+   FAILED  Tests\Feature\AuthApiTest > login fails with invalid password                      MassAssignmentException   
+  Add [email] to fillable property to allow mass assignment on [App\Models\Guest].
+
+  at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:694
+    690Ôûò             } elseif ($totallyGuarded || static::preventsSilentlyDiscardingAttributes()) {
+    691Ôûò                 if (isset(static::$discardedAttributeViolationCallback)) {
+    692Ôûò                     call_user_func(static::$discardedAttributeViolationCallback, $this, [$key]);
+    693Ôûò                 } else {
+  Ô×£ 694Ôûò                     throw new MassAssignmentException(sprintf(
+    695Ôûò                         'Add [%s] to fillable property to allow mass assignment on [%s].',
+    696Ôûò                         $key, get_class($this)
+    697Ôûò                     ));
+    698Ôûò                 }
+
+  1   vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:694
+  2   vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:783
+
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ  
+   FAILED  Tests\Feature\AuthApiTest > login fails for unverified email                       MassAssignmentException   
+  Add [email] to fillable property to allow mass assignment on [App\Models\Guest].
+
+  at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:694
+    690Ôûò             } elseif ($totallyGuarded || static::preventsSilentlyDiscardingAttributes()) {
+    691Ôûò                 if (isset(static::$discardedAttributeViolationCallback)) {
+    692Ôûò                     call_user_func(static::$discardedAttributeViolationCallback, $this, [$key]);
+    693Ôûò                 } else {
+  Ô×£ 694Ôûò                     throw new MassAssignmentException(sprintf(
+    695Ôûò                         'Add [%s] to fillable property to allow mass assignment on [%s].',
+    696Ôûò                         $key, get_class($this)
+    697Ôûò                     ));
+    698Ôûò                 }
+
+  1   vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:694
+  2   vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:783
+
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ  
+   FAILED  Tests\Feature\AuthApiTest > can verify email with valid token                      MassAssignmentException   
+  Add [email] to fillable property to allow mass assignment on [App\Models\Guest].
+
+  at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:694
+    690Ôûò             } elseif ($totallyGuarded || static::preventsSilentlyDiscardingAttributes()) {
+    691Ôûò                 if (isset(static::$discardedAttributeViolationCallback)) {
+    692Ôûò                     call_user_func(static::$discardedAttributeViolationCallback, $this, [$key]);
+    693Ôûò                 } else {
+  Ô×£ 694Ôûò                     throw new MassAssignmentException(sprintf(
+    695Ôûò                         'Add [%s] to fillable property to allow mass assignment on [%s].',
+    696Ôûò                         $key, get_class($this)
+    697Ôûò                     ));
+    698Ôûò                 }
+
+  1   vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:694
+  2   vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:783
+
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ  
+   FAILED  Tests\Feature\BookingApiTest > search availability returns available rooms         MassAssignmentException   
+  Add [name] to fillable property to allow mass assignment on [App\Models\Property].
+
+  at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:694
+    690Ôûò             } elseif ($totallyGuarded || static::preventsSilentlyDiscardingAttributes()) {
+    691Ôûò                 if (isset(static::$discardedAttributeViolationCallback)) {
+    692Ôûò                     call_user_func(static::$discardedAttributeViolationCallback, $this, [$key]);
+    693Ôûò                 } else {
+  Ô×£ 694Ôûò                     throw new MassAssignmentException(sprintf(
+    695Ôûò                         'Add [%s] to fillable property to allow mass assignment on [%s].',
+    696Ôûò                         $key, get_class($this)
+    697Ôûò                     ));
+    698Ôûò                 }
+
+  1   vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:694
+  2   vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:783
+
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ  
+   FAILED  Tests\Feature\BookingApiTest > create booking requires authentication              MassAssignmentException   
+  Add [name] to fillable property to allow mass assignment on [App\Models\Property].
+
+  at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:694
+    690Ôûò             } elseif ($totallyGuarded || static::preventsSilentlyDiscardingAttributes()) {
+    691Ôûò                 if (isset(static::$discardedAttributeViolationCallback)) {
+    692Ôûò                     call_user_func(static::$discardedAttributeViolationCallback, $this, [$key]);
+    693Ôûò                 } else {
+  Ô×£ 694Ôûò                     throw new MassAssignmentException(sprintf(
+    695Ôûò                         'Add [%s] to fillable property to allow mass assignment on [%s].',
+    696Ôûò                         $key, get_class($this)
+    697Ôûò                     ));
+    698Ôûò                 }
+
+  1   vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:694
+  2   vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:783
+
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ  
+   FAILED  Tests\Feature\BookingApiTest > booking creation with valid data                    MassAssignmentException   
+  Add [name] to fillable property to allow mass assignment on [App\Models\Property].
+
+  at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:694
+    690Ôûò             } elseif ($totallyGuarded || static::preventsSilentlyDiscardingAttributes()) {
+    691Ôûò                 if (isset(static::$discardedAttributeViolationCallback)) {
+    692Ôûò                     call_user_func(static::$discardedAttributeViolationCallback, $this, [$key]);
+    693Ôûò                 } else {
+  Ô×£ 694Ôûò                     throw new MassAssignmentException(sprintf(
+    695Ôûò                         'Add [%s] to fillable property to allow mass assignment on [%s].',
+    696Ôûò                         $key, get_class($this)
+    697Ôûò                     ));
+    698Ôûò                 }
+
+  1   vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:694
+  2   vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:783
+
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ  
+   FAILED  Tests\Feature\BookingApiTest > cannot create booking for unavailable dates         MassAssignmentException   
+  Add [name] to fillable property to allow mass assignment on [App\Models\Property].
+
+  at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:694
+    690Ôûò             } elseif ($totallyGuarded || static::preventsSilentlyDiscardingAttributes()) {
+    691Ôûò                 if (isset(static::$discardedAttributeViolationCallback)) {
+    692Ôûò                     call_user_func(static::$discardedAttributeViolationCallback, $this, [$key]);
+    693Ôûò                 } else {
+  Ô×£ 694Ôûò                     throw new MassAssignmentException(sprintf(
+    695Ôûò                         'Add [%s] to fillable property to allow mass assignment on [%s].',
+    696Ôûò                         $key, get_class($this)
+    697Ôûò                     ));
+    698Ôûò                 }
+
+  1   vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:694
+  2   vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php:783
+
+
+  Tests:    9 failed, 4 passed (7 assertions)
+  Duration: 5.94s
+

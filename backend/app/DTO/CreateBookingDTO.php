@@ -43,13 +43,13 @@ readonly class CreateBookingDTO
     public static function fromArray(array $data): self
     {
         return new self(
-            propertyId: $data['property_id'],
-            roomTypeId: $data['room_type_id'],
-            guestId: $data['guest_id'],
-            checkInDate: new Carbon($data['check_in_date']),
-            checkOutDate: new Carbon($data['check_out_date']),
-            guestCount: $data['guest_count'],
-            paymentMethod: PaymentMethod::from($data['payment_method']),
+            propertyId: $data['property_id'] ?? '',
+            roomTypeId: $data['room_type_id'] ?? '',
+            guestId: $data['guest_id'] ?? '',
+            checkInDate: isset($data['check_in_date']) ? new Carbon($data['check_in_date']) : now(),
+            checkOutDate: isset($data['check_out_date']) ? new Carbon($data['check_out_date']) : now(),
+            guestCount: $data['guest_count'] ?? 1,
+            paymentMethod: isset($data['payment_method']) ? PaymentMethod::from($data['payment_method']) : null,
             source: isset($data['source']) ? BookingSource::from($data['source']) : null,
             specialRequests: $data['special_requests'] ?? null,
             extras: $data['extras'] ?? [],

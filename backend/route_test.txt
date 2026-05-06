@@ -1,0 +1,178 @@
+﻿<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+
+  GET|HEAD  / ....................................................................................... routes/web.php:5
+  GET|HEAD  api/admin/analytics ........................... App\Modules\Admin\Controllers\AdminController@getAnalytics
+  POST      api/admin/announcements ................... App\Modules\Admin\Controllers\AdminController@sendAnnouncement
+  GET|HEAD  api/admin/audit-logs .......................... App\Modules\Admin\Controllers\AdminController@getAuditLogs
+  GET|HEAD  api/admin/bookings ............................. App\Modules\Admin\Controllers\AdminController@getBookings
+  GET|HEAD  api/admin/bookings/export ................... App\Modules\Admin\Controllers\AdminController@exportBookings
+  PUT       api/admin/bookings/{id} ...................... App\Modules\Admin\Controllers\AdminController@updateBooking
+  DELETE    api/admin/bookings/{id} ...................... App\Modules\Admin\Controllers\AdminController@cancelBooking
+  POST      api/admin/bookings/{id}/refund ............... App\Modules\Admin\Controllers\AdminController@refundBooking
+  GET|HEAD  api/admin/config ........................... App\Modules\Admin\Controllers\AdminController@getSystemConfig
+  PUT       api/admin/config ........................ App\Modules\Admin\Controllers\AdminController@updateSystemConfig
+  GET|HEAD  api/admin/email-templates ................ App\Modules\Admin\Controllers\AdminController@getEmailTemplates
+  PUT       api/admin/email-templates/{id} ......... App\Modules\Admin\Controllers\AdminController@updateEmailTemplate
+  GET|HEAD  api/admin/extras ................................. App\Modules\Admin\Controllers\AdminController@getExtras
+  POST      api/admin/extras ............................... App\Modules\Admin\Controllers\AdminController@createExtra
+  PUT       api/admin/extras/{id} .......................... App\Modules\Admin\Controllers\AdminController@updateExtra
+  DELETE    api/admin/extras/{id} .......................... App\Modules\Admin\Controllers\AdminController@deleteExtra
+  GET|HEAD  api/admin/guests ................................. App\Modules\Admin\Controllers\AdminController@getGuests
+  POST      api/admin/guests/merge ......................... App\Modules\Admin\Controllers\AdminController@mergeGuests
+  PUT       api/admin/guests/{id} .......................... App\Modules\Admin\Controllers\AdminController@updateGuest
+  POST      api/admin/guests/{id}/ban ......................... App\Modules\Admin\Controllers\AdminController@banGuest
+  DELETE    api/admin/guests/{id}/data ................. App\Modules\Admin\Controllers\AdminController@deleteGuestData
+  GET|HEAD  api/admin/guests/{id}/export ............... App\Modules\Admin\Controllers\AdminController@exportGuestData
+  POST      api/admin/guests/{id}/unban ..................... App\Modules\Admin\Controllers\AdminController@unbanGuest
+  GET|HEAD  api/admin/payments ............................. App\Modules\Admin\Controllers\AdminController@getPayments
+  GET|HEAD  api/admin/permissions ....................... App\Modules\Admin\Controllers\AdminController@getPermissions
+  GET|HEAD  api/admin/promotions ......................... App\Modules\Admin\Controllers\AdminController@getPromotions
+  POST      api/admin/promotions ....................... App\Modules\Admin\Controllers\AdminController@createPromotion
+  PUT       api/admin/promotions/{id} .................. App\Modules\Admin\Controllers\AdminController@updatePromotion
+  DELETE    api/admin/promotions/{id} .................. App\Modules\Admin\Controllers\AdminController@deletePromotion
+  GET|HEAD  api/admin/properties ......................... App\Modules\Admin\Controllers\AdminController@getProperties
+  POST      api/admin/properties ........................ App\Modules\Admin\Controllers\AdminController@createProperty
+  PUT       api/admin/properties/{id} ................... App\Modules\Admin\Controllers\AdminController@updateProperty
+  DELETE    api/admin/properties/{id} ................... App\Modules\Admin\Controllers\AdminController@deleteProperty
+  GET|HEAD  api/admin/properties/{id}/kpis ............. App\Modules\Admin\Controllers\AdminController@getPropertyKpis
+  GET|HEAD  api/admin/reports ........................................................... Api\ReportController@reports
+  GET|HEAD  api/admin/revenue ...................... App\Modules\Admin\Controllers\AdminController@getRevenueDashboard
+  GET|HEAD  api/admin/reviews ............................... App\Modules\Admin\Controllers\AdminController@getReviews
+  PUT       api/admin/reviews/{id}/moderate ............. App\Modules\Admin\Controllers\AdminController@moderateReview
+  GET|HEAD  api/admin/roles ................................... App\Modules\Admin\Controllers\AdminController@getRoles
+  GET|HEAD  api/admin/room-types .......................... App\Modules\Admin\Controllers\AdminController@getRoomTypes
+  POST      api/admin/room-types ........................ App\Modules\Admin\Controllers\AdminController@createRoomType
+  PUT       api/admin/room-types/{id} ................... App\Modules\Admin\Controllers\AdminController@updateRoomType
+  GET|HEAD  api/admin/rooms ................................... App\Modules\Admin\Controllers\AdminController@getRooms
+  POST      api/admin/rooms ................................. App\Modules\Admin\Controllers\AdminController@createRoom
+  PUT       api/admin/rooms/{id} ............................ App\Modules\Admin\Controllers\AdminController@updateRoom
+  PATCH     api/admin/rooms/{id}/status ............... App\Modules\Admin\Controllers\AdminController@updateRoomStatus
+  GET|HEAD  api/admin/seed .................................... App\Modules\Admin\Controllers\AdminController@seedData
+  POST      api/admin/staff ................................ App\Modules\Admin\Controllers\AdminController@createStaff
+  GET|HEAD  api/admin/staff ................................... App\Modules\Admin\Controllers\AdminController@getStaff
+  PUT       api/admin/staff/{id} ........................... App\Modules\Admin\Controllers\AdminController@updateStaff
+  DELETE    api/admin/staff/{id} ........................... App\Modules\Admin\Controllers\AdminController@deleteStaff
+  GET|HEAD  api/admin/staff/{id} .......................... App\Modules\Admin\Controllers\AdminController@getStaffById
+  POST      api/admin/staff/{id}/force-logout .............. App\Modules\Admin\Controllers\AdminController@forceLogout
+  POST      api/auth/forgot-password ............................................... Api\AuthController@forgotPassword
+  POST      api/auth/login .................................................................. Api\AuthController@login
+  POST      api/auth/logout ................................................................ Api\AuthController@logout
+  POST      api/auth/refresh .............................................................. Api\AuthController@refresh
+  POST      api/auth/register ............................................................ Api\AuthController@register
+  POST      api/auth/reset-password ................................................. Api\AuthController@resetPassword
+  POST      api/auth/verify-email ..................................................... Api\AuthController@verifyEmail
+  GET|HEAD  api/bookings ................................................................. Api\BookingController@index
+  POST      api/bookings ................................................................. Api\BookingController@store
+  GET|HEAD  api/bookings/availability ............................................. Api\BookingController@availability
+  GET|HEAD  api/bookings/{id} ............................................................. Api\BookingController@show
+  PUT       api/bookings/{id} ........................................................... Api\BookingController@update
+  DELETE    api/bookings/{id} ........................................................... Api\BookingController@cancel
+  POST      api/bookings/{id}/check-in ................................................. Api\BookingController@checkIn
+  POST      api/bookings/{id}/check-out ............................................... Api\BookingController@checkOut
+  DELETE    api/guest/account ...................................................... Api\GuestController@deleteAccount
+  GET|HEAD  api/guest/bookings .......................................................... Api\GuestController@bookings
+  POST      api/guest/change-password ............................................. Api\GuestController@changePassword
+  GET|HEAD  api/guest/loyalty ............................................................ Api\GuestController@loyalty
+  POST      api/guest/loyalty/join ................................................... Api\GuestController@joinLoyalty
+  POST      api/guest/loyalty/redeem ......................................... Api\GuestController@redeemLoyaltyPoints
+  PUT       api/guest/notifications .......................................... Api\GuestController@updateNotifications
+  GET|HEAD  api/guest/profile ............................................................ Api\GuestController@profile
+  PUT       api/guest/profile ...................................................... Api\GuestController@updateProfile
+  GET|HEAD  api/invoices/download/{bookingId} ......................................... Api\InvoiceController@download
+  GET|HEAD  api/invoices/{bookingId} .................................................. Api\InvoiceController@generate
+  GET|HEAD  api/payments/booking/{bookingId} ................................... Api\PaymentController@bookingPayments
+  POST      api/payments/create-intent ............................................ Api\PaymentController@createIntent
+  POST      api/payments/refund ......................................................... Api\PaymentController@refund
+  POST      api/payments/webhook ................................................. Api\PaymentWebhookController@handle
+  GET|HEAD  api/properties .............................................................. Api\PropertyController@index
+  POST      api/properties .............................................................. Api\PropertyController@store
+  GET|HEAD  api/properties/destinations .......................................... Api\PropertyController@destinations
+  GET|HEAD  api/properties/{id} .......................................................... Api\PropertyController@show
+  PUT       api/properties/{id} ........................................................ Api\PropertyController@update
+  DELETE    api/properties/{id} ....................................................... Api\PropertyController@destroy
+  GET|HEAD  api/properties/{id}/availability ......................................... Api\RoomController@availability
+  GET|HEAD  api/properties/{id}/room-types ...................................... Api\RoomController@propertyRoomTypes
+  GET|HEAD  api/properties/{id}/rooms ............................................... Api\RoomController@propertyRooms
+  GET|HEAD  api/staff/check-ins .................................................... Api\StaffController@todayCheckIns
+  GET|HEAD  api/staff/check-outs .................................................. Api\StaffController@todayCheckOuts
+  GET|HEAD  api/staff/dashboard ........................................................ Api\StaffController@dashboard
+  GET|HEAD  api/staff/guest/{id} .................................................... Api\StaffController@guestDetails
+  POST      api/staff/login ................................................................ Api\StaffController@login
+  POST      api/staff/logout .............................................................. Api\StaffController@logout
+  GET|HEAD  health ................................................................................. routes/web.php:13
+  GET|HEAD  storage/{path} storage.local ÔÇ║ vendor/laravel/framework/src/Illuminate/Filesystem/FilesystemServiceProvidÔÇª
+  PUT       storage/{path} storage.local.upload ÔÇ║ vendor/laravel/framework/src/Illuminate/Filesystem/FilesystemServicÔÇª
+  GET|HEAD  up ........... vendor/laravel/framework/src/Illuminate/Foundation/Configuration/ApplicationBuilder.php:223
+
+                                                                                                  Showing [103] routes
+

@@ -2,156 +2,90 @@
 
 namespace App\Modules\Staff\Controllers;
 
-use App\Modules\Staff\Services\ReportingService;
+use App\Http\Requests\Modules\Staff\DailyStatsRequest;
+use App\Http\Requests\Modules\Staff\DashboardRequest;
+use App\Http\Requests\Modules\Staff\ReportRequest;
+use App\Queries\GetADRQuery;
+use App\Queries\GetBookingStatsQuery;
+use App\Queries\GetDailyStatsQuery;
+use App\Queries\GetDashboardMetricsQuery;
+use App\Queries\GetOccupancyQuery;
+use App\Queries\GetRevenueQuery;
+use App\Queries\GetRevPARQuery;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Routing\Controller;
 
-class ReportController
+class ReportController extends Controller
 {
-    private ReportingService $reportingService;
-
-    public function __construct(ReportingService $reportingService)
+    public function getOccupancy(ReportRequest $request, GetOccupancyQuery $query): JsonResponse
     {
-        $this->reportingService = $reportingService;
-    }
-
-    public function getOccupancy(Request $request): JsonResponse
-    {
-        $validator = Validator::make($request->all(), [
-            'property_id' => 'required|uuid|exists:properties,id',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $data = $this->reportingService->getOccupancyRate(
-            $request->property_id,
-            $request->start_date,
-            $request->end_date
+        $data = $query->handle(
+            $request->validated('property_id'),
+            $request->validated('start_date'),
+            $request->validated('end_date')
         );
 
         return response()->json(['data' => $data]);
     }
 
-    public function getRevenue(Request $request): JsonResponse
+    public function getRevenue(ReportRequest $request, GetRevenueQuery $query): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'property_id' => 'required|uuid|exists:properties,id',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $data = $this->reportingService->getRevenueReport(
-            $request->property_id,
-            $request->start_date,
-            $request->end_date
+        $data = $query->handle(
+            $request->validated('property_id'),
+            $request->validated('start_date'),
+            $request->validated('end_date')
         );
 
         return response()->json(['data' => $data]);
     }
 
-    public function getBookingStats(Request $request): JsonResponse
+    public function getBookingStats(ReportRequest $request, GetBookingStatsQuery $query): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'property_id' => 'required|uuid|exists:properties,id',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $data = $this->reportingService->getBookingStats(
-            $request->property_id,
-            $request->start_date,
-            $request->end_date
+        $data = $query->handle(
+            $request->validated('property_id'),
+            $request->validated('start_date'),
+            $request->validated('end_date')
         );
 
         return response()->json(['data' => $data]);
     }
 
-    public function getDailyStats(Request $request): JsonResponse
+    public function getDailyStats(DailyStatsRequest $request, GetDailyStatsQuery $query): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'property_id' => 'required|uuid|exists:properties,id',
-            'date' => 'required|date',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $data = $this->reportingService->getDailyStats(
-            $request->property_id,
-            $request->date
+        $data = $query->handle(
+            $request->validated('property_id'),
+            $request->validated('date')
         );
 
         return response()->json(['data' => $data]);
     }
 
-    public function getDashboard(Request $request): JsonResponse
+    public function getDashboard(DashboardRequest $request, GetDashboardMetricsQuery $query): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'property_id' => 'required|uuid|exists:properties,id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $data = $this->reportingService->getDashboardMetrics($request->property_id);
+        $data = $query->handle($request->validated('property_id'));
 
         return response()->json(['data' => $data]);
     }
 
-    public function getADR(Request $request): JsonResponse
+    public function getADR(ReportRequest $request, GetADRQuery $query): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'property_id' => 'required|uuid|exists:properties,id',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $adr = $this->reportingService->getADR(
-            $request->property_id,
-            $request->start_date,
-            $request->end_date
+        $adr = $query->handle(
+            $request->validated('property_id'),
+            $request->validated('start_date'),
+            $request->validated('end_date')
         );
 
-        return response()->json(['data' => ['adr' => round($adr, 2)]]);
+        return response()->json(['data' => ['adr' => $adr]]);
     }
 
-    public function getRevPAR(Request $request): JsonResponse
+    public function getRevPAR(ReportRequest $request, GetRevPARQuery $query): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'property_id' => 'required|uuid|exists:properties,id',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $revpar = $this->reportingService->getRevPAR(
-            $request->property_id,
-            $request->start_date,
-            $request->end_date
+        $revpar = $query->handle(
+            $request->validated('property_id'),
+            $request->validated('start_date'),
+            $request->validated('end_date')
         );
 
-        return response()->json(['data' => ['revpar' => round($revpar, 2)]]);
+        return response()->json(['data' => ['revpar' => $revpar]]);
     }
 }

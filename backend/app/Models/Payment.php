@@ -2,39 +2,45 @@
 
 namespace App\Models;
 
+use App\Enums\PaymentStatus;
+use App\Observers\PaymentObserver;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Str;
 
+#[Table('payments', key: 'payment_id')]
+#[Hidden(['created_at', 'updated_at'])]
+#[ObservedBy([PaymentObserver::class])]
 class Payment extends Model
 {
-    protected $table = 'payments';
+    use HasUuids;
+
+    protected $fillable = [
+        'booking_id', 'amount', 'payment_method',
+        'status', 'stripe_payment_id', 'stripe_client_secret',
+        'failure_message', 'notes',
+    ];
 
     protected $keyType = 'string';
 
     public $incrementing = false;
 
-    protected static function boot(): void
+    public function getIdAttribute()
     {
-        parent::boot();
-        static::creating(function ($model) {
-            if (empty($model->id)) {
-                $model->id = Str::uuid()->toString();
-            }
-        });
+        return $this->getKey();
     }
 
-    protected $fillable = [
-        'id', 'booking_id', 'amount', 'payment_method',
-        'status', 'stripe_payment_id', 'stripe_client_secret',
-        'failure_message', 'notes',
-    ];
+    public function __get($key)
+    {
+        if ($key === 'id') {
+            return $this->getKey();
+        }
 
-    protected $casts = [
-        'amount' => 'decimal:2',
-    ];
-
-    protected $hidden = ['created_at', 'updated_at'];
+        return parent::__get($key);
+    }
 
     public function booking(): BelongsTo
     {

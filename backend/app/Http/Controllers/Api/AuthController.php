@@ -18,9 +18,12 @@ use App\Http\Requests\Api\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Api\Auth\LoginRequest;
 use App\Http\Requests\Api\Auth\RegisterRequest;
 use App\Http\Requests\Api\Auth\ResetPasswordRequest;
+use App\Http\Requests\Api\Auth\VerifyEmailRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Attributes\Middleware;
 
+#[Middleware('guest')]
 class AuthController extends Controller
 {
     public function register(RegisterRequest $request, RegisterGuestAction $action): JsonResponse
@@ -45,6 +48,7 @@ class AuthController extends Controller
         }
     }
 
+    #[Middleware('auth.jwt')]
     public function refresh(Request $request, RefreshTokenAction $action): JsonResponse
     {
         $refreshToken = $request->bearerToken();
@@ -62,6 +66,7 @@ class AuthController extends Controller
         }
     }
 
+    #[Middleware('auth.jwt')]
     public function logout(Request $request, LogoutGuestAction $action): JsonResponse
     {
         $token = $request->bearerToken();
@@ -70,12 +75,9 @@ class AuthController extends Controller
         return response()->json($result);
     }
 
-    public function verifyEmail(Request $request, VerifyEmailAction $action): JsonResponse
+    #[Middleware('auth.jwt')]
+    public function verifyEmail(VerifyEmailRequest $request, VerifyEmailAction $action): JsonResponse
     {
-        $request->validate([
-            'token' => ['required', 'string'],
-        ]);
-
         try {
             $result = $action->handle($request->input('token'));
 

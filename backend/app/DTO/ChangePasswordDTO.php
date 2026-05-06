@@ -18,4 +18,12 @@ readonly class ChangePasswordDTO
             newPassword: $request->validated('new_password'),
         );
     }
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            currentPassword: $data['current_password'] ?? '',
+            newPassword: $data['new_password'] ?? '',
+        );
+    }
 }

@@ -9,8 +9,8 @@ use App\Services\StripeService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\Attributes\Backoff;
 use Illuminate\Queue\Attributes\Timeout;
-use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
 
 #[Tries(5)]
@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Log;
 #[Timeout(60)]
 class ProcessPaymentWebhook implements ShouldQueue
 {
-    use \Illuminate\Contracts\Queue\ShouldQueue, \Illuminate\Queue\Queueable, InteractsWithQueue;
+    use Queueable, InteractsWithQueue;
 
     public function __construct(
         private string $payload,

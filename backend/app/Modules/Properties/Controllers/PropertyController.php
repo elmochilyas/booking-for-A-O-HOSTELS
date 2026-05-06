@@ -2,132 +2,97 @@
 
 namespace App\Modules\Properties\Controllers;
 
-use App\Models\Property;
-use App\Modules\Properties\Services\PropertyService;
+use App\Actions\Properties\CreateProperty;
+use App\Actions\Properties\CreateRoomType;
+use App\Actions\Properties\DeleteProperty;
+use App\Actions\Properties\UpdateProperty;
+use App\Contracts\Repositories\PropertyRepositoryInterface;
+use App\Contracts\Repositories\RoomTypeRepositoryInterface;
+use App\DTO\CreatePropertyDTO;
+use App\DTO\UpdatePropertyDTO;
+use App\Http\Requests\Api\Property\CreateRoomTypeRequest;
+use App\Http\Requests\Modules\Properties\CreatePropertyRequest;
+use App\Http\Requests\Modules\Properties\GetPropertiesRequest;
+use App\Http\Requests\Modules\Properties\UpdatePropertyRequest;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Routing\Controller;
 
-class PropertyController
+class PropertyController extends Controller
 {
-    private PropertyService $propertyService;
+    public function __construct(
+        private PropertyRepositoryInterface $propertyRepository,
+        private RoomTypeRepositoryInterface $roomTypeRepository,
+    ) {}
 
-    public function __construct(PropertyService $propertyService)
+    public function index(GetPropertiesRequest $request): JsonResponse
     {
-        $this->propertyService = $propertyService;
-    }
-
-    public function index(Request $request): JsonResponse
-    {
-        $filters = $request->only(['location']);
-        $properties = $this->propertyService->getAllProperties($filters);
+        $filters = $request->validated();
+        $properties = $this->propertyRepository->getPaginated($filters);
 
         return response()->json(['data' => $properties]);
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(CreatePropertyRequest $request, CreateProperty $action): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'location' => 'required|string|max:255',
-            'address' => 'required|string',
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
-            'check_in_time' => 'required',
-            'check_out_time' => 'required',
-            'total_rooms' => 'required|integer|min:1',
-        ]);
+        $property = $action->handle(CreatePropertyDTO::fromRequest($request));
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $property = $this->propertyService->createProperty($request->all());
-
-        return response()->json(['data' => $property, 'message' => 'Property created successfully'], 201);
+        return response()->json([
+            'data' => $property,
+            'message' => 'Property created successfully',
+        ], 201);
     }
 
     public function show(string $id): JsonResponse
     {
-        $property = $this->propertyService->getPropertyById($id);
-
-        if (! $property) {
-            return response()->json(['message' => 'Property not found'], 404);
-        }
+        $property = $this->propertyRepository->findOrFail($id);
 
         return response()->json(['data' => $property]);
     }
 
-    public function update(Request $request, string $id): JsonResponse
+    public function update(UpdatePropertyRequest $request, string $id, UpdateProperty $action): JsonResponse
     {
-        $property = Property::find($id);
+        $property = $this->propertyRepository->findOrFail($id);
+        $property = $action->handle($property, UpdatePropertyDTO::fromRequest($request));
 
-        if (! $property) {
-            return response()->json(['message' => 'Property not found'], 404);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|string|max:255',
-            'location' => 'sometimes|string|max:255',
-            'address' => 'sometimes|string',
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
-            'check_in_time' => 'sometimes',
-            'check_out_time' => 'sometimes',
-            'total_rooms' => 'sometimes|integer|min:1',
+        return response()->json([
+            'data' => $property,
+            'message' => 'Property updated successfully',
         ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $property = $this->propertyService->updateProperty($property, $request->all());
-
-        return response()->json(['data' => $property, 'message' => 'Property updated successfully']);
     }
 
-    public function destroy(string $id): JsonResponse
+    public function destroy(string $id, DeleteProperty $action): JsonResponse
     {
-        $property = Property::find($id);
-
-        if (! $property) {
-            return response()->json(['message' => 'Property not found'], 404);
-        }
-
-        $this->propertyService->deleteProperty($property);
+        $property = $this->propertyRepository->findOrFail($id);
+        $action->handle($property);
 
         return response()->json(['message' => 'Property deleted successfully']);
     }
 
     public function roomTypes(string $propertyId): JsonResponse
     {
-        $roomTypes = $this->propertyService->getRoomTypes($propertyId);
+        $roomTypes = $this->roomTypeRepository->getByProperty($propertyId);
 
         return response()->json(['data' => $roomTypes]);
     }
 
     public function rooms(string $propertyId): JsonResponse
     {
-        $rooms = $this->propertyService->getRooms($propertyId);
+        $property = $this->propertyRepository->findOrFail($propertyId);
+        $rooms = $property->rooms()->with('roomType')->get();
 
         return response()->json(['data' => $rooms]);
     }
 
-    public function createRoomType(Request $request, string $propertyId): JsonResponse
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:100',
-            'capacity' => 'required|integer|min:1',
-            'base_price' => 'required|numeric|min:0',
-            'description' => 'nullable|string',
-        ]);
+    public function createRoomType(
+        CreateRoomTypeRequest $request,
+        string $propertyId,
+        CreateRoomType $action,
+    ): JsonResponse {
+        $roomType = $action->handle($propertyId, $request->validated());
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $roomType = $this->propertyService->createRoomType($propertyId, $request->all());
-
-        return response()->json(['data' => $roomType, 'message' => 'Room type created successfully'], 201);
+        return response()->json([
+            'data' => $roomType,
+            'message' => 'Room type created successfully',
+        ], 201);
     }
 }

@@ -10,22 +10,38 @@ use App\Models\RoomType;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class EloquentBookingRepository implements BookingRepositoryInterface
 {
     public function find(string $id): ?Booking
     {
-        return Booking::with(['guest', 'room', 'property', 'payments'])->find($id);
+        $key = "booking:{$id}:detail";
+        Cache::touch($key, 3600);
+
+        return Cache::tags(['bookings', $key])->remember(
+            $key,
+            3600,
+            fn () => Booking::with(['guest', 'room', 'property', 'payments'])->find($id)
+        );
     }
 
     public function findOrFail(string $id): Booking
     {
-        return Booking::with(['guest', 'room', 'property', 'payments'])->findOrFail($id);
+        $key = "booking:{$id}:detail";
+        Cache::touch($key, 3600);
+
+        return Cache::tags(['bookings', $key])->remember(
+            $key,
+            3600,
+            fn () => Booking::with(['guest', 'room', 'property', 'payments'])->findOrFail($id)
+        );
     }
 
     public function create(array $data): Booking
     {
         $booking = Booking::create($data);
+        Cache::tags(['bookings'])->flush();
 
         return $booking->load(['guest', 'room', 'property']);
     }
@@ -33,76 +49,109 @@ class EloquentBookingRepository implements BookingRepositoryInterface
     public function update(Booking $booking, array $data): Booking
     {
         $booking->update($data);
+        Cache::tags(['bookings', "booking:{$booking->id}"])->flush();
 
         return $booking->fresh(['guest', 'room', 'property', 'payments']);
     }
 
     public function delete(Booking $booking): bool
     {
-        return $booking->delete();
+        $result = $booking->delete();
+        Cache::tags(['bookings', "booking:{$booking->id}"])->flush();
+
+        return $result;
     }
 
     public function getPaginated(array $filters, int $perPage = 15): LengthAwarePaginator
     {
-        $query = Booking::with(['guest', 'room.roomType', 'property']);
+        $cacheKey = 'bookings:paginated:'.md5(serialize($filters)).":{$perPage}";
 
-        $query = $this->applyFilters($query, $filters);
+        return Cache::tags(['bookings'])->remember(
+            $cacheKey,
+            1800,
+            function () use ($filters, $perPage) {
+                $query = Booking::with(['guest', 'room.roomType', 'property']);
+                $query = $this->applyFilters($query, $filters);
 
-        return $query->latest()->paginate($perPage);
+                return $query->latest()->paginate($perPage);
+            }
+        );
     }
 
     public function findByGuest(string $guestId, array $filters = []): LengthAwarePaginator
     {
-        $query = Booking::with(['room.roomType', 'property'])
-            ->where('guest_id', $guestId);
+        $cacheKey = "bookings:guest:{$guestId}:".md5(serialize($filters));
 
-        $query = $this->applyFilters($query, $filters);
+        return Cache::tags(['bookings', "guest:{$guestId}:bookings"])->remember(
+            $cacheKey,
+            1800,
+            function () use ($guestId, $filters) {
+                $query = Booking::with(['room.roomType', 'property'])
+                    ->where('guest_id', $guestId);
 
-        return $query->latest()->paginate($filters['per_page'] ?? 15);
+                $query = $this->applyFilters($query, $filters);
+
+                return $query->latest()->paginate($filters['per_page'] ?? 15);
+            }
+        );
     }
 
     public function checkAvailability(string $roomTypeId, string $checkIn, string $checkOut, ?string $excludeBookingId = null): bool
     {
-        $query = Booking::where('room_type_id', $roomTypeId)
-            ->whereIn('status', ['confirmed', 'pending', 'checked_in'])
-            ->where(function ($query) use ($checkIn, $checkOut) {
-                $query->whereBetween('check_in_date', [$checkIn, $checkOut])
-                    ->orWhereBetween('check_out_date', [$checkIn, $checkOut])
-                    ->orWhere(function ($q) use ($checkIn, $checkOut) {
-                        $q->where('check_in_date', '<=', $checkIn)
-                            ->where('check_out_date', '>=', $checkOut);
+        $cacheKey = "booking:availability:{$roomTypeId}:{$checkIn}:{$checkOut}:".($excludeBookingId ?? 'none');
+
+        return Cache::tags(['bookings', 'availability'])->remember(
+            $cacheKey,
+            300,
+            function () use ($roomTypeId, $checkIn, $checkOut, $excludeBookingId) {
+                $query = Booking::where('room_type_id', $roomTypeId)
+                    ->whereIn('status', ['confirmed', 'pending', 'checked_in'])
+                    ->where(function ($query) use ($checkIn, $checkOut) {
+                        $query->whereBetween('check_in_date', [$checkIn, $checkOut])
+                            ->orWhereBetween('check_out_date', [$checkIn, $checkOut])
+                            ->orWhere(function ($q) use ($checkIn, $checkOut) {
+                                $q->where('check_in_date', '<=', $checkIn)
+                                    ->where('check_out_date', '>=', $checkOut);
+                            });
                     });
-            });
 
-        if ($excludeBookingId) {
-            $query->where('id', '!=', $excludeBookingId);
-        }
+                if ($excludeBookingId) {
+                    $query->where('id', '!=', $excludeBookingId);
+                }
 
-        return $query->exists(); // Returns true if there ARE conflicting bookings (not available)
+                return $query->exists();
+            }
+        );
     }
 
     public function findAvailableRoom(string $propertyId, string $roomTypeId, string $checkIn, string $checkOut): ?Room
     {
-        $bookedRoomIds = Booking::where('property_id', $propertyId)
-            ->where('room_type_id', $roomTypeId)
-            ->whereIn('status', ['confirmed', 'pending', 'checked_in'])
-            ->where(function ($query) use ($checkIn, $checkOut) {
-                $query->whereBetween('check_in_date', [$checkIn, $checkOut])
-                    ->orWhereBetween('check_out_date', [$checkIn, $checkOut])
-                    ->orWhere(function ($q) use ($checkIn, $checkOut) {
-                        $q->where('check_in_date', '<=', $checkIn)
-                            ->where('check_out_date', '>=', $checkOut);
-                    });
-            })
-            ->whereNotNull('room_id')
-            ->pluck('room_id')
-            ->toArray();
+        return Cache::tags(['bookings', 'rooms', 'availability'])->remember(
+            "room:available:{$propertyId}:{$roomTypeId}:{$checkIn}:{$checkOut}",
+            300,
+            function () use ($propertyId, $roomTypeId, $checkIn, $checkOut) {
+                $bookedRoomIds = Booking::where('property_id', $propertyId)
+                    ->where('room_type_id', $roomTypeId)
+                    ->whereIn('status', ['confirmed', 'pending', 'checked_in'])
+                    ->where(function ($query) use ($checkIn, $checkOut) {
+                        $query->whereBetween('check_in_date', [$checkIn, $checkOut])
+                            ->orWhereBetween('check_out_date', [$checkIn, $checkOut])
+                            ->orWhere(function ($q) use ($checkIn, $checkOut) {
+                                $q->where('check_in_date', '<=', $checkIn)
+                                    ->where('check_out_date', '>=', $checkOut);
+                            });
+                    })
+                    ->whereNotNull('room_id')
+                    ->pluck('room_id')
+                    ->toArray();
 
-        return Room::where('property_id', $propertyId)
-            ->where('room_type_id', $roomTypeId)
-            ->where('status', 'available')
-            ->whereNotIn('id', $bookedRoomIds)
-            ->first();
+                return Room::where('property_id', $propertyId)
+                    ->where('room_type_id', $roomTypeId)
+                    ->where('status', 'available')
+                    ->whereNotIn('id', $bookedRoomIds)
+                    ->first();
+            }
+        );
     }
 
     public function calculateTotalPrice(string $propertyId, string $roomTypeId, string $checkIn, string $checkOut, array $extras = []): float
@@ -213,9 +262,14 @@ class EloquentBookingRepository implements BookingRepositoryInterface
     public function countByPeriodAndStatus(string $propertyId, string $start, string $end, array $statuses): int
     {
         return Booking::where('property_id', $propertyId)
-            ->whereIn('status', $statuses)
             ->whereBetween('check_in_date', [$start, $end])
+            ->whereIn('status', $statuses)
             ->count();
+    }
+
+    public function getQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return Booking::query();
     }
 
     private function applyFilters(Builder $query, array $filters): Builder

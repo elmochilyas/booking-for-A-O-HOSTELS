@@ -11,6 +11,8 @@ interface PropertyRepositoryInterface
 
     public function findOrFail(string $id): Property;
 
+    public function findFirst(): ?Property;
+
     public function create(array $data): Property;
 
     public function update(Property $property, array $data): Property;

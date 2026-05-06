@@ -35,6 +35,8 @@ readonly class RegisterGuestAction
             ]);
 
             $verificationToken = $this->jwtService->generateEmailVerificationToken($guest);
+            $guest->verification_token = $verificationToken;
+            $guest->save();
             $this->emailService->sendVerificationEmail($guest, $verificationToken);
 
             $token = $this->jwtService->generateToken($guest);

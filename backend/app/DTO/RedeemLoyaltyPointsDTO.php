@@ -18,4 +18,12 @@ readonly class RedeemLoyaltyPointsDTO
             description: $request->validated('description'),
         );
     }
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            points: $data['points'] ?? 0,
+            description: $data['description'] ?? null,
+        );
+    }
 }

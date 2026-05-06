@@ -24,4 +24,6 @@ interface RoomRepositoryInterface
     public function checkAvailability(string $roomId, string $checkIn, string $checkOut): bool;
 
     public function getAvailableRooms(string $propertyId, string $checkIn, string $checkOut): array;
+
+    public function getStatusCounts(?string $propertyId = null): array;
 }

@@ -95,20 +95,28 @@ class AuthApiTest extends TestCase
 
     public function test_can_verify_email_with_valid_token()
     {
-        $guest = Guest::create([
+        // Register a new guest (this triggers the verification email with token)
+        $response = $this->postJson('/api/auth/register', [
             'email' => 'verify@example.com',
-            'password_hash' => bcrypt('password123'),
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
             'first_name' => 'Test',
             'last_name' => 'User',
-            'verification_token' => 'valid_token_123',
         ]);
 
+        $response->assertStatus(201);
+
+        // Get the guest and verification token that was generated
+        $guest = Guest::where('email', 'verify@example.com')->first();
+        $this->assertNotNull($guest->verification_token, 'Verification token should not be null');
+
+        // Verify email with the token
         $response = $this->postJson('/api/auth/verify-email', [
-            'token' => 'valid_token_123',
+            'token' => $guest->verification_token,
         ]);
 
         $response->assertStatus(200);
-        $this->assertNotNull($guest->fresh()->email_verified_at);
+        $this->assertNotNull($guest->fresh()->email_verified_at, 'email_verified_at should be set after verification');
     }
 
     public function test_cannot_access_protected_routes_without_token()

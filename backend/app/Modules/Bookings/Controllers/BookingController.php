@@ -2,68 +2,60 @@
 
 namespace App\Modules\Bookings\Controllers;
 
+use App\Actions\Bookings\CancelBooking;
+use App\Actions\Bookings\CheckInBooking;
+use App\Actions\Bookings\CheckOutBooking;
+use App\Actions\Bookings\CreateBooking;
+use App\Actions\Bookings\GetBooking;
+use App\Actions\Bookings\GetBookings;
+use App\Actions\Bookings\UpdateBooking;
+use App\Contracts\Repositories\BookingRepositoryInterface;
+use App\DTO\CreateBookingDTO;
+use App\DTO\UpdateBookingDTO;
+use App\Enums\BookingStatus;
+use App\Http\Requests\Api\Booking\CreateBookingRequest;
+use App\Http\Requests\Modules\Bookings\CancelBookingRequest;
+use App\Http\Requests\Modules\Bookings\CheckInRequest;
+use App\Http\Requests\Modules\Bookings\ConfirmBookingRequest;
+use App\Http\Requests\Modules\Bookings\GuestBookingsRequest;
+use App\Http\Requests\Modules\Bookings\SearchAvailabilityRequest;
 use App\Modules\Bookings\Services\AvailabilityService;
-use App\Modules\Bookings\Services\BookingService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Routing\Controller;
 
-class BookingController
+class BookingController extends Controller
 {
-    private BookingService $bookingService;
+    public function __construct(
+        private AvailabilityService $availabilityService,
+    ) {}
 
-    private AvailabilityService $availabilityService;
-
-    public function __construct(BookingService $bookingService, AvailabilityService $availabilityService)
+    public function searchAvailability(SearchAvailabilityRequest $request): JsonResponse
     {
-        $this->bookingService = $bookingService;
-        $this->availabilityService = $availabilityService;
-    }
-
-    public function searchAvailability(Request $request): JsonResponse
-    {
-        $validator = Validator::make($request->all(), [
-            'property_id' => 'required|uuid',
-            'check_in' => 'required|date|after_or_equal:today',
-            'check_out' => 'required|date|after:check_in',
-            'guests' => 'nullable|integer|min:1',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
         $availableRooms = $this->availabilityService->checkAvailability(
-            $request->property_id,
-            $request->check_in,
-            $request->check_out,
-            $request->guests ?? 1
+            $request->validated('property_id'),
+            $request->validated('check_in'),
+            $request->validated('check_out'),
+            $request->validated('guests', 1)
         );
 
         return response()->json([
             'data' => $availableRooms,
-            'property_id' => $request->property_id,
-            'check_in' => $request->check_in,
-            'check_out' => $request->check_out,
+            'property_id' => $request->validated('property_id'),
+            'check_in' => $request->validated('check_in'),
+            'check_out' => $request->validated('check_out'),
         ]);
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(CreateBookingRequest $request, CreateBooking $action): JsonResponse
     {
-        $result = $this->bookingService->createBooking($request);
+        $booking = $action->handle(CreateBookingDTO::fromRequest($request));
 
-        if (! $result['success']) {
-            $status = isset($result['errors']) ? 422 : 400;
-
-            return response()->json($result, $status);
-        }
-
-        return response()->json($result, 201);
+        return response()->json(['data' => $booking], 201);
     }
 
-    public function show(string $id): JsonResponse
+    public function show(string $id, GetBooking $action): JsonResponse
     {
-        $booking = $this->bookingService->getBooking($id);
+        $booking = $action->handle($id);
 
         if (! $booking) {
             return response()->json(['message' => 'Booking not found'], 404);
@@ -72,78 +64,78 @@ class BookingController
         return response()->json(['data' => $booking]);
     }
 
-    public function update(Request $request, string $id): JsonResponse
+    public function update(): JsonResponse
     {
         return response()->json(['message' => 'Use confirm/cancel endpoints'], 400);
     }
 
-    public function destroy(string $id): JsonResponse
+    public function destroy(string $id, CancelBooking $action, BookingRepositoryInterface $bookingRepo): JsonResponse
     {
-        $result = $this->bookingService->cancelBooking($id);
+        try {
+            $booking = $bookingRepo->findOrFail($id);
+            $updatedBooking = $action->handle($booking, '');
 
-        if (! $result['success']) {
-            return response()->json($result, 400);
+            return response()->json(['data' => $updatedBooking]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
         }
-
-        return response()->json($result);
     }
 
-    public function confirm(string $id): JsonResponse
+    public function confirm(string $id, ConfirmBookingRequest $request, UpdateBooking $action, BookingRepositoryInterface $bookingRepo): JsonResponse
     {
-        $result = $this->bookingService->confirmBooking($id);
+        try {
+            $booking = $bookingRepo->findOrFail($id);
+            $dto = new UpdateBookingDTO(status: BookingStatus::CONFIRMED);
+            $updatedBooking = $action->handle($booking, $dto);
 
-        if (! $result['success']) {
-            return response()->json($result, 400);
+            return response()->json(['data' => $updatedBooking]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
         }
-
-        return response()->json($result);
     }
 
-    public function cancel(Request $request, string $id): JsonResponse
+    public function cancel(string $id, CancelBookingRequest $request, CancelBooking $action, BookingRepositoryInterface $bookingRepo): JsonResponse
     {
-        $result = $this->bookingService->cancelBooking($id);
+        try {
+            $booking = $bookingRepo->findOrFail($id);
+            $reason = $request->validated('reason', '');
+            $updatedBooking = $action->handle($booking, $reason);
 
-        if (! $result['success']) {
-            return response()->json($result, 400);
+            return response()->json(['data' => $updatedBooking]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
         }
-
-        return response()->json($result);
     }
 
-    public function guestBookings(string $guestId): JsonResponse
+    public function guestBookings(GuestBookingsRequest $request, GetBookings $action): JsonResponse
     {
-        $bookings = $this->bookingService->getGuestBookings($guestId);
+        $bookings = $action->handle($request->validated('guest_id'));
 
         return response()->json(['data' => $bookings]);
     }
 
-    public function checkIn(Request $request, string $id): JsonResponse
+    public function checkIn(string $id, CheckInRequest $request, CheckInBooking $action, BookingRepositoryInterface $bookingRepo): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'room_id' => 'nullable|uuid',
-        ]);
+        try {
+            $booking = $bookingRepo->findOrFail($id);
+            $notes = $request->validated('notes');
+            $updatedBooking = $action->handle($booking, $notes);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json(['data' => $updatedBooking]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
         }
-
-        $result = $this->bookingService->checkIn($id, $request->room_id);
-
-        if (! $result['success']) {
-            return response()->json($result, 400);
-        }
-
-        return response()->json($result);
     }
 
-    public function checkOut(string $id): JsonResponse
+    public function checkOut(string $id, CheckOutBooking $action, BookingRepositoryInterface $bookingRepo): JsonResponse
     {
-        $result = $this->bookingService->checkOut($id);
+        try {
+            $booking = $bookingRepo->findOrFail($id);
+            $updatedBooking = $action->handle($booking);
 
-        if (! $result['success']) {
-            return response()->json($result, 400);
+            return response()->json(['data' => $updatedBooking]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
         }
-
-        return response()->json($result);
     }
 }

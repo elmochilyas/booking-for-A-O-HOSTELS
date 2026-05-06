@@ -30,10 +30,10 @@ readonly class ConfirmPayment
             $stripePayment = $this->stripeService->confirmPaymentIntent($dto->paymentIntentId);
 
             if ($stripePayment->status === 'succeeded') {
-                $payment->update(['status' => 'success']);
+                $payment->update(['status' => 'completed']);
 
                 $booking = $this->bookings->findOrFail($payment->booking_id);
-                $totalPaid = $booking->payments()->where('status', 'success')->sum('amount');
+                $totalPaid = $booking->payments()->where('status', 'completed')->sum('amount');
 
                 if ($totalPaid >= $booking->total_price) {
                     $booking->update([

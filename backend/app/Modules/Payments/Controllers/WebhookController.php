@@ -2,15 +2,24 @@
 
 namespace App\Modules\Payments\Controllers;
 
-use App\Models\Booking;
-use App\Models\Payment;
+use App\Actions\Payments\HandlePaymentFailed;
+use App\Actions\Payments\HandlePaymentSucceeded;
+use App\Actions\Payments\HandleRefund as HandleRefundAction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Stripe\Exception\SignatureVerificationException;
 use Stripe\Webhook;
+use Illuminate\Support\Facades\Log;
 
-class WebhookController
+#[Middleware('throttle:60,1')]
+class WebhookController extends Controller
 {
+    public function __construct(
+        private HandlePaymentSucceeded $handlePaymentSucceeded,
+        private HandlePaymentFailed $handlePaymentFailed,
+        private HandleRefundAction $handleRefund,
+    ) {}
+
     public function handleStripeWebhook(Request $request): JsonResponse
     {
         $payload = $request->getContent();
@@ -23,65 +32,13 @@ class WebhookController
             return response()->json(['error' => 'Invalid signature'], 400);
         }
 
-        switch ($event->type) {
-            case 'payment_intent.succeeded':
-                $this->handlePaymentSuccess($event->data->object);
-                break;
-
-            case 'payment_intent.payment_failed':
-                $this->handlePaymentFailed($event->data->object);
-                break;
-
-            case 'charge.refunded':
-                $this->handleRefund($event->data->object);
-                break;
-
-            default:
-                \Log::info("Unhandled event type: {$event->type}");
-        }
+        match ($event->type) {
+            'payment_intent.succeeded' => $this->handlePaymentSucceeded->handle($event->data->object),
+            'payment_intent.payment_failed' => $this->handlePaymentFailed->handle($event->data->object),
+            'charge.refunded' => $this->handleRefund->handle($event->data->object),
+            default => Log::info("Unhandled event type: {$event->type}"),
+        };
 
         return response()->json(['received' => true]);
-    }
-
-    private function handlePaymentSuccess($paymentIntent): void
-    {
-        $payment = Payment::where('stripe_payment_id', $paymentIntent->id)->first();
-
-        if ($payment) {
-            $payment->update(['status' => 'success']);
-
-            $booking = Booking::find($payment->booking_id);
-            if ($booking) {
-                $totalPaid = Payment::where('booking_id', $booking->id)
-                    ->where('status', 'success')
-                    ->sum('amount');
-
-                if ($totalPaid >= $booking->total_price) {
-                    $booking->update(['payment_status' => 'paid', 'status' => 'confirmed']);
-                } else {
-                    $booking->update(['payment_status' => 'partial']);
-                }
-            }
-        }
-    }
-
-    private function handlePaymentFailed($paymentIntent): void
-    {
-        $payment = Payment::where('stripe_payment_id', $paymentIntent->id)->first();
-
-        if ($payment) {
-            $payment->update(['status' => 'failed']);
-        }
-    }
-
-    private function handleRefund($charge): void
-    {
-        if ($charge->payment_intent) {
-            $payment = Payment::where('stripe_payment_id', $charge->payment_intent)->first();
-
-            if ($payment) {
-                $payment->update(['status' => 'refunded']);
-            }
-        }
     }
 }

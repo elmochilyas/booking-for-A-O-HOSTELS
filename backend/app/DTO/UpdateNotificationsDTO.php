@@ -18,4 +18,12 @@ readonly class UpdateNotificationsDTO
             notificationSms: $request->validated('notification_sms'),
         );
     }
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            notificationEmail: $data['notification_email'] ?? null,
+            notificationSms: $data['notification_sms'] ?? null,
+        );
+    }
 }

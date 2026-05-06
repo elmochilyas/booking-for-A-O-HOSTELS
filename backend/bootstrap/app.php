@@ -2,6 +2,9 @@
 
 use App\Http\Middleware\JwtAuthenticate;
 use App\Http\Middleware\RoleMiddleware;
+use App\Providers\AuthServiceProvider;
+use App\Providers\QueueServiceProvider;
+use App\Providers\RepositoryServiceProvider;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -25,5 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withProviders([
-        App\Providers\RepositoryServiceProvider::class,
+        AuthServiceProvider::class,
+        RepositoryServiceProvider::class,
+        QueueServiceProvider::class,
     ])->create();

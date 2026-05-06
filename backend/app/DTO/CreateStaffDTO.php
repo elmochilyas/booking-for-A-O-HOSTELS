@@ -27,4 +27,16 @@ readonly class CreateStaffDTO
             propertyId: $request->validated('property_id'),
         );
     }
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            email: $data['email'] ?? '',
+            password: $data['password'] ?? '',
+            firstName: $data['first_name'] ?? '',
+            lastName: $data['last_name'] ?? '',
+            role: isset($data['role']) ? StaffRole::from($data['role']) : StaffRole::STAFF,
+            propertyId: $data['property_id'] ?? null,
+        );
+    }
 }

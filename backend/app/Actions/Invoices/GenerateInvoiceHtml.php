@@ -18,7 +18,7 @@ readonly class GenerateInvoiceHtml
             'booking' => $booking,
             'property' => $booking->property,
             'guest' => $booking->guest,
-            'payments' => $booking->payments->where('status', 'success'),
+            'payments' => $booking->payments->where('status', 'completed'),
             'generated_at' => now(),
         ];
 

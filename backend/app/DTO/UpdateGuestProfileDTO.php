@@ -24,4 +24,15 @@ readonly class UpdateGuestProfileDTO
             dateOfBirth: $request->validated('date_of_birth'),
         );
     }
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            firstName: $data['first_name'] ?? null,
+            lastName: $data['last_name'] ?? null,
+            phone: $data['phone'] ?? null,
+            country: $data['country'] ?? null,
+            dateOfBirth: $data['date_of_birth'] ?? null,
+        );
+    }
 }

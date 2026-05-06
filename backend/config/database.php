@@ -178,7 +178,12 @@ return [
             'backoff_base' => env('REDIS_BACKOFF_BASE', 100),
             'backoff_cap' => env('REDIS_BACKOFF_CAP', 1000),
         ],
-
     ],
 
+    'testing' => [
+        'driver' => 'sqlite',
+        'database' => database_path('tests.sqlite'),
+        'prefix' => '',
+        'foreign_key_constraints' => true,
+    ],
 ];

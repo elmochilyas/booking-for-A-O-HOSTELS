@@ -24,4 +24,6 @@ interface PaymentRepositoryInterface
     public function getTotalByPeriod(string $startDate, string $endDate, ?string $propertyId = null): float;
 
     public function refund(Payment $payment, array $data): Payment;
+
+    public function findByStripeId(string $stripePaymentId): ?Payment;
 }

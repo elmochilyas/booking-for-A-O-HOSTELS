@@ -7,6 +7,7 @@ use App\Enums\BookingStatus;
 use App\Events\GuestCheckedIn;
 use App\Exceptions\InvalidBookingStatusException;
 use App\Models\Booking;
+use Illuminate\Support\Facades\DB;
 
 readonly class CheckInBooking
 {
@@ -20,14 +21,16 @@ readonly class CheckInBooking
             throw new InvalidBookingStatusException('Booking must be confirmed before check-in.');
         }
 
-        $updatedBooking = $this->bookings->update($booking, [
-            'status' => BookingStatus::CHECKED_IN,
-            'checked_in_at' => now(),
-            'check_in_notes' => $notes,
-        ]);
+        return DB::transaction(function () use ($booking, $notes) {
+            $updatedBooking = $this->bookings->update($booking, [
+                'status' => BookingStatus::CHECKED_IN,
+                'checked_in_at' => now(),
+                'check_in_notes' => $notes,
+            ]);
 
-        GuestCheckedIn::dispatch($updatedBooking);
+            GuestCheckedIn::dispatch($updatedBooking);
 
-        return $updatedBooking;
+            return $updatedBooking;
+        });
     }
 }

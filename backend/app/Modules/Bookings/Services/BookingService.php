@@ -2,6 +2,7 @@
 
 namespace App\Modules\Bookings\Services;
 
+use App\Enums\BookingStatus;
 use App\Models\Booking;
 use App\Models\Room;
 use App\Models\RoomType;
@@ -68,7 +69,7 @@ class BookingService
                 'check_out_date' => $checkOut,
                 'guest_count' => $request->guest_count,
                 'total_price' => $totalPrice,
-                'status' => 'pending',
+                'status' => BookingStatus::PENDING,
                 'payment_status' => 'pending',
             ]);
 
@@ -96,11 +97,11 @@ class BookingService
             return ['success' => false, 'message' => 'Booking not found'];
         }
 
-        if ($booking->status !== 'pending') {
+        if ($booking->status !== BookingStatus::PENDING) {
             return ['success' => false, 'message' => 'Booking cannot be confirmed'];
         }
 
-        $booking->update(['status' => 'confirmed']);
+        $booking->update(['status' => BookingStatus::CONFIRMED]);
 
         return ['success' => true, 'data' => $booking, 'message' => 'Booking confirmed'];
     }
@@ -113,14 +114,14 @@ class BookingService
             return ['success' => false, 'message' => 'Booking not found'];
         }
 
-        if ($booking->status === 'cancelled') {
+        if ($booking->status === BookingStatus::CANCELLED) {
             return ['success' => false, 'message' => 'Booking already cancelled'];
         }
 
         try {
             DB::beginTransaction();
 
-            $booking->update(['status' => 'cancelled']);
+            $booking->update(['status' => BookingStatus::CANCELLED]);
 
             if ($booking->room_id) {
                 Room::where('id', $booking->room_id)->update(['status' => 'available']);
@@ -158,7 +159,7 @@ class BookingService
             return ['success' => false, 'message' => 'Booking not found'];
         }
 
-        if ($booking->status !== 'confirmed') {
+        if ($booking->status !== BookingStatus::CONFIRMED) {
             return ['success' => false, 'message' => 'Only confirmed bookings can be checked in'];
         }
 
@@ -167,7 +168,7 @@ class BookingService
         }
 
         $booking->update([
-            'status' => 'checked_in',
+            'status' => BookingStatus::CHECKED_IN,
             'actual_check_in' => now(),
         ]);
 
@@ -182,14 +183,16 @@ class BookingService
             return ['success' => false, 'message' => 'Booking not found'];
         }
 
-        if ($booking->status !== 'checked_in') {
+        if ($booking->status !== BookingStatus::CHECKED_IN) {
             return ['success' => false, 'message' => 'Booking must be checked in first'];
         }
 
         $booking->update([
-            'status' => 'completed',
+            'status' => BookingStatus::COMPLETED,
             'actual_check_out' => now(),
         ]);
+
+        $booking->refresh();
 
         if ($booking->room_id) {
             Room::where('id', $booking->room_id)->update(['status' => 'available']);

@@ -19,6 +19,11 @@ class EloquentPaymentRepository implements PaymentRepositoryInterface
         return Payment::with(['booking', 'booking.guest'])->findOrFail($id);
     }
 
+    public function findByStripeId(string $stripePaymentId): ?Payment
+    {
+        return Payment::with(['booking', 'booking.guest'])->where('stripe_payment_id', $stripePaymentId)->first();
+    }
+
     public function create(array $data): Payment
     {
         $payment = Payment::create($data);

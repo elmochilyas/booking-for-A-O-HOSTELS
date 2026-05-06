@@ -19,6 +19,8 @@ interface GuestRepositoryInterface
 
     public function getPaginated(array $filters, int $perPage = 15): LengthAwarePaginator;
 
+    public function getPaginatedWithCount(array $filters, array $withCount = [], int $perPage = 15): LengthAwarePaginator;
+
     public function findByEmail(string $email): ?Guest;
 
     public function updateLoyaltyPoints(string $guestId, int $points): void;

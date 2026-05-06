@@ -44,7 +44,7 @@ class ReportingService
             $query->where('property_id', $propertyId);
         })
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->where('status', 'success')
+            ->where('status', 'completed')
             ->sum('amount');
 
         $bookingCount = Booking::where('property_id', $propertyId)
@@ -97,7 +97,7 @@ class ReportingService
             $query->where('property_id', $propertyId)
                 ->whereDate('created_at', $date);
         })
-            ->where('status', 'success')
+            ->where('status', 'completed')
             ->sum('amount');
 
         return [

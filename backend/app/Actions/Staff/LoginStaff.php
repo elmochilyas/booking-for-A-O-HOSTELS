@@ -3,6 +3,7 @@
 namespace App\Actions\Staff;
 
 use App\DTO\LoginStaffDTO;
+use App\Exceptions\InvalidCredentialsException;
 use App\Models\Staff;
 use App\Services\JwtService;
 use Illuminate\Support\Facades\Hash;
@@ -18,11 +19,11 @@ readonly class LoginStaff
         $staff = Staff::where('email', $dto->email)->first();
 
         if (! $staff || ! Hash::check($dto->password, $staff->password_hash)) {
-            throw new \Exception('Invalid credentials');
+            throw new InvalidCredentialsException('Invalid credentials');
         }
 
         if (! $staff->is_active) {
-            throw new \Exception('Account is deactivated');
+            throw new InvalidCredentialsException('Account is deactivated');
         }
 
         $token = $this->jwtService->generateStaffToken($staff);

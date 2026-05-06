@@ -48,6 +48,19 @@ class EloquentGuestRepository implements GuestRepositoryInterface
         return $query->latest()->paginate($perPage);
     }
 
+    public function getPaginatedWithCount(array $filters, array $withCount = [], int $perPage = 15): LengthAwarePaginator
+    {
+        $query = Guest::query();
+
+        if (!empty($withCount)) {
+            $query->withCount($withCount);
+        }
+
+        $query = $this->applyFilters($query, $filters);
+
+        return $query->latest()->paginate($perPage);
+    }
+
     public function findByEmail(string $email): ?Guest
     {
         return Guest::where('email', $email)->first();

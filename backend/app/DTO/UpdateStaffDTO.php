@@ -27,4 +27,16 @@ readonly class UpdateStaffDTO
             password: $request->validated('password'),
         );
     }
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            firstName: $data['first_name'] ?? null,
+            lastName: $data['last_name'] ?? null,
+            role: isset($data['role']) ? StaffRole::from($data['role']) : null,
+            propertyId: $data['property_id'] ?? null,
+            isActive: $data['is_active'] ?? null,
+            password: $data['password'] ?? null,
+        );
+    }
 }

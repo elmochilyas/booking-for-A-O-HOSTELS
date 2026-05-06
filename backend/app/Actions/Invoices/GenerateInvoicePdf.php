@@ -15,13 +15,13 @@ readonly class GenerateInvoicePdf
     {
         $booking = $this->bookings->findOrFail($bookingId)->load(['property', 'roomType', 'guest', 'payments']);
 
-        $totalPaid = $booking->payments->where('status', 'success')->sum('amount');
+        $totalPaid = $booking->payments->where('status', 'completed')->sum('amount');
 
         $pdf = Pdf::loadView('invoices.template', [
             'booking' => $booking,
             'property' => $booking->property,
             'guest' => $booking->guest,
-            'payments' => $booking->payments->where('status', 'success'),
+            'payments' => $booking->payments->where('status', 'completed'),
             'total_paid' => $totalPaid,
             'generated_at' => now(),
         ]);

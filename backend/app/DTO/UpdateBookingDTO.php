@@ -27,6 +27,17 @@ readonly class UpdateBookingDTO
         );
     }
 
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            checkInDate: isset($data['check_in_date']) ? new Carbon($data['check_in_date']) : null,
+            checkOutDate: isset($data['check_out_date']) ? new Carbon($data['check_out_date']) : null,
+            guestCount: $data['guest_count'] ?? null,
+            specialRequests: $data['special_requests'] ?? null,
+            status: isset($data['status']) ? BookingStatus::from($data['status']) : null,
+        );
+    }
+
     public function toArray(): array
     {
         return array_filter([

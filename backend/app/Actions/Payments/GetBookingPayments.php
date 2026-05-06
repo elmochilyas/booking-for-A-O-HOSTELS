@@ -16,7 +16,7 @@ readonly class GetBookingPayments
 
         return [
             'payments' => $booking->payments,
-            'total_paid' => $booking->payments()->where('status', 'success')->sum('amount'),
+            'total_paid' => $booking->payments()->where('status', 'completed')->sum('amount'),
         ];
     }
 }
