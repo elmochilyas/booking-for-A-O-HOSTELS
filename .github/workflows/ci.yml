@@ -65,8 +65,8 @@ jobs:
           cp backend/.env.example backend/.env
           cd backend && php artisan key:generate
 
-      - name: Run PHPUnit
-        run: cd backend && ./vendor/bin/phpunit
+      - name: Run Pest
+        run: cd backend && ./vendor/bin/pest
 
   frontend-tests:
     name: Frontend Tests
