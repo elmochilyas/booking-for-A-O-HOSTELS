@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Contracts\Repositories;
 
 use App\Models\Property;
@@ -28,4 +30,6 @@ interface PropertyRepositoryInterface
     public function search(string $query, array $filters = []): LengthAwarePaginator;
 
     public function getWithAvailability(string $checkIn, string $checkOut): array;
+
+    public function getDestinations(): array;
 }

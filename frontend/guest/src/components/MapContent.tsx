@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import type { LatLngExpression, LatLngBoundsExpression } from 'leaflet'
 import L from 'leaflet'
@@ -42,18 +42,13 @@ function createCustomIcon() {
 }
 
 export default function MapContent({ markers, center = [50.5, 10], zoom = 4 }: MapContentProps) {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-
-    delete (L.Icon.Default.prototype as any)._getIconUrl
-    L.Icon.Default.mergeOptions({
-      iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-      iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-    })
-  }, [])
+  // Fix Leaflet's default icon paths (broken by webpack asset hashing)
+  delete (L.Icon.Default.prototype as any)._getIconUrl
+  L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+  })
 
   useEffect(() => {
     const style = document.createElement('style')
@@ -72,14 +67,6 @@ export default function MapContent({ markers, center = [50.5, 10], zoom = 4 }: M
       document.head.removeChild(style)
     }
   }, [])
-
-  if (!mounted) {
-    return (
-      <div className="w-full h-[500px] bg-muted animate-pulse rounded-2xl flex items-center justify-center">
-        <span className="text-muted-foreground">Loading map...</span>
-      </div>
-    )
-  }
 
   const customIcon = createCustomIcon()
 

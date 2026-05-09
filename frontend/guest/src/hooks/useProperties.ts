@@ -7,18 +7,13 @@ import type { Property, RoomType, PropertyAvailability, SearchFilters } from '@/
 export function useProperties(filters?: SearchFilters, options?: { lightweight?: boolean }) {
   return useQuery<Property[]>({
     queryKey: ['properties', filters, options?.lightweight],
-    queryFn: async () => {
-      try {
-        if (options?.lightweight) {
-          return await propertiesService.getLightweight()
-        }
-        return await propertiesService.getAll(filters)
-      } catch (error) {
-        console.error('Error fetching properties:', error)
-        throw error
-      }
-    },
+    queryFn: () =>
+      options?.lightweight
+        ? propertiesService.getLightweight()
+        : propertiesService.getAll(filters),
     staleTime: 1000 * 60 * 5,
+    // Decorative map data — fail fast so the UI doesn't hang for 40+ seconds on retry loops
+    retry: options?.lightweight ? 0 : 3,
   })
 }
 

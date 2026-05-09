@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Full API Integration Test Suite
  * Run: php run_tests.php

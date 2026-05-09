@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -10,36 +12,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
-#[Table('properties', key: 'property_id')]
+#[Table('properties')]
 #[Hidden(['created_at', 'updated_at'])]
 class Property extends Model
 {
     use HasFactory, HasUuids;
-    
+
     protected $fillable = [
         'name', 'location', 'address', 'latitude', 'longitude',
         'check_in_time', 'check_out_time', 'total_rooms',
         'description', 'phone', 'email', 'images', 'rating', 'review_count',
     ];
 
-    protected $keyType = 'string';
-    
-    public $incrementing = false;
-    
-    public function getIdAttribute()
-    {
-        return $this->getKey();
-    }
-    
-    public function __get($key)
-    {
-        if ($key === 'id') {
-            return $this->getKey();
-        }
-        
-        return parent::__get($key);
-    }
-    
     protected $casts = [
         'latitude' => 'decimal:6',
         'longitude' => 'decimal:6',
@@ -53,16 +37,21 @@ class Property extends Model
 
     public function roomTypes(): HasMany
     {
-        return $this->hasMany(RoomType::class, 'property_id');
+        return $this->hasMany(RoomType::class);
     }
 
     public function rooms(): HasManyThrough
     {
-        return $this->hasManyThrough(Room::class, RoomType::class, 'property_id', 'room_type_id');
+        return $this->hasManyThrough(Room::class, RoomType::class);
     }
 
     public function bookings(): HasMany
     {
-        return $this->hasMany(Booking::class, 'property_id');
+        return $this->hasMany(Booking::class);
+    }
+
+    public function amenities(): HasMany
+    {
+        return $this->hasMany(Amenity::class);
     }
 }

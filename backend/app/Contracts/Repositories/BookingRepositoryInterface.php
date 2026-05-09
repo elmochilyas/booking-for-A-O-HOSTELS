@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Contracts\Repositories;
 
 use App\Models\Booking;
 use App\Models\Room;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 interface BookingRepositoryInterface
@@ -45,5 +48,5 @@ interface BookingRepositoryInterface
 
     public function countByPeriodAndStatus(string $propertyId, string $start, string $end, array $statuses): int;
 
-    public function getQuery(): \Illuminate\Database\Eloquent\Builder;
+    public function getQuery(): Builder;
 }

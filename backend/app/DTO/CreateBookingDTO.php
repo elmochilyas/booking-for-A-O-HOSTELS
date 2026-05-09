@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DTO;
 
 use App\Enums\BookingSource;
@@ -59,6 +61,6 @@ readonly class CreateBookingDTO
 
     public function getNights(): int
     {
-        return $this->checkInDate->diffInDays($this->checkOutDate);
+        return (int) $this->checkInDate->diffInDays($this->checkOutDate);
     }
 }

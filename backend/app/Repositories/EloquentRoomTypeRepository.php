@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repositories;
 
 use App\Contracts\Repositories\RoomTypeRepositoryInterface;
 use App\Models\RoomType;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 
 class EloquentRoomTypeRepository implements RoomTypeRepositoryInterface
@@ -69,7 +72,7 @@ class EloquentRoomTypeRepository implements RoomTypeRepositoryInterface
         return $query->orderBy('name')->paginate($perPage);
     }
 
-    public function getWithCount(string $withCount, ?string $propertyId = null): \Illuminate\Database\Eloquent\Collection
+    public function getWithCount(string $withCount, ?string $propertyId = null): Collection
     {
         $query = RoomType::withCount($withCount);
 

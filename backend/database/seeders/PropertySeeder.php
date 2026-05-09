@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use App\Models\Amenity;
@@ -85,12 +87,22 @@ class PropertySeeder extends Seeder
 
     public function run(): void
     {
-        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        if (DB::getDriverName() === 'sqlite') {
+            DB::statement('PRAGMA foreign_keys = OFF');
+        } else {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        }
+        
         Extra::truncate();
         Amenity::truncate();
         DB::table('room_types')->truncate();
         Property::truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        
+        if (DB::getDriverName() === 'sqlite') {
+            DB::statement('PRAGMA foreign_keys = ON');
+        } else {
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        }
 
         $properties = $this->propertyData();
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DTO;
 
 use App\Enums\RoomStatus;
@@ -18,6 +20,7 @@ readonly class CreateRoomDTO
     public static function fromRequest(CreateRoomRequest $request): self
     {
         $status = $request->validated('status') ?? RoomStatus::AVAILABLE->value;
+
         return new self(
             propertyId: $request->validated('property_id'),
             roomTypeId: $request->validated('room_type_id'),
@@ -30,6 +33,7 @@ readonly class CreateRoomDTO
     public static function fromArray(array $data): self
     {
         $status = $data['status'] ?? RoomStatus::AVAILABLE->value;
+
         return new self(
             propertyId: $data['property_id'] ?? '',
             roomTypeId: $data['room_type_id'] ?? '',

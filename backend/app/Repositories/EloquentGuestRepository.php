@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repositories;
 
 use App\Contracts\Repositories\GuestRepositoryInterface;
@@ -52,7 +54,7 @@ class EloquentGuestRepository implements GuestRepositoryInterface
     {
         $query = Guest::query();
 
-        if (!empty($withCount)) {
+        if (! empty($withCount)) {
             $query->withCount($withCount);
         }
 

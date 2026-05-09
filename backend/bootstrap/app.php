@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Middleware\JwtAuthenticate;
 use App\Http\Middleware\RoleMiddleware;
 use App\Providers\AuthServiceProvider;

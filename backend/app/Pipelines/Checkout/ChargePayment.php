@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Pipelines\Checkout;
 
 use App\Contracts\Services\PaymentGatewayInterface;

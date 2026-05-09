@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -9,7 +11,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('room_types', function (Blueprint $table) {
-            $table->uuid('room_type_id')->primary();
+            $table->uuid('id')->primary();
             $table->uuid('property_id');
             $table->string('name');
             $table->integer('capacity');
@@ -20,7 +22,7 @@ return new class extends Migration
             $table->integer('max_occupancy')->nullable();
             $table->timestamps();
 
-            $table->foreign('property_id')->references('property_id')->on('properties')->onDelete('cascade');
+            $table->foreign('property_id')->references('id')->on('properties')->onDelete('cascade');
             $table->index('property_id');
         });
     }

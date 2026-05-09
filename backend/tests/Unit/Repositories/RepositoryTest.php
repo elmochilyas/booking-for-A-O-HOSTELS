@@ -1,4 +1,6 @@
-<?php>
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit\Repositories;
 
@@ -14,4 +16,3 @@ test('PropertyRepository implements PropertyRepositoryInterface', function () {
     $repo = app(PropertyRepositoryInterface::class);
     expect($repo)->toBeInstanceOf(PropertyRepositoryInterface::class);
 });
-

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Enums\PaymentStatus;
@@ -11,7 +13,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Table('payments', key: 'payment_id')]
+#[Table('payments')]
 #[Hidden(['created_at', 'updated_at'])]
 #[ObservedBy([PaymentObserver::class])]
 class Payment extends Model
@@ -24,26 +26,13 @@ class Payment extends Model
         'failure_message', 'notes',
     ];
 
-    protected $keyType = 'string';
-
-    public $incrementing = false;
-
-    public function getIdAttribute()
-    {
-        return $this->getKey();
-    }
-
-    public function __get($key)
-    {
-        if ($key === 'id') {
-            return $this->getKey();
-        }
-
-        return parent::__get($key);
-    }
+    protected $casts = [
+        'amount' => 'decimal:2',
+        'status' => PaymentStatus::class,
+    ];
 
     public function booking(): BelongsTo
     {
-        return $this->belongsTo(Booking::class, 'booking_id');
+        return $this->belongsTo(Booking::class);
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Enums\GuestStatus;
@@ -12,7 +14,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Table('guests', key: 'guest_id')]
+#[Table('guests')]
 #[Hidden([
     'password_hash', 'id_type', 'id_number',
     'email_verified_at', 'created_at', 'updated_at',
@@ -21,7 +23,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Guest extends Model
 {
     use HasFactory, HasUuids;
-    
+
     protected $fillable = [
         'email', 'password_hash', 'first_name', 'last_name',
         'phone', 'country', 'date_of_birth', 'gender',
@@ -32,26 +34,6 @@ class Guest extends Model
         'is_banned', 'ban_reason', 'banned_at',
     ];
 
-    protected $table = 'guests';
-    
-    protected $keyType = 'string';
-    
-    public $incrementing = false;
-    
-    public function getIdAttribute()
-    {
-        return $this->getKey();
-    }
-    
-    public function __get($key)
-    {
-        if ($key === 'id') {
-            return $this->getKey();
-        }
-        
-        return parent::__get($key);
-    }
-    
     protected $casts = [
         'date_of_birth' => 'date',
         'email_verified_at' => 'datetime',
@@ -66,7 +48,7 @@ class Guest extends Model
 
     public function bookings(): HasMany
     {
-        return $this->hasMany(Booking::class, 'guest_id');
+        return $this->hasMany(Booking::class);
     }
 
     public function reviews(): HasMany

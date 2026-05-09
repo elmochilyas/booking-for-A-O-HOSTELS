@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Contracts\Repositories;
 
 use App\Models\RoomType;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 
 interface RoomTypeRepositoryInterface
 {
@@ -21,5 +24,5 @@ interface RoomTypeRepositoryInterface
 
     public function getPaginated(array $filters, int $perPage = 15): LengthAwarePaginator;
 
-    public function getWithCount(string $withCount, ?string $propertyId = null): \Illuminate\Database\Eloquent\Collection;
+    public function getWithCount(string $withCount, ?string $propertyId = null): Collection;
 }

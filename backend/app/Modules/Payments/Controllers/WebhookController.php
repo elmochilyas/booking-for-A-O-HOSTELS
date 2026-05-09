@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Modules\Payments\Controllers;
 
 use App\Actions\Payments\HandlePaymentFailed;
@@ -7,9 +9,9 @@ use App\Actions\Payments\HandlePaymentSucceeded;
 use App\Actions\Payments\HandleRefund as HandleRefundAction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Stripe\Exception\SignatureVerificationException;
 use Stripe\Webhook;
-use Illuminate\Support\Facades\Log;
 
 #[Middleware('throttle:60,1')]
 class WebhookController extends Controller

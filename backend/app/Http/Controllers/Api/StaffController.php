@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api;
 
 use App\Actions\Staff\CreateStaff;
@@ -12,7 +14,6 @@ use App\Actions\Staff\ListStaff;
 use App\Actions\Staff\LoginStaff;
 use App\Actions\Staff\LogoutStaff;
 use App\Actions\Staff\UpdateStaff;
-use App\Contracts\Repositories\StaffRepositoryInterface;
 use App\DTO\CreateStaffDTO;
 use App\DTO\LoginStaffDTO;
 use App\DTO\UpdateStaffDTO;
@@ -38,7 +39,6 @@ class StaffController extends Controller
         private GetTodayCheckIns $getTodayCheckIns,
         private GetTodayCheckOuts $getTodayCheckOuts,
         private GetGuestDetails $getGuestDetails,
-        private StaffRepositoryInterface $staffRepository,
     ) {}
 
     public function index(ListStaffRequest $request): JsonResponse
@@ -62,9 +62,8 @@ class StaffController extends Controller
     #[Middleware('role:superadmin,admin,property_admin')]
     public function update(UpdateStaffRequest $request, string $id): JsonResponse
     {
-        $staff = $this->staffRepository->findOrFail($id);
         $dto = UpdateStaffDTO::fromRequest($request);
-        $updatedStaff = $this->updateStaff->handle($staff, $dto);
+        $updatedStaff = $this->updateStaff->handle($id, $dto);
 
         return response()->json([
             'message' => 'Staff updated successfully',
@@ -75,8 +74,7 @@ class StaffController extends Controller
     #[Middleware('role:superadmin,admin,property_admin')]
     public function destroy(string $id): JsonResponse
     {
-        $staff = $this->staffRepository->findOrFail($id);
-        $this->deleteStaff->handle($staff);
+        $this->deleteStaff->handle($id);
 
         return response()->json(['message' => 'Staff deactivated successfully']);
     }

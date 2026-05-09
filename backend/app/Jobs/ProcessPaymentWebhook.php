@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Jobs;
 
 use App\Actions\Payments\HandlePaymentFailed;
@@ -18,7 +20,7 @@ use Illuminate\Support\Facades\Log;
 #[Timeout(60)]
 class ProcessPaymentWebhook implements ShouldQueue
 {
-    use Queueable, InteractsWithQueue;
+    use InteractsWithQueue, Queueable;
 
     public function __construct(
         private string $payload,

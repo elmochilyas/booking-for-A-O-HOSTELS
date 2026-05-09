@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Modules\Staff\Controllers;
 
 use App\Actions\Staff\CreateStaff;
@@ -8,6 +10,7 @@ use App\Actions\Staff\GetStaffDashboard;
 use App\Actions\Staff\ListStaff;
 use App\Actions\Staff\ToggleActive;
 use App\Actions\Staff\UpdateStaff;
+use App\Contracts\Repositories\StaffRepositoryInterface;
 use App\DTO\CreateStaffDTO;
 use App\DTO\UpdateStaffDTO;
 use App\Http\Requests\Modules\Staff\ByPropertyRequest;
@@ -20,6 +23,10 @@ use Illuminate\Routing\Controller;
 
 class StaffController extends Controller
 {
+    public function __construct(
+        private StaffRepositoryInterface $staffRepo,
+    ) {}
+
     public function index(GetStaffRequest $request, ListStaff $action): JsonResponse
     {
         $propertyId = $request->query('property_id');
@@ -40,14 +47,14 @@ class StaffController extends Controller
 
     public function show(string $id): JsonResponse
     {
-        $staff = app('App\Contracts\Repositories\StaffRepositoryInterface')->findOrFail($id);
+        $staff = $this->staffRepo->findOrFail($id);
 
         return response()->json(['data' => $staff]);
     }
 
     public function update(UpdateStaffRequest $request, string $id, UpdateStaff $action): JsonResponse
     {
-        $staff = app('App\Contracts\Repositories\StaffRepositoryInterface')->findOrFail($id);
+        $staff = $this->staffRepo->findOrFail($id);
         $staff = $action->handle($staff, UpdateStaffDTO::fromRequest($request));
 
         return response()->json([
@@ -58,7 +65,7 @@ class StaffController extends Controller
 
     public function destroy(string $id, DeleteStaff $action): JsonResponse
     {
-        $staff = app('App\Contracts\Repositories\StaffRepositoryInterface')->findOrFail($id);
+        $staff = $this->staffRepo->findOrFail($id);
         $action->handle($staff);
 
         return response()->json(['message' => 'Staff deleted successfully']);
@@ -66,7 +73,7 @@ class StaffController extends Controller
 
     public function toggleActive(string $id, ToggleActiveRequest $request, ToggleActive $action): JsonResponse
     {
-        $staff = app('App\Contracts\Repositories\StaffRepositoryInterface')->findOrFail($id);
+        $staff = $this->staffRepo->findOrFail($id);
         $staff = $action->handle($staff);
 
         return response()->json([
@@ -85,7 +92,7 @@ class StaffController extends Controller
 
     public function dashboard(string $id, GetStaffDashboard $action): JsonResponse
     {
-        $staff = app('App\Contracts\Repositories\StaffRepositoryInterface')->findOrFail($id);
+        $staff = $this->staffRepo->findOrFail($id);
         $dashboard = $action->handle($staff);
 
         return response()->json(['data' => $dashboard]);

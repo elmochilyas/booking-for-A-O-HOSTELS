@@ -1,4 +1,6 @@
-<?php>
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -12,7 +14,7 @@ class PropertyFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->company() . ' Hotel',
+            'name' => $this->faker->company().' Hotel',
             'location' => $this->faker->city(),
             'address' => $this->faker->address(),
             'latitude' => $this->faker->latitude(),

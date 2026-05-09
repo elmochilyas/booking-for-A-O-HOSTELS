@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Payments;
 
 use App\Contracts\Repositories\BookingRepositoryInterface;
 use App\Contracts\Repositories\PaymentRepositoryInterface;
+use App\Enums\PaymentStatus;
 use App\Events\PaymentRefunded;
 use App\Services\EmailService;
 use App\Services\StripeService;
@@ -49,7 +52,7 @@ readonly class RefundPayment
             return [
                 'refund_id' => $refundPayment->id,
                 'amount' => $refundAmount,
-                'status' => 'success',
+                'status' => PaymentStatus::COMPLETED->value,
             ];
         });
     }

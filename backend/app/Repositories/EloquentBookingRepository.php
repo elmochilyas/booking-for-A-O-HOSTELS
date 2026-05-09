@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repositories;
 
 use App\Contracts\Repositories\BookingRepositoryInterface;
@@ -157,7 +159,7 @@ class EloquentBookingRepository implements BookingRepositoryInterface
     public function calculateTotalPrice(string $propertyId, string $roomTypeId, string $checkIn, string $checkOut, array $extras = []): float
     {
         $roomType = RoomType::find($roomTypeId);
-        $basePrice = $this->calculatePrice($roomType->base_price ?? 0, $checkIn, $checkOut);
+        $basePrice = $this->calculatePrice((float) ($roomType->base_price ?? 0), $checkIn, $checkOut);
 
         $extrasPrice = 0;
         foreach ($extras as $extra) {
@@ -212,8 +214,12 @@ class EloquentBookingRepository implements BookingRepositoryInterface
         return $query->sum('total_amount');
     }
 
-    public function countByPropertyAndStatus(string $propertyId, string $status, ?string $dateColumn = null, ?string $date = null): int
+    public function countByPropertyAndStatus(?string $propertyId, string $status, ?string $dateColumn = null, ?string $date = null): int
     {
+        if (!$propertyId) {
+            return 0;
+        }
+
         $query = Booking::where('property_id', $propertyId)->where('status', $status);
 
         if ($dateColumn && $date) {
@@ -223,8 +229,12 @@ class EloquentBookingRepository implements BookingRepositoryInterface
         return $query->count();
     }
 
-    public function sumRevenueByPropertyAndDate(string $propertyId, array $statuses, string $date): float
+    public function sumRevenueByPropertyAndDate(?string $propertyId, array $statuses, string $date): float
     {
+        if (!$propertyId) {
+            return 0.0;
+        }
+
         return Booking::where('property_id', $propertyId)
             ->whereIn('status', $statuses)
             ->where('check_in_date', $date)
@@ -267,7 +277,7 @@ class EloquentBookingRepository implements BookingRepositoryInterface
             ->count();
     }
 
-    public function getQuery(): \Illuminate\Database\Eloquent\Builder
+    public function getQuery(): Builder
     {
         return Booking::query();
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature;
 
 use App\Models\Booking;
@@ -8,6 +10,7 @@ use App\Models\Property;
 use App\Models\Room;
 use App\Models\RoomType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class BookingApiTest extends TestCase
@@ -21,6 +24,7 @@ class BookingApiTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        Event::fake();
 
         $property = Property::create([
             'name' => 'A&O Berlin Hauptbahnhof',
@@ -32,15 +36,15 @@ class BookingApiTest extends TestCase
         ]);
 
         $roomType = RoomType::create([
-            'property_id' => $property->property_id ?? $property->getKey(),
+            'property_id' => $property->id,
             'name' => 'Double Room',
             'capacity' => 2,
             'base_price' => 65.00,
         ]);
 
         Room::create([
-            'property_id' => $property->property_id ?? $property->getKey(),
-            'room_type_id' => $roomType->room_type_id ?? $roomType->getKey(),
+            'property_id' => $property->id,
+            'room_type_id' => $roomType->id,
             'room_number' => '101',
             'floor' => 1,
             'status' => 'available',
@@ -52,7 +56,7 @@ class BookingApiTest extends TestCase
 
     public function test_search_availability_returns_available_rooms()
     {
-        $response = $this->getJson('/api/bookings/availability?property_id='.$this->property->property_id ?? $this->property->getKey().'&check_in=2026-06-01&check_out=2026-06-03');
+        $response = $this->getJson('/api/bookings/availability?property_id='.$this->property->id.'&check_in=2026-06-01&check_out=2026-06-03');
 
         $response->assertStatus(200);
         $response->assertJsonStructure(['data']);
@@ -61,8 +65,8 @@ class BookingApiTest extends TestCase
     public function test_create_booking_requires_authentication()
     {
         $response = $this->postJson('/api/bookings', [
-            'property_id' => $this->property->property_id ?? $this->property->getKey(),
-            'room_type_id' => $this->roomType->room_type_id ?? $this->roomType->getKey(),
+            'property_id' => $this->property->id,
+            'room_type_id' => $this->roomType->id,
             'check_in_date' => '2026-06-01',
             'check_out_date' => '2026-06-03',
             'guest_count' => 2,
@@ -88,9 +92,9 @@ class BookingApiTest extends TestCase
 
         $response = $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/bookings', [
-                'guest_id' => $guest->guest_id ?? $guest->getKey(),
-                'property_id' => $this->property->property_id ?? $this->property->getKey(),
-                'room_type_id' => $this->roomType->room_type_id ?? $this->roomType->getKey(),
+                'guest_id' => $guest->id,
+                'property_id' => $this->property->id,
+                'room_type_id' => $this->roomType->id,
                 'check_in_date' => '2026-06-01',
                 'check_out_date' => '2026-06-03',
                 'guest_count' => 2,
@@ -110,9 +114,9 @@ class BookingApiTest extends TestCase
         ]);
 
         Booking::create([
-            'guest_id' => $guest->guest_id ?? $guest->getKey(),
-            'property_id' => $this->property->property_id ?? $this->property->getKey(),
-            'room_type_id' => $this->roomType->room_type_id ?? $this->roomType->getKey(),
+            'guest_id' => $guest->id,
+            'property_id' => $this->property->id,
+            'room_type_id' => $this->roomType->id,
             'check_in_date' => '2026-06-01',
             'check_out_date' => '2026-06-03',
             'guest_count' => 2,
@@ -130,40 +134,6 @@ class BookingApiTest extends TestCase
 
         $token = $this->postJson('/api/auth/login', [
             'email' => 'test3@example.com',
-            'password' => 'password',
-        ])->json()['access_token'];
-
-        $response = $this->withHeader('Authorization', 'Bearer '.$token)
-            ->postJson('/api/bookings', [
-                'guest_id' => $guest2->guest_id ?? $guest2->getKey(),
-                'property_id' => $this->property->property_id ?? $this->property->getKey(),
-                'room_type_id' => $this->roomType->room_type_id ?? $this->roomType->getKey(),
-                'check_in_date' => '2026-06-01',
-                'check_out_date' => '2026-06-03',
-                'guest_count' => 2,
-            ]);
-
-        Booking::create([
-            'guest_id' => $guest->id,
-            'property_id' => $this->property->id,
-            'room_type_id' => $this->roomType->id,
-            'check_in_date' => '2026-06-01',
-            'check_out_date' => '2026-06-03',
-            'guest_count' => 2,
-            'total_price' => 130,
-            'status' => 'confirmed',
-        ]);
-
-        $guest2 = Guest::create([
-            'email' => 'test2@example.com',
-            'password_hash' => bcrypt('password'),
-            'first_name' => 'Test2',
-            'last_name' => 'User',
-            'email_verified_at' => now(),
-        ]);
-
-        $token = $this->postJson('/api/auth/login', [
-            'email' => 'test2@example.com',
             'password' => 'password',
         ])->json()['access_token'];
 

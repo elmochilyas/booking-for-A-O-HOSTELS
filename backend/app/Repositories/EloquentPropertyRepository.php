@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repositories;
 
 use App\Contracts\Repositories\PropertyRepositoryInterface;
@@ -14,9 +16,8 @@ class EloquentPropertyRepository implements PropertyRepositoryInterface
     public function find(string $id): ?Property
     {
         $key = "property:{$id}:detail";
-        Cache::touch($key, 3600);
 
-        return Cache::tags(['properties', $key])->remember(
+        return Cache::remember(
             $key,
             3600,
             fn () => Property::with(['rooms.roomType', 'amenities'])->find($id)
@@ -26,9 +27,8 @@ class EloquentPropertyRepository implements PropertyRepositoryInterface
     public function findOrFail(string $id): Property
     {
         $key = "property:{$id}:detail";
-        Cache::touch($key, 3600);
 
-        return Cache::tags(['properties', $key])->remember(
+        return Cache::remember(
             $key,
             3600,
             fn () => Property::with(['rooms.roomType', 'amenities'])->findOrFail($id)
@@ -37,7 +37,7 @@ class EloquentPropertyRepository implements PropertyRepositoryInterface
 
     public function findFirst(): ?Property
     {
-        return Cache::tags(['properties'])->remember(
+        return Cache::remember(
             'property:first',
             3600,
             fn () => Property::with(['rooms.roomType', 'amenities'])->first()
@@ -47,7 +47,7 @@ class EloquentPropertyRepository implements PropertyRepositoryInterface
     public function create(array $data): Property
     {
         $property = Property::create($data);
-        Cache::tags(['properties'])->flush();
+        Cache::flush();
 
         return $property->load(['rooms', 'amenities']);
     }
@@ -55,7 +55,7 @@ class EloquentPropertyRepository implements PropertyRepositoryInterface
     public function update(Property $property, array $data): Property
     {
         $property->update($data);
-        Cache::tags(['properties', "property:{$property->id}"])->flush();
+        Cache::forget("property:{$property->id}:detail");
 
         return $property->fresh(['rooms', 'amenities']);
     }
@@ -63,30 +63,22 @@ class EloquentPropertyRepository implements PropertyRepositoryInterface
     public function delete(Property $property): bool
     {
         $result = $property->delete();
-        Cache::tags(['properties', "property:{$property->id}"])->flush();
+        Cache::forget("property:{$property->id}:detail");
 
         return $result;
     }
 
     public function getPaginated(array $filters, int $perPage = 15): LengthAwarePaginator
     {
-        $cacheKey = 'properties:paginated:'.md5(serialize($filters).":{$perPage}");
+        $query = Property::with(['rooms', 'amenities']);
+        $query = $this->applyFilters($query, $filters);
 
-        return Cache::tags(['properties'])->remember(
-            $cacheKey,
-            3600,
-            function () use ($filters, $perPage) {
-                $query = Property::with(['rooms', 'amenities']);
-                $query = $this->applyFilters($query, $filters);
-
-                return $query->latest()->paginate($perPage);
-            }
-        );
+        return $query->latest()->paginate($perPage);
     }
 
     public function findByCity(string $city): LengthAwarePaginator
     {
-        return Cache::tags(['properties'])->remember(
+        return Cache::remember(
             "property:city:{$city}",
             3600,
             fn () => Property::with(['rooms.roomType', 'amenities'])
@@ -99,7 +91,7 @@ class EloquentPropertyRepository implements PropertyRepositoryInterface
 
     public function findByStatus(string $status): LengthAwarePaginator
     {
-        return Cache::tags(['properties'])->remember(
+        return Cache::remember(
             "property:status:{$status}",
             3600,
             fn () => Property::with(['rooms.roomType', 'amenities'])
@@ -113,7 +105,7 @@ class EloquentPropertyRepository implements PropertyRepositoryInterface
     {
         $cacheKey = 'property:search:'.md5($query.serialize($filters));
 
-        return Cache::tags(['properties'])->remember(
+        return Cache::remember(
             $cacheKey,
             1800,
             function () use ($query, $filters) {
@@ -134,7 +126,7 @@ class EloquentPropertyRepository implements PropertyRepositoryInterface
 
     public function getWithAvailability(string $checkIn, string $checkOut): array
     {
-        return Cache::tags(['properties', 'availability'])->remember(
+        return Cache::remember(
             "property:availability:{$checkIn}:{$checkOut}",
             600,
             function () use ($checkIn, $checkOut) {
@@ -152,6 +144,25 @@ class EloquentPropertyRepository implements PropertyRepositoryInterface
                     })
                     ->toArray();
             }
+        );
+    }
+
+    public function getDestinations(): array
+    {
+        return Cache::remember('property:destinations', 3600, fn () => Property::query()
+            ->select(['id', 'name', 'location', 'latitude', 'longitude', 'rating'])
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->get()
+            ->map(fn (Property $p) => [
+                'id'        => $p->id,
+                'name'      => $p->name,
+                'location'  => $p->location,
+                'latitude'  => (float) $p->latitude,
+                'longitude' => (float) $p->longitude,
+                'rating'    => (float) $p->rating,
+            ])
+            ->toArray()
         );
     }
 

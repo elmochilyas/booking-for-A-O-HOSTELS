@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Modules\Admin\Controllers;
 
+use App\Actions\Admin\ArchivePropertyAction;
 use App\Actions\Admin\BanGuestAction;
 use App\Actions\Admin\CancelBookingAction;
 use App\Actions\Admin\CreateExtraAction;
@@ -11,6 +14,7 @@ use App\Actions\Admin\CreateStaffAction;
 use App\Actions\Admin\DeactivateExtraAction;
 use App\Actions\Admin\DeactivatePromotionAction;
 use App\Actions\Admin\DeactivateStaffAction;
+use App\Actions\Admin\DeleteGuestDataAction;
 use App\Actions\Admin\ExportGuestDataAction;
 use App\Actions\Admin\MergeGuestsAction;
 use App\Actions\Admin\ModerateReviewAction;
@@ -30,6 +34,7 @@ use App\Contracts\Repositories\RoomRepositoryInterface;
 use App\Contracts\Repositories\RoomTypeRepositoryInterface;
 use App\Contracts\Repositories\StaffRepositoryInterface;
 use App\Contracts\Repositories\SystemConfigRepositoryInterface;
+use App\Http\Requests\Modules\Admin\AnalyticsRequest;
 use App\Http\Requests\Modules\Admin\BanGuestRequest;
 use App\Http\Requests\Modules\Admin\CancelBookingRequest;
 use App\Http\Requests\Modules\Admin\CreateExtraRequest;
@@ -62,22 +67,20 @@ use App\Http\Requests\Modules\Admin\UpdatePropertyRequest;
 use App\Http\Requests\Modules\Admin\UpdateRoomRequest;
 use App\Http\Requests\Modules\Admin\UpdateRoomStatusRequest;
 use App\Http\Requests\Modules\Admin\UpdateRoomTypeRequest;
-        use App\Http\Requests\Modules\Admin\AnalyticsRequest;
-        use App\Http\Requests\Modules\Admin\UpdateStaffRequest;
-        use App\Http\Requests\Modules\Admin\UpdateSystemConfigRequest;
+use App\Http\Requests\Modules\Admin\UpdateStaffRequest;
+use App\Http\Requests\Modules\Admin\UpdateSystemConfigRequest;
+use App\Models\AdminPermission;
 use App\Models\AdminRole;
 use App\Models\AuditLog;
-use App\Models\Booking;
 use App\Models\EmailTemplate;
 use App\Models\Extra;
-use App\Models\Guest;
 use App\Models\Promotion;
-use App\Models\Property;
 use App\Models\Review;
 use App\Models\Room;
 use App\Models\RoomType;
 use App\Modules\Admin\Services\AdminManagementService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -259,10 +262,10 @@ class AdminController extends Controller
         ]);
     }
 
-    public function getPropertyKpis(Request $request, string $id): JsonResponse
+    public function getPropertyKpis(AnalyticsRequest $request, string $id): JsonResponse
     {
-        $startDate = $request->query('start_date');
-        $endDate = $request->query('end_date');
+        $startDate = $request->validated('start_date');
+        $endDate = $request->validated('end_date');
 
         $kpis = $this->propertyRepo->getKpis($id, $startDate, $endDate);
 
@@ -500,11 +503,11 @@ class AdminController extends Controller
         ]);
     }
 
-    public function getRevenueDashboard(Request $request): JsonResponse
+    public function getRevenueDashboard(AnalyticsRequest $request): JsonResponse
     {
-        $propertyId = $request->query('property_id');
-        $startDate = $request->query('start_date');
-        $endDate = $request->query('end_date');
+        $propertyId = $request->validated('property_id');
+        $startDate = $request->validated('start_date');
+        $endDate = $request->validated('end_date');
 
         $data = $this->propertyRepo->getRevenueDashboard($propertyId, $startDate, $endDate);
 
@@ -771,7 +774,7 @@ class AdminController extends Controller
         // Weekly bookings: grouped query for last 7 days
         $weeklyBookings = [];
         $weekDates = collect(range(6, 0))->mapWithKeys(fn ($i) => [
-            now()->subDays($i)->toDateString() => now()->subDays($i)->format('D')
+            now()->subDays($i)->toDateString() => now()->subDays($i)->format('D'),
         ]);
         if ($propertyId) {
             $weeklyCounts = $this->bookingRepo->getQuery()
@@ -801,7 +804,7 @@ class AdminController extends Controller
         // Monthly revenue: grouped query for last 12 months
         $monthlyRevenue = [];
         $monthDates = collect(range(11, 0))->mapWithKeys(fn ($i) => [
-            now()->subMonths($i)->format('Y-m') => now()->subMonths($i)->format('M')
+            now()->subMonths($i)->format('Y-m') => now()->subMonths($i)->format('M'),
         ]);
         if ($propertyId) {
             $monthlySums = $this->bookingRepo->getQuery()

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Events;
 
 use App\Models\Booking;
@@ -10,6 +12,7 @@ use Illuminate\Foundation\Events\SerializesModels;
 class GuestCheckedOut implements ShouldDispatchAfterCommit
 {
     use Dispatchable;
+    use SerializesModels;
 
     public function __construct(
         public readonly Booking $booking,

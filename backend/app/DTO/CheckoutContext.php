@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DTO;
 
 use App\Enums\PaymentMethod;
@@ -11,8 +13,6 @@ readonly class CheckoutContext
     public float $discount;
 
     public float $tax;
-
-    public float $total;
 
     public ?string $couponCode;
 
@@ -29,7 +29,6 @@ readonly class CheckoutContext
         $this->subtotal = 0.0;
         $this->discount = 0.0;
         $this->tax = 0.0;
-        $this->total = 0.0;
         $this->couponCode = null;
         $this->errorMessage = null;
     }
@@ -37,12 +36,12 @@ readonly class CheckoutContext
     public static function fromDTO(CreateBookingDTO $dto): self
     {
         return new self(
-            bookingId: '', // Booking ID not available until creation
+            bookingId: $dto->bookingId ?? '',
             propertyId: $dto->propertyId,
             roomTypeId: $dto->roomTypeId,
             guestCount: $dto->guestCount,
             paymentMethod: $dto->paymentMethod,
-            shippingAddress: '', // To be filled
+            shippingAddress: '',
         );
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Enums\BookingStatus;
@@ -14,7 +16,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Table('bookings', key: 'booking_id')]
+#[Table('bookings')]
 #[Hidden(['created_at', 'updated_at'])]
 #[ObservedBy([BookingObserver::class])]
 class Booking extends Model
@@ -29,26 +31,6 @@ class Booking extends Model
         'actual_check_in', 'actual_check_out',
     ];
 
-    protected $table = 'bookings';
-
-    protected $keyType = 'string';
-
-    public $incrementing = false;
-    
-    public function getIdAttribute()
-    {
-        return $this->getKey();
-    }
-    
-    public function __get($key)
-    {
-        if ($key === 'id') {
-            return $this->getKey();
-        }
-        
-        return parent::__get($key);
-    }
-    
     protected $casts = [
         'check_in_date' => 'date',
         'check_out_date' => 'date',
@@ -63,7 +45,7 @@ class Booking extends Model
 
     public function guest(): BelongsTo
     {
-        return $this->belongsTo(Guest::class, 'guest_id');
+        return $this->belongsTo(Guest::class);
     }
 
     public function property(): BelongsTo
@@ -91,37 +73,16 @@ class Booking extends Model
         return $this->hasMany(Review::class);
     }
 
-    public function scopePending($query)
-    {
-        return $query->where('status', 'pending');
-    }
-
-    public function scopeConfirmed($query)
-    {
-        return $query->where('status', 'confirmed');
-    }
-
-    public function scopeCheckedIn($query)
-    {
-        return $query->where('status', 'checked_in');
-    }
-
-    public function scopeCompleted($query)
-    {
-        return $query->where('status', 'completed');
-    }
-
     public function canTransitionTo(BookingStatus $newStatus): bool
     {
         $currentStatus = $this->status instanceof BookingStatus ? $this->status : BookingStatus::from($this->status);
 
-        // Define valid transitions
         $validTransitions = [
             BookingStatus::PENDING->value => [BookingStatus::CONFIRMED, BookingStatus::CANCELLED],
             BookingStatus::CONFIRMED->value => [BookingStatus::CHECKED_IN, BookingStatus::CANCELLED],
             BookingStatus::CHECKED_IN->value => [BookingStatus::COMPLETED, BookingStatus::CANCELLED],
-            BookingStatus::COMPLETED->value => [], // No transitions from completed
-            BookingStatus::CANCELLED->value => [], // No transitions from cancelled
+            BookingStatus::COMPLETED->value => [],
+            BookingStatus::CANCELLED->value => [],
         ];
 
         $allowed = $validTransitions[$currentStatus->value] ?? [];
