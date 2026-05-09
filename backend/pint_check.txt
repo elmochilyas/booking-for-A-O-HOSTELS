@@ -1,0 +1,1 @@
+﻿{"tool":"pint","result":"fail","files":[{"path":"app\\Modules\\Properties\\Controllers\\PropertyController.php","fixers":["braces_position","no_unused_imports","single_line_empty_body"]}]}

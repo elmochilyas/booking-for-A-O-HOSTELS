@@ -1,0 +1,1306 @@
+﻿
+  [44;1m INFO [49;22m <?php> namespace Tests\Unit\Actions; use App\Actions\Bookings\CreateBooking; use App\Actions\Auth\RegisterGuestAction; use Illuminate\Foundation\Testing\RefreshDatabase; uses(RefreshDatabase::class)->in('Unit/Actions'); test('CreateBooking action has handle method', function () { expect(class_exists(CreateBooking::class))->toBeTrue(); expect(method_exists(CreateBooking::class, 'handle'))->toBeTrue(); }); test('RegisterGuestAction action has handle method', function () { expect(class_exists(RegisterGuestAction::class))->toBeTrue(); expect(method_exists(RegisterGuestAction::class, 'handle'))->toBeTrue(); });
+
+
+<?php>
+
+test('simple test', function () {
+    expect(true)->toBeTrue();
+});
+<?php>
+
+namespace Tests\Unit\DTO;
+
+use App\DTO\CreateBookingDTO;
+use App\DTO\RegisterGuestDTO;
+use App\Enums\PaymentMethod;
+
+test('CreateBookingDTO is readonly class', function () {
+    $reflection = new ReflectionClass(CreateBookingDTO::class);
+    expect($reflection->isReadonly())->toBeTrue();
+});
+
+test('RegisterGuestDTO is readonly class', function () {
+    $reflection = new ReflectionClass(RegisterGuestDTO::class);
+    expect($reflection->isReadonly())->toBeTrue();
+});
+
+<?php>
+
+namespace Tests\Unit\Repositories;
+
+use App\Contracts\Repositories\BookingRepositoryInterface;
+use App\Contracts\Repositories\PropertyRepositoryInterface;
+
+test('BookingRepository implements BookingRepositoryInterface', function () {
+    $repo = app(BookingRepositoryInterface::class);
+    expect($repo)->toBeInstanceOf(BookingRepositoryInterface::class);
+});
+
+test('PropertyRepository implements PropertyRepositoryInterface', function () {
+    $repo = app(PropertyRepositoryInterface::class);
+    expect($repo)->toBeInstanceOf(PropertyRepositoryInterface::class);
+});.
+
+   PASS  Tests\Unit\ExampleTest
+  Ô£ô that true is true                                                                                            0.02s  
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+
+   FAIL  Tests\Feature\AuthApiTest
+  Ô¿» guest can register                                                                                           3.15s  
+  Ô£ô registration fails with invalid email                                                                        0.06s  
+  Ô£ô guest can login with valid credentials                                                                       0.06s  
+  Ô£ô login fails with invalid password                                                                            0.06s  
+  Ô£ô login fails for unverified email                                                                             0.05s  
+  Ô¿» can verify email with valid token                                                                            0.05s  
+  Ô£ô cannot access protected routes without token                                                                 0.05s  
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+
+   FAIL  Tests\Feature\BookingApiTest
+  Ô¿» search availability returns available rooms                                                                  0.07s  
+  Ô£ô create booking requires authentication                                                                       0.07s  
+  Ô¿» booking creation with valid data                                                                             0.07s  
+  Ô¿» cannot create booking for unavailable dates                                                                  0.07s  
+<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+
+   PASS  Tests\Feature\ExampleTest
+  Ô£ô the application returns a successful response                                                                0.06s  
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ  
+   FAILED  Tests\Feature\AuthApiTest > guest can register                                                               
+  Expected response status code [201] but received 500.
+Failed asserting that 500 is identical to 201.
+
+The following exception occurred during the last request:
+
+PDOException: SQLSTATE[HY000]: General error: 1 no such column: bookings.guest_guest_id in C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Connection.php:421
+Stack trace:
+#0 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Connection.php(421): PDO->prepare('select * from "...')
+#1 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Connection.php(830): Illuminate\Database\Connection->{closure:Illuminate\Database\Connection::select():412}('select * from "...', Array)
+#2 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Connection.php(797): Illuminate\Database\Connection->runQueryCallback('select * from "...', Array, Object(Closure))
+#3 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Connection.php(412): Illuminate\Database\Connection->run('select * from "...', Array, Object(Closure))
+#4 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php(3562): Illuminate\Database\Connection->select('select * from "...', Array, true, Array)
+#5 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php(3546): Illuminate\Database\Query\Builder->runSelect()
+#6 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php(907): Illuminate\Database\Query\Builder->get(Array)
+#7 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php(889): Illuminate\Database\Eloquent\Builder->getModels(Array)
+#8 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Relation.php(212): Illuminate\Database\Eloquent\Builder->get(Array)
+#9 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Relation.php(175): Illuminate\Database\Eloquent\Relations\Relation->get()
+#10 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php(955): Illuminate\Database\Eloquent\Relations\Relation->getEager()
+#11 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php(924): Illuminate\Database\Eloquent\Builder->eagerLoadRelation(Array, 'bookings', Object(Closure))
+#12 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php(870): Illuminate\Database\Eloquent\Builder->eagerLoadRelations(Array)
+#13 C:\Users\admin\Herd\AO\backend\app\Repositories\EloquentGuestRepository.php(27): Illuminate\Database\Eloquent\Model->load(Array)
+#14 C:\Users\admin\Herd\AO\backend\app\Actions\Auth\RegisterGuestAction.php(23): App\Repositories\EloquentGuestRepository->create(Array)
+#15 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Concerns\ManagesTransactions.php(35): App\Actions\Auth\RegisterGuestAction->{closure:App\Actions\Auth\RegisterGuestAction::handle():22}(Object(Illuminate\Database\SQLiteConnection))
+#16 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\DatabaseManager.php(496): Illuminate\Database\Connection->transaction(Object(Closure))
+#17 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php(363): Illuminate\Database\DatabaseManager->__call('transaction', Array)
+#18 C:\Users\admin\Herd\AO\backend\app\Actions\Auth\RegisterGuestAction.php(22): Illuminate\Support\Facades\Facade::__callStatic('transaction', Array)
+#19 C:\Users\admin\Herd\AO\backend\app\Http\Controllers\Api\AuthController.php(31): App\Actions\Auth\RegisterGuestAction->handle(Object(App\DTO\CreateGuestDTO))
+#20 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Controller.php(54): App\Http\Controllers\Api\AuthController->register(Object(App\Http\Requests\Api\Auth\RegisterRequest), Object(App\Actions\Auth\RegisterGuestAction))
+#21 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\ControllerDispatcher.php(43): Illuminate\Routing\Controller->callAction('register', Array)
+#22 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Route.php(269): Illuminate\Routing\ControllerDispatcher->dispatch(Object(Illuminate\Routing\Route), Object(App\Http\Controllers\Api\AuthController), 'register')
+#23 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Route.php(215): Illuminate\Routing\Route->runController()
+#24 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Router.php(822): Illuminate\Routing\Route->run()
+#25 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(180): Illuminate\Routing\Router->{closure:Illuminate\Routing\Router::runRouteWithinStack():821}(Object(Illuminate\Http\Request))
+#26 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Middleware\SubstituteBindings.php(52): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}(Object(Illuminate\Http\Request))
+#27 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Routing\Middleware\SubstituteBindings->handle(Object(Illuminate\Http\Request), Object(Closure))
+#28 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#29 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Router.php(821): Illuminate\Pipeline\Pipeline->then(Object(Closure))
+#30 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Router.php(800): Illuminate\Routing\Router->runRouteWithinStack(Object(Illuminate\Routing\Route), Object(Illuminate\Http\Request))
+#31 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Router.php(764): Illuminate\Routing\Router->runRoute(Object(Illuminate\Http\Request), Object(Illuminate\Routing\Route))
+#32 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Router.php(753): Illuminate\Routing\Router->dispatchToRoute(Object(Illuminate\Http\Request))
+#33 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(200): Illuminate\Routing\Router->dispatch(Object(Illuminate\Http\Request))
+#34 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(180): Illuminate\Foundation\Http\Kernel->{closure:Illuminate\Foundation\Http\Kernel::dispatchToRouter():197}(Object(Illuminate\Http\Request))
+#35 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}(Object(Illuminate\Http\Request))
+#36 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull.php(31): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle(Object(Illuminate\Http\Request), Object(Closure))
+#37 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull->handle(Object(Illuminate\Http\Request), Object(Closure))
+#38 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#39 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TrimStrings.php(51): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle(Object(Illuminate\Http\Request), Object(Closure))
+#40 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\TrimStrings->handle(Object(Illuminate\Http\Request), Object(Closure))
+#41 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Http\Middleware\ValidatePostSize.php(27): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#42 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\ValidatePostSize->handle(Object(Illuminate\Http\Request), Object(Closure))
+#43 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance.php(109): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#44 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance->handle(Object(Illuminate\Http\Request), Object(Closure))
+#45 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Http\Middleware\TrustProxies.php(58): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#46 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\TrustProxies->handle(Object(Illuminate\Http\Request), Object(Closure))
+#47 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks.php(22): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#48 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks->handle(Object(Illuminate\Http\Request), Object(Closure))
+#49 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Http\Middleware\ValidatePathEncoding.php(28): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#50 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\ValidatePathEncoding->handle(Object(Illuminate\Http\Request), Object(Closure))
+#51 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Http\Middleware\HandleCors.php(74): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#52 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\HandleCors->handle(Object(Illuminate\Http\Request), Object(Closure))
+#53 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#54 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(175): Illuminate\Pipeline\Pipeline->then(Object(Closure))
+#55 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(144): Illuminate\Foundation\Http\Kernel->sendRequestThroughRouter(Object(Illuminate\Http\Request))
+#56 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php(607): Illuminate\Foundation\Http\Kernel->handle(Object(Illuminate\Http\Request))
+#57 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php(573): Illuminate\Foundation\Testing\TestCase->call('POST', '/api/auth/regis...', Array, Array, Array, Array, '{"email":"newus...')
+#58 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php(411): Illuminate\Foundation\Testing\TestCase->json('POST', '/api/auth/regis...', Array, Array, 0)
+#59 C:\Users\admin\Herd\AO\backend\tests\Feature\AuthApiTest.php(15): Illuminate\Foundation\Testing\TestCase->postJson('/api/auth/regis...', Array)
+#60 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestCase.php(1332): Tests\Feature\AuthApiTest->test_guest_can_register()
+#61 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestCase.php(519): PHPUnit\Framework\TestCase->runTest()
+#62 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestRunner\TestRunner.php(99): PHPUnit\Framework\TestCase->runBare()
+#63 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestCase.php(359): PHPUnit\Framework\TestRunner->run(Object(Tests\Feature\AuthApiTest))
+#64 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestCase->run()
+#65 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+#66 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+#67 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\TextUI\TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+#68 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\TextUI\Application.php(229): PHPUnit\TextUI\TestRunner->run(Object(PHPUnit\TextUI\Configuration\Configuration), Object(PHPUnit\Runner\ResultCache\DefaultResultCache), Object(PHPUnit\Framework\TestSuite))
+#69 C:\Users\admin\Herd\AO\backend\vendor\pestphp\pest\src\Kernel.php(103): PHPUnit\TextUI\Application->run(Array)
+#70 C:\Users\admin\Herd\AO\backend\vendor\pestphp\pest\bin\pest(184): Pest\Kernel->handle(Array, Array)
+#71 C:\Users\admin\Herd\AO\backend\vendor\pestphp\pest\bin\pest(192): {closure:C:\Users\admin\Herd\AO\backend\vendor\pestphp\pest\bin\pest:18}()
+#72 C:\Users\admin\Herd\AO\backend\vendor\bin\pest(119): include('C:\\Users\\admin\\...')
+#73 {main}
+
+Next Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 no such column: bookings.guest_guest_id (Connection: sqlite, Database: tests.sqlite, SQL: select * from "bookings" where "bookings"."guest_guest_id" in (?)) in C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Connection.php:841
+Stack trace:
+#0 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Connection.php(797): Illuminate\Database\Connection->runQueryCallback('select * from "...', Array, Object(Closure))
+#1 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Connection.php(412): Illuminate\Database\Connection->run('select * from "...', Array, Object(Closure))
+#2 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php(3562): Illuminate\Database\Connection->select('select * from "...', Array, true, Array)
+#3 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php(3546): Illuminate\Database\Query\Builder->runSelect()
+#4 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php(907): Illuminate\Database\Query\Builder->get(Array)
+#5 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php(889): Illuminate\Database\Eloquent\Builder->getModels(Array)
+#6 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Relation.php(212): Illuminate\Database\Eloquent\Builder->get(Array)
+#7 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Relation.php(175): Illuminate\Database\Eloquent\Relations\Relation->get()
+#8 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php(955): Illuminate\Database\Eloquent\Relations\Relation->getEager()
+#9 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php(924): Illuminate\Database\Eloquent\Builder->eagerLoadRelation(Array, 'bookings', Object(Closure))
+#10 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Model.php(870): Illuminate\Database\Eloquent\Builder->eagerLoadRelations(Array)
+#11 C:\Users\admin\Herd\AO\backend\app\Repositories\EloquentGuestRepository.php(27): Illuminate\Database\Eloquent\Model->load(Array)
+#12 C:\Users\admin\Herd\AO\backend\app\Actions\Auth\RegisterGuestAction.php(23): App\Repositories\EloquentGuestRepository->create(Array)
+#13 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Concerns\ManagesTransactions.php(35): App\Actions\Auth\RegisterGuestAction->{closure:App\Actions\Auth\RegisterGuestAction::handle():22}(Object(Illuminate\Database\SQLiteConnection))
+#14 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\DatabaseManager.php(496): Illuminate\Database\Connection->transaction(Object(Closure))
+#15 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Support\Facades\Facade.php(363): Illuminate\Database\DatabaseManager->__call('transaction', Array)
+#16 C:\Users\admin\Herd\AO\backend\app\Actions\Auth\RegisterGuestAction.php(22): Illuminate\Support\Facades\Facade::__callStatic('transaction', Array)
+#17 C:\Users\admin\Herd\AO\backend\app\Http\Controllers\Api\AuthController.php(31): App\Actions\Auth\RegisterGuestAction->handle(Object(App\DTO\CreateGuestDTO))
+#18 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Controller.php(54): App\Http\Controllers\Api\AuthController->register(Object(App\Http\Requests\Api\Auth\RegisterRequest), Object(App\Actions\Auth\RegisterGuestAction))
+#19 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\ControllerDispatcher.php(43): Illuminate\Routing\Controller->callAction('register', Array)
+#20 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Route.php(269): Illuminate\Routing\ControllerDispatcher->dispatch(Object(Illuminate\Routing\Route), Object(App\Http\Controllers\Api\AuthController), 'register')
+#21 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Route.php(215): Illuminate\Routing\Route->runController()
+#22 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Router.php(822): Illuminate\Routing\Route->run()
+#23 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(180): Illuminate\Routing\Router->{closure:Illuminate\Routing\Router::runRouteWithinStack():821}(Object(Illuminate\Http\Request))
+#24 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Middleware\SubstituteBindings.php(52): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}(Object(Illuminate\Http\Request))
+#25 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Routing\Middleware\SubstituteBindings->handle(Object(Illuminate\Http\Request), Object(Closure))
+#26 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#27 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Router.php(821): Illuminate\Pipeline\Pipeline->then(Object(Closure))
+#28 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Router.php(800): Illuminate\Routing\Router->runRouteWithinStack(Object(Illuminate\Routing\Route), Object(Illuminate\Http\Request))
+#29 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Router.php(764): Illuminate\Routing\Router->runRoute(Object(Illuminate\Http\Request), Object(Illuminate\Routing\Route))
+#30 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Router.php(753): Illuminate\Routing\Router->dispatchToRoute(Object(Illuminate\Http\Request))
+#31 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(200): Illuminate\Routing\Router->dispatch(Object(Illuminate\Http\Request))
+#32 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(180): Illuminate\Foundation\Http\Kernel->{closure:Illuminate\Foundation\Http\Kernel::dispatchToRouter():197}(Object(Illuminate\Http\Request))
+#33 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}(Object(Illuminate\Http\Request))
+#34 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull.php(31): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle(Object(Illuminate\Http\Request), Object(Closure))
+#35 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull->handle(Object(Illuminate\Http\Request), Object(Closure))
+#36 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#37 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TrimStrings.php(51): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle(Object(Illuminate\Http\Request), Object(Closure))
+#38 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\TrimStrings->handle(Object(Illuminate\Http\Request), Object(Closure))
+#39 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Http\Middleware\ValidatePostSize.php(27): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#40 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\ValidatePostSize->handle(Object(Illuminate\Http\Request), Object(Closure))
+#41 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance.php(109): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#42 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance->handle(Object(Illuminate\Http\Request), Object(Closure))
+#43 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Http\Middleware\TrustProxies.php(58): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#44 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\TrustProxies->handle(Object(Illuminate\Http\Request), Object(Closure))
+#45 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks.php(22): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#46 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks->handle(Object(Illuminate\Http\Request), Object(Closure))
+#47 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Http\Middleware\ValidatePathEncoding.php(28): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#48 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\ValidatePathEncoding->handle(Object(Illuminate\Http\Request), Object(Closure))
+#49 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Http\Middleware\HandleCors.php(74): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#50 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\HandleCors->handle(Object(Illuminate\Http\Request), Object(Closure))
+#51 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#52 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(175): Illuminate\Pipeline\Pipeline->then(Object(Closure))
+#53 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(144): Illuminate\Foundation\Http\Kernel->sendRequestThroughRouter(Object(Illuminate\Http\Request))
+#54 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php(607): Illuminate\Foundation\Http\Kernel->handle(Object(Illuminate\Http\Request))
+#55 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php(573): Illuminate\Foundation\Testing\TestCase->call('POST', '/api/auth/regis...', Array, Array, Array, Array, '{"email":"newus...')
+#56 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php(411): Illuminate\Foundation\Testing\TestCase->json('POST', '/api/auth/regis...', Array, Array, 0)
+#57 C:\Users\admin\Herd\AO\backend\tests\Feature\AuthApiTest.php(15): Illuminate\Foundation\Testing\TestCase->postJson('/api/auth/regis...', Array)
+#58 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestCase.php(1332): Tests\Feature\AuthApiTest->test_guest_can_register()
+#59 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestCase.php(519): PHPUnit\Framework\TestCase->runTest()
+#60 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestRunner\TestRunner.php(99): PHPUnit\Framework\TestCase->runBare()
+#61 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestCase.php(359): PHPUnit\Framework\TestRunner->run(Object(Tests\Feature\AuthApiTest))
+#62 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestCase->run()
+#63 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+#64 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+#65 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\TextUI\TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+#66 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\TextUI\Application.php(229): PHPUnit\TextUI\TestRunner->run(Object(PHPUnit\TextUI\Configuration\Configuration), Object(PHPUnit\Runner\ResultCache\DefaultResultCache), Object(PHPUnit\Framework\TestSuite))
+#67 C:\Users\admin\Herd\AO\backend\vendor\pestphp\pest\src\Kernel.php(103): PHPUnit\TextUI\Application->run(Array)
+#68 C:\Users\admin\Herd\AO\backend\vendor\pestphp\pest\bin\pest(184): Pest\Kernel->handle(Array, Array)
+#69 C:\Users\admin\Herd\AO\backend\vendor\pestphp\pest\bin\pest(192): {closure:C:\Users\admin\Herd\AO\backend\vendor\pestphp\pest\bin\pest:18}()
+#70 C:\Users\admin\Herd\AO\backend\vendor\bin\pest(119): include('C:\\Users\\admin\\...')
+#71 {main}
+
+----------------------------------------------------------------------------------
+
+SQLSTATE[HY000]: General error: 1 no such column: bookings.guest_guest_id (Connection: sqlite, Database: tests.sqlite, SQL: select * from "bookings" where "bookings"."guest_guest_id" in (?))
+
+  at tests\Feature\AuthApiTest.php:23
+     19Ôûò             'first_name' => 'John',
+     20Ôûò             'last_name' => 'Doe',
+     21Ôûò         ]);
+     22Ôûò 
+  Ô×£  23Ôûò         $response->assertStatus(201);
+     24Ôûò         $response->assertJsonStructure(['message', 'guest', 'access_token']);
+     25Ôûò         $this->assertDatabaseHas('guests', ['email' => 'newuser@example.com']);
+     26Ôûò     }
+     27Ôûò
+
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ  
+   FAILED  Tests\Feature\AuthApiTest > can verify email with valid token                               ErrorException   
+  Attempt to read property "email_verified_at" on null
+
+  at tests\Feature\AuthApiTest.php:111
+    107Ôûò             'token' => 'valid_token_123',
+    108Ôûò         ]);
+    109Ôûò 
+    110Ôûò         $response->assertStatus(200);
+  Ô×£ 111Ôûò         $this->assertNotNull($guest->fresh()->email_verified_at);
+    112Ôûò     }
+    113Ôûò 
+    114Ôûò     public function test_cannot_access_protected_routes_without_token()
+    115Ôûò     {
+
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ  
+   FAILED  Tests\Feature\BookingApiTest > search availability returns available rooms                                   
+  Expected response status code [200] but received 500.
+Failed asserting that 500 is identical to 200.
+
+The following exception occurred during the last request:
+
+PDOException: SQLSTATE[HY000]: General error: 1 no such column: rooms.room_type_room_type_id in C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Connection.php:421
+Stack trace:
+#0 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Connection.php(421): PDO->prepare('select * from "...')
+#1 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Connection.php(830): Illuminate\Database\Connection->{closure:Illuminate\Database\Connection::select():412}('select * from "...', Array)
+#2 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Connection.php(797): Illuminate\Database\Connection->runQueryCallback('select * from "...', Array, Object(Closure))
+#3 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Connection.php(412): Illuminate\Database\Connection->run('select * from "...', Array, Object(Closure))
+#4 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php(3562): Illuminate\Database\Connection->select('select * from "...', Array, true, Array)
+#5 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php(3546): Illuminate\Database\Query\Builder->runSelect()
+#6 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php(907): Illuminate\Database\Query\Builder->get(Array)
+#7 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php(889): Illuminate\Database\Eloquent\Builder->getModels(Array)
+#8 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Relation.php(212): Illuminate\Database\Eloquent\Builder->get(Array)
+#9 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Relation.php(175): Illuminate\Database\Eloquent\Relations\Relation->get()
+#10 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php(955): Illuminate\Database\Eloquent\Relations\Relation->getEager()
+#11 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php(924): Illuminate\Database\Eloquent\Builder->eagerLoadRelation(Array, 'rooms', Object(Closure))
+#12 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php(890): Illuminate\Database\Eloquent\Builder->eagerLoadRelations(Array)
+#13 C:\Users\admin\Herd\AO\backend\app\Repositories\EloquentBookingRepository.php(184): Illuminate\Database\Eloquent\Builder->get()
+#14 C:\Users\admin\Herd\AO\backend\app\Actions\Bookings\CheckBookingAvailability.php(15): App\Repositories\EloquentBookingRepository->getAvailableRooms('a65a7eae-7a41-4...', '2026-06-01', '2026-06-03')
+#15 C:\Users\admin\Herd\AO\backend\app\Http\Controllers\Api\BookingController.php(144): App\Actions\Bookings\CheckBookingAvailability->handle('a65a7eae-7a41-4...', '2026-06-01', '2026-06-03')
+#16 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Controller.php(54): App\Http\Controllers\Api\BookingController->availability(Object(App\Http\Requests\Api\Booking\CheckAvailabilityRequest))
+#17 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\ControllerDispatcher.php(43): Illuminate\Routing\Controller->callAction('availability', Array)
+#18 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Route.php(269): Illuminate\Routing\ControllerDispatcher->dispatch(Object(Illuminate\Routing\Route), Object(App\Http\Controllers\Api\BookingController), 'availability')
+#19 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Route.php(215): Illuminate\Routing\Route->runController()
+#20 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Router.php(822): Illuminate\Routing\Route->run()
+#21 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(180): Illuminate\Routing\Router->{closure:Illuminate\Routing\Router::runRouteWithinStack():821}(Object(Illuminate\Http\Request))
+#22 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Middleware\SubstituteBindings.php(52): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}(Object(Illuminate\Http\Request))
+#23 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Routing\Middleware\SubstituteBindings->handle(Object(Illuminate\Http\Request), Object(Closure))
+#24 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#25 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Router.php(821): Illuminate\Pipeline\Pipeline->then(Object(Closure))
+#26 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Router.php(800): Illuminate\Routing\Router->runRouteWithinStack(Object(Illuminate\Routing\Route), Object(Illuminate\Http\Request))
+#27 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Router.php(764): Illuminate\Routing\Router->runRoute(Object(Illuminate\Http\Request), Object(Illuminate\Routing\Route))
+#28 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Router.php(753): Illuminate\Routing\Router->dispatchToRoute(Object(Illuminate\Http\Request))
+#29 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(200): Illuminate\Routing\Router->dispatch(Object(Illuminate\Http\Request))
+#30 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(180): Illuminate\Foundation\Http\Kernel->{closure:Illuminate\Foundation\Http\Kernel::dispatchToRouter():197}(Object(Illuminate\Http\Request))
+#31 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}(Object(Illuminate\Http\Request))
+#32 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull.php(31): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle(Object(Illuminate\Http\Request), Object(Closure))
+#33 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull->handle(Object(Illuminate\Http\Request), Object(Closure))
+#34 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#35 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TrimStrings.php(51): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle(Object(Illuminate\Http\Request), Object(Closure))
+#36 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\TrimStrings->handle(Object(Illuminate\Http\Request), Object(Closure))
+#37 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Http\Middleware\ValidatePostSize.php(27): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#38 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\ValidatePostSize->handle(Object(Illuminate\Http\Request), Object(Closure))
+#39 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance.php(109): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#40 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance->handle(Object(Illuminate\Http\Request), Object(Closure))
+#41 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Http\Middleware\TrustProxies.php(58): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#42 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\TrustProxies->handle(Object(Illuminate\Http\Request), Object(Closure))
+#43 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks.php(22): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#44 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks->handle(Object(Illuminate\Http\Request), Object(Closure))
+#45 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Http\Middleware\ValidatePathEncoding.php(28): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#46 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\ValidatePathEncoding->handle(Object(Illuminate\Http\Request), Object(Closure))
+#47 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Http\Middleware\HandleCors.php(74): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#48 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\HandleCors->handle(Object(Illuminate\Http\Request), Object(Closure))
+#49 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#50 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(175): Illuminate\Pipeline\Pipeline->then(Object(Closure))
+#51 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(144): Illuminate\Foundation\Http\Kernel->sendRequestThroughRouter(Object(Illuminate\Http\Request))
+#52 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php(607): Illuminate\Foundation\Http\Kernel->handle(Object(Illuminate\Http\Request))
+#53 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php(573): Illuminate\Foundation\Testing\TestCase->call('GET', '/api/bookings/a...', Array, Array, Array, Array, '[]')
+#54 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php(381): Illuminate\Foundation\Testing\TestCase->json('GET', '/api/bookings/a...', Array, Array, 0)
+#55 C:\Users\admin\Herd\AO\backend\tests\Feature\BookingApiTest.php(55): Illuminate\Foundation\Testing\TestCase->getJson('/api/bookings/a...')
+#56 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestCase.php(1332): Tests\Feature\BookingApiTest->test_search_availability_returns_available_rooms()
+#57 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestCase.php(519): PHPUnit\Framework\TestCase->runTest()
+#58 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestRunner\TestRunner.php(99): PHPUnit\Framework\TestCase->runBare()
+#59 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestCase.php(359): PHPUnit\Framework\TestRunner->run(Object(Tests\Feature\BookingApiTest))
+#60 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestCase->run()
+#61 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+#62 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+#63 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\TextUI\TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+#64 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\TextUI\Application.php(229): PHPUnit\TextUI\TestRunner->run(Object(PHPUnit\TextUI\Configuration\Configuration), Object(PHPUnit\Runner\ResultCache\DefaultResultCache), Object(PHPUnit\Framework\TestSuite))
+#65 C:\Users\admin\Herd\AO\backend\vendor\pestphp\pest\src\Kernel.php(103): PHPUnit\TextUI\Application->run(Array)
+#66 C:\Users\admin\Herd\AO\backend\vendor\pestphp\pest\bin\pest(184): Pest\Kernel->handle(Array, Array)
+#67 C:\Users\admin\Herd\AO\backend\vendor\pestphp\pest\bin\pest(192): {closure:C:\Users\admin\Herd\AO\backend\vendor\pestphp\pest\bin\pest:18}()
+#68 C:\Users\admin\Herd\AO\backend\vendor\bin\pest(119): include('C:\\Users\\admin\\...')
+#69 {main}
+
+Next Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 no such column: rooms.room_type_room_type_id (Connection: sqlite, Database: tests.sqlite, SQL: select * from "rooms" where "rooms"."room_type_room_type_id" in (?)) in C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Connection.php:841
+Stack trace:
+#0 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Connection.php(797): Illuminate\Database\Connection->runQueryCallback('select * from "...', Array, Object(Closure))
+#1 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Connection.php(412): Illuminate\Database\Connection->run('select * from "...', Array, Object(Closure))
+#2 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php(3562): Illuminate\Database\Connection->select('select * from "...', Array, true, Array)
+#3 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Query\Builder.php(3546): Illuminate\Database\Query\Builder->runSelect()
+#4 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php(907): Illuminate\Database\Query\Builder->get(Array)
+#5 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php(889): Illuminate\Database\Eloquent\Builder->getModels(Array)
+#6 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Relation.php(212): Illuminate\Database\Eloquent\Builder->get(Array)
+#7 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Relations\Relation.php(175): Illuminate\Database\Eloquent\Relations\Relation->get()
+#8 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php(955): Illuminate\Database\Eloquent\Relations\Relation->getEager()
+#9 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php(924): Illuminate\Database\Eloquent\Builder->eagerLoadRelation(Array, 'rooms', Object(Closure))
+#10 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Database\Eloquent\Builder.php(890): Illuminate\Database\Eloquent\Builder->eagerLoadRelations(Array)
+#11 C:\Users\admin\Herd\AO\backend\app\Repositories\EloquentBookingRepository.php(184): Illuminate\Database\Eloquent\Builder->get()
+#12 C:\Users\admin\Herd\AO\backend\app\Actions\Bookings\CheckBookingAvailability.php(15): App\Repositories\EloquentBookingRepository->getAvailableRooms('a65a7eae-7a41-4...', '2026-06-01', '2026-06-03')
+#13 C:\Users\admin\Herd\AO\backend\app\Http\Controllers\Api\BookingController.php(144): App\Actions\Bookings\CheckBookingAvailability->handle('a65a7eae-7a41-4...', '2026-06-01', '2026-06-03')
+#14 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Controller.php(54): App\Http\Controllers\Api\BookingController->availability(Object(App\Http\Requests\Api\Booking\CheckAvailabilityRequest))
+#15 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\ControllerDispatcher.php(43): Illuminate\Routing\Controller->callAction('availability', Array)
+#16 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Route.php(269): Illuminate\Routing\ControllerDispatcher->dispatch(Object(Illuminate\Routing\Route), Object(App\Http\Controllers\Api\BookingController), 'availability')
+#17 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Route.php(215): Illuminate\Routing\Route->runController()
+#18 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Router.php(822): Illuminate\Routing\Route->run()
+#19 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(180): Illuminate\Routing\Router->{closure:Illuminate\Routing\Router::runRouteWithinStack():821}(Object(Illuminate\Http\Request))
+#20 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Middleware\SubstituteBindings.php(52): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}(Object(Illuminate\Http\Request))
+#21 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Routing\Middleware\SubstituteBindings->handle(Object(Illuminate\Http\Request), Object(Closure))
+#22 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#23 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Router.php(821): Illuminate\Pipeline\Pipeline->then(Object(Closure))
+#24 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Router.php(800): Illuminate\Routing\Router->runRouteWithinStack(Object(Illuminate\Routing\Route), Object(Illuminate\Http\Request))
+#25 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Router.php(764): Illuminate\Routing\Router->runRoute(Object(Illuminate\Http\Request), Object(Illuminate\Routing\Route))
+#26 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Routing\Router.php(753): Illuminate\Routing\Router->dispatchToRoute(Object(Illuminate\Http\Request))
+#27 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(200): Illuminate\Routing\Router->dispatch(Object(Illuminate\Http\Request))
+#28 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(180): Illuminate\Foundation\Http\Kernel->{closure:Illuminate\Foundation\Http\Kernel::dispatchToRouter():197}(Object(Illuminate\Http\Request))
+#29 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}(Object(Illuminate\Http\Request))
+#30 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull.php(31): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle(Object(Illuminate\Http\Request), Object(Closure))
+#31 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull->handle(Object(Illuminate\Http\Request), Object(Closure))
+#32 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#33 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\TrimStrings.php(51): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle(Object(Illuminate\Http\Request), Object(Closure))
+#34 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\TrimStrings->handle(Object(Illuminate\Http\Request), Object(Closure))
+#35 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Http\Middleware\ValidatePostSize.php(27): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#36 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\ValidatePostSize->handle(Object(Illuminate\Http\Request), Object(Closure))
+#37 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance.php(109): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#38 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance->handle(Object(Illuminate\Http\Request), Object(Closure))
+#39 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Http\Middleware\TrustProxies.php(58): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#40 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\TrustProxies->handle(Object(Illuminate\Http\Request), Object(Closure))
+#41 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks.php(22): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#42 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks->handle(Object(Illuminate\Http\Request), Object(Closure))
+#43 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Http\Middleware\ValidatePathEncoding.php(28): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#44 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\ValidatePathEncoding->handle(Object(Illuminate\Http\Request), Object(Closure))
+#45 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Http\Middleware\HandleCors.php(74): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#46 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(219): Illuminate\Http\Middleware\HandleCors->handle(Object(Illuminate\Http\Request), Object(Closure))
+#47 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Pipeline\Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}(Object(Illuminate\Http\Request))
+#48 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(175): Illuminate\Pipeline\Pipeline->then(Object(Closure))
+#49 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Http\Kernel.php(144): Illuminate\Foundation\Http\Kernel->sendRequestThroughRouter(Object(Illuminate\Http\Request))
+#50 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php(607): Illuminate\Foundation\Http\Kernel->handle(Object(Illuminate\Http\Request))
+#51 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php(573): Illuminate\Foundation\Testing\TestCase->call('GET', '/api/bookings/a...', Array, Array, Array, Array, '[]')
+#52 C:\Users\admin\Herd\AO\backend\vendor\laravel\framework\src\Illuminate\Foundation\Testing\Concerns\MakesHttpRequests.php(381): Illuminate\Foundation\Testing\TestCase->json('GET', '/api/bookings/a...', Array, Array, 0)
+#53 C:\Users\admin\Herd\AO\backend\tests\Feature\BookingApiTest.php(55): Illuminate\Foundation\Testing\TestCase->getJson('/api/bookings/a...')
+#54 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestCase.php(1332): Tests\Feature\BookingApiTest->test_search_availability_returns_available_rooms()
+#55 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestCase.php(519): PHPUnit\Framework\TestCase->runTest()
+#56 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestRunner\TestRunner.php(99): PHPUnit\Framework\TestCase->runBare()
+#57 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestCase.php(359): PHPUnit\Framework\TestRunner->run(Object(Tests\Feature\BookingApiTest))
+#58 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestCase->run()
+#59 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+#60 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\Framework\TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+#61 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\TextUI\TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+#62 C:\Users\admin\Herd\AO\backend\vendor\phpunit\phpunit\src\TextUI\Application.php(229): PHPUnit\TextUI\TestRunner->run(Object(PHPUnit\TextUI\Configuration\Configuration), Object(PHPUnit\Runner\ResultCache\DefaultResultCache), Object(PHPUnit\Framework\TestSuite))
+#63 C:\Users\admin\Herd\AO\backend\vendor\pestphp\pest\src\Kernel.php(103): PHPUnit\TextUI\Application->run(Array)
+#64 C:\Users\admin\Herd\AO\backend\vendor\pestphp\pest\bin\pest(184): Pest\Kernel->handle(Array, Array)
+#65 C:\Users\admin\Herd\AO\backend\vendor\pestphp\pest\bin\pest(192): {closure:C:\Users\admin\Herd\AO\backend\vendor\pestphp\pest\bin\pest:18}()
+#66 C:\Users\admin\Herd\AO\backend\vendor\bin\pest(119): include('C:\\Users\\admin\\...')
+#67 {main}
+
+----------------------------------------------------------------------------------
+
+SQLSTATE[HY000]: General error: 1 no such column: rooms.room_type_room_type_id (Connection: sqlite, Database: tests.sqlite, SQL: select * from "rooms" where "rooms"."room_type_room_type_id" in (?))
+
+  at tests\Feature\BookingApiTest.php:57
+     53Ôûò     public function test_search_availability_returns_available_rooms()
+     54Ôûò     {
+     55Ôûò         $response = $this->getJson('/api/bookings/availability?property_id='.$this->property->id.'&check_in=2026-06-01&check_out=2026-06-03');
+     56Ôûò 
+  Ô×£  57Ôûò         $response->assertStatus(200);
+     58Ôûò         $response->assertJsonStructure(['data']);
+     59Ôûò     }
+     60Ôûò 
+     61Ôûò     public function test_create_booking_requires_authentication()
+
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ  
+   FAILED  Tests\Feature\BookingApiTest > booking creation with valid data                                              
+  Expected response status code [201] but received 401.
+Failed asserting that 401 is identical to 201.
+
+  at tests\Feature\BookingApiTest.php:99
+     95Ôûò                 'check_out_date' => '2026-06-03',
+     96Ôûò                 'guest_count' => 2,
+     97Ôûò             ]);
+     98Ôûò 
+  Ô×£  99Ôûò         $response->assertStatus(201);
+    100Ôûò     }
+    101Ôûò 
+    102Ôûò     public function test_cannot_create_booking_for_unavailable_dates()
+    103Ôûò     {
+
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ  
+   FAILED  Tests\Feature\BookingApiTest > cannot create booking for unavailable dates                                   
+  Expected response status code [400] but received 401.
+Failed asserting that 401 is identical to 400.
+
+  at tests\Feature\BookingApiTest.php:146
+    142Ôûò                 'check_out_date' => '2026-06-03',
+    143Ôûò                 'guest_count' => 2,
+    144Ôûò             ]);
+    145Ôûò 
+  Ô×£ 146Ôûò         $response->assertStatus(400);
+    147Ôûò     }
+    148Ôûò }
+    149Ôûò
+
+
+  Tests:    5 failed, 8 passed (18 assertions)
+  Duration: 4.21s
+

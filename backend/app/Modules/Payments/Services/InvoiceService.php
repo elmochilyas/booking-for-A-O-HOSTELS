@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Modules\Payments\Services;
 
 use App\Models\Booking;
@@ -19,7 +21,7 @@ class InvoiceService
         }
 
         $payments = Payment::where('booking_id', $bookingId)
-            ->where('status', 'success')
+            ->where('status', 'completed')
             ->get();
 
         $invoiceNumber = $this->generateInvoiceNumber($bookingId);

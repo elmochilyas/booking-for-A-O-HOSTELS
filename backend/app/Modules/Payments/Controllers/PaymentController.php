@@ -1,34 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Modules\Payments\Controllers;
 
-use App\Modules\Payments\Services\PaymentService;
+use App\Actions\Payments\ConfirmPayment;
+use App\Actions\Payments\CreatePaymentIntent;
+use App\Actions\Payments\GetBookingPayments;
+use App\Actions\Payments\GetPaymentBreakdown;
+use App\Actions\Payments\ProcessRefund;
+use App\Http\Requests\Modules\Payments\ConfirmPaymentRequest;
+use App\Http\Requests\Modules\Payments\CreatePaymentIntentRequest;
+use App\Http\Requests\Modules\Payments\GetPaymentBreakdownRequest;
+use App\Http\Requests\Modules\Payments\ProcessRefundRequest;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Routing\Controller;
 
-class PaymentController
+class PaymentController extends Controller
 {
-    private PaymentService $paymentService;
-
-    public function __construct(PaymentService $paymentService)
+    public function createPaymentIntent(CreatePaymentIntentRequest $request, CreatePaymentIntent $action): JsonResponse
     {
-        $this->paymentService = $paymentService;
-    }
-
-    public function createPaymentIntent(Request $request): JsonResponse
-    {
-        $validator = Validator::make($request->all(), [
-            'booking_id' => 'required|uuid|exists:bookings,id',
-            'is_deposit' => 'nullable|boolean',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $result = $this->paymentService->createPaymentIntent(
-            $request->booking_id,
+        $result = $action->handle(
+            $request->validated('booking_id'),
             $request->boolean('is_deposit', true)
         );
 
@@ -39,17 +32,9 @@ class PaymentController
         return response()->json($result);
     }
 
-    public function confirmPayment(Request $request): JsonResponse
+    public function confirmPayment(ConfirmPaymentRequest $request, ConfirmPayment $action): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'payment_id' => 'required|uuid',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $result = $this->paymentService->confirmPayment($request->payment_id);
+        $result = $action->handle($request->validated('payment_id'));
 
         if (! $result['success']) {
             return response()->json($result, 400);
@@ -58,10 +43,10 @@ class PaymentController
         return response()->json($result);
     }
 
-    public function getPaymentDetails(string $bookingId): JsonResponse
+    public function getPaymentDetails(string $bookingId, GetBookingPayments $action): JsonResponse
     {
-        $payments = $this->paymentService->getPaymentByBooking($bookingId);
-        $totalPaid = $this->paymentService->calculateTotalPaid($bookingId);
+        $payments = $action->handle($bookingId);
+        $totalPaid = $action->calculateTotalPaid($bookingId);
 
         return response()->json([
             'payments' => $payments,
@@ -69,17 +54,9 @@ class PaymentController
         ]);
     }
 
-    public function processRefund(Request $request): JsonResponse
+    public function processRefund(ProcessRefundRequest $request, ProcessRefund $action): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'payment_id' => 'required|uuid',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $result = $this->paymentService->processRefund($request->payment_id);
+        $result = $action->handle($request->validated('payment_id'));
 
         if (! $result['success']) {
             return response()->json($result, 400);
@@ -88,21 +65,13 @@ class PaymentController
         return response()->json($result);
     }
 
-    public function getPaymentBreakdown(Request $request): JsonResponse
+    public function getPaymentBreakdown(GetPaymentBreakdownRequest $request, GetPaymentBreakdown $action): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'total_price' => 'required|numeric|min:0',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $deposit = $this->paymentService->getDepositAmount($request->total_price);
-        $balance = $this->paymentService->getBalanceAmount($request->total_price);
+        $deposit = $action->getDepositAmount($request->validated('total_price'));
+        $balance = $action->getBalanceAmount($request->validated('total_price'));
 
         return response()->json([
-            'total_price' => $request->total_price,
+            'total_price' => $request->validated('total_price'),
             'deposit' => $deposit,
             'balance_at_property' => $balance,
             'deposit_percentage' => 20,

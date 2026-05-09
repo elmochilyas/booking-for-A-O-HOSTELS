@@ -1,0 +1,93 @@
+﻿<?php>
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Default AI Provider
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Always configure provider failover in config/ai.php
+    | ÔÇö never rely on a single provider.
+    |
+    */
+
+    'default' => env('AI_PROVIDER', 'openai'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-02: Tools used by agents are injected via DI
+    | ÔÇö never instantiated inside the Agent.
+    |
+    */
+
+    'providers' => [
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'model' => env('OPENAI_MODEL', 'gpt-4'),
+            'embedding_model' => env('OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        ],
+
+        'anthropic' => [
+            'driver' => 'anthropic',
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-3-opus'),
+        ],
+
+        'gemini' => [
+            'driver' => 'gemini',
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-pro'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Provider Failover
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-03: Configure failover ÔÇö never rely on single provider.
+    |
+    */
+
+    'failover' => ['openai', 'anthropic', 'gemini'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fake Provider for Testing
+    |--------------------------------------------------------------------------
+    |
+    | RULE AI-08: Test AI features using fake providers
+    | ÔÇö never call real AI APIs in tests.
+    |
+    */
+
+    'testing' => [
+        'driver' => 'fake',
+    ],
+];
+
+   Illuminate\Contracts\Container\BindingResolutionException 
+
+  Target class [App\Actions\Properties\UpdateProperty] does not exist.
+
+  at vendor\laravel\framework\src\Illuminate\Container\Container.php:1127
+    1123Ôûò 
+    1124Ôûò         try {
+    1125Ôûò             $reflector = new ReflectionClass($concrete);
+    1126Ôûò         } catch (ReflectionException $e) {
+  Ô×£ 1127Ôûò             throw new BindingResolutionException("Target class [$concrete] does not exist.", 0, $e);
+    1128Ôûò         }
+    1129Ôûò 
+    1130Ôûò         // If the type is not instantiable, the developer is attempting to resolve
+    1131Ôûò         // an abstract type such as an Interface or Abstract Class and there is
+
+  1   [internal]:0
+      Illuminate\Foundation\Console\RouteListCommand::{closure:Illuminate\Foundation\Console\RouteListCommand::getRoutes():117}(Object(Illuminate\Routing\Route))
+
+  2   vendor\laravel\framework\src\Illuminate\Container\Container.php:1125
+      ReflectionException::("Class "App\Actions\Properties\UpdateProperty" does not exist")
+

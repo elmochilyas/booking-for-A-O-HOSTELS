@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Modules\Admin\Services;
 
 use App\Models\AdminPermission;
@@ -352,7 +354,7 @@ class AdminManagementService
 
         $revenue = Payment::whereHas('booking', function ($q) use ($propertyId) {
             $q->where('property_id', $propertyId);
-        })->where('status', 'success')->sum('amount');
+        })->where('status', 'completed')->sum('amount');
 
         return [
             'occupancy_rate' => round($occupancyRate, 1),
@@ -415,7 +417,7 @@ class AdminManagementService
     public function processRefund(string $bookingId, ?float $amount = null, ?string $reason = null): Payment
     {
         $booking = Booking::findOrFail($bookingId);
-        $payment = $booking->payments()->where('status', 'success')->firstOrFail();
+        $payment = $booking->payments()->where('status', 'completed')->firstOrFail();
 
         $refundAmount = $amount ?? $payment->amount;
 
@@ -556,7 +558,7 @@ class AdminManagementService
 
     public function getRevenueDashboard(?string $propertyId = null, ?string $startDate = null, ?string $endDate = null): array
     {
-        $query = Payment::where('status', 'success');
+        $query = Payment::where('status', 'completed');
 
         if ($propertyId) {
             $query->whereHas('booking', fn ($q) => $q->where('property_id', $propertyId));

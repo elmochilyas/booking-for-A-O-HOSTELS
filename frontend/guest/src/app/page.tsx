@@ -104,13 +104,26 @@ function getPropertyMarkers(properties: any[] | undefined): any[] {
     }))
 }
 
+const TODAY = new Date().toISOString().split('T')[0]
+const MAX_DATE = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+
+function addDays(dateStr: string, days: number): string {
+  const d = new Date(dateStr)
+  d.setDate(d.getDate() + days)
+  return d.toISOString().split('T')[0]
+}
+
 export default function Homepage() {
   const { data: properties, isLoading, error } = useProperties(undefined, { lightweight: true })
-  
+
   const cities = getCityDataFromProperties(properties)
   const markers = getPropertyMarkers(properties)
   const [rotatingCity, setRotatingCity] = useState(0)
   const [activeRoomTab, setActiveRoomTab] = useState(0)
+  const [checkIn, setCheckIn] = useState('')
+  const [checkOut, setCheckOut] = useState('')
+
+  const checkOutMin = checkIn ? addDays(checkIn, 1) : addDays(TODAY, 1)
 
   const rotatingCities = ['Berlin', 'Vienna', 'Prague']
 
@@ -164,61 +177,131 @@ export default function Homepage() {
             </p>
           </div>
 
-          {/* Search Bar - Enhanced Glass Effect */}
-          <div className="max-w-5xl mx-auto mt-8">
-            <form action="/search" className="bg-white/95 backdrop-blur-xl rounded-2xl p-3 shadow-2xl flex flex-col lg:flex-row gap-3 items-stretch lg:items-center border border-white/20">
-              <div className="flex-1 relative min-w-[200px]">
-                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-primary/60" />
-                <Input
-                  name="location"
-                  placeholder="Where are you going?"
-                  className="pl-12 h-14 border-0 focus-visible:ring-2 focus-visible:ring-primary/50 rounded-xl text-base bg-transparent"
-                />
+          {/* Search Bar */}
+          <div className="max-w-5xl mx-auto mt-10 px-4 lg:px-0">
+            <form action="/search" className="rounded-3xl overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.35)] ring-1 ring-white/20">
+
+              {/* Main fields */}
+              <div className="flex flex-col lg:flex-row bg-white">
+
+                {/* Destination */}
+                <label htmlFor="location" className="flex-[2] flex items-center gap-4 px-6 py-5 cursor-text border-b lg:border-b-0 lg:border-r border-gray-100 hover:bg-blue-50/40 transition-colors duration-150 group">
+                  <div className="shrink-0 w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/15 transition-colors">
+                    <MapPin className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="block text-[10px] font-bold uppercase tracking-[0.15em] text-primary/70 mb-0.5">Destination</span>
+                    <input
+                      id="location"
+                      name="location"
+                      placeholder="Where are you going?"
+                      className="w-full bg-transparent text-gray-900 placeholder-gray-300 text-[15px] font-semibold outline-none leading-tight"
+                    />
+                  </div>
+                </label>
+
+                {/* Check-in */}
+                <label htmlFor="check_in" className="flex-1 flex items-center gap-4 px-6 py-5 cursor-pointer border-b lg:border-b-0 lg:border-r border-gray-100 hover:bg-blue-50/40 transition-colors duration-150 group">
+                  <div className="shrink-0 w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/15 transition-colors">
+                    <Clock className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="block text-[10px] font-bold uppercase tracking-[0.15em] text-primary/70 mb-0.5">Check-in</span>
+                    <input
+                      id="check_in"
+                      name="check_in"
+                      type="date"
+                      min={TODAY}
+                      max={MAX_DATE}
+                      value={checkIn}
+                      onChange={(e) => {
+                        setCheckIn(e.target.value)
+                        if (checkOut && e.target.value >= checkOut) setCheckOut('')
+                      }}
+                      className="w-full bg-transparent text-gray-900 text-[15px] font-semibold outline-none leading-tight cursor-pointer"
+                    />
+                  </div>
+                </label>
+
+                {/* Check-out */}
+                <label htmlFor="check_out" className="flex-1 flex items-center gap-4 px-6 py-5 cursor-pointer border-b lg:border-b-0 lg:border-r border-gray-100 hover:bg-blue-50/40 transition-colors duration-150 group">
+                  <div className="shrink-0 w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/15 transition-colors">
+                    <Clock className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="block text-[10px] font-bold uppercase tracking-[0.15em] text-primary/70 mb-0.5">Check-out</span>
+                    <input
+                      id="check_out"
+                      name="check_out"
+                      type="date"
+                      min={checkOutMin}
+                      max={MAX_DATE}
+                      value={checkOut}
+                      onChange={(e) => setCheckOut(e.target.value)}
+                      className="w-full bg-transparent text-gray-900 text-[15px] font-semibold outline-none leading-tight cursor-pointer"
+                    />
+                  </div>
+                </label>
+
+                {/* Guests */}
+                <label htmlFor="guests" className="flex items-center gap-4 px-6 py-5 cursor-pointer hover:bg-blue-50/40 transition-colors duration-150 group">
+                  <div className="shrink-0 w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/15 transition-colors">
+                    <Users className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="min-w-[80px]">
+                    <span className="block text-[10px] font-bold uppercase tracking-[0.15em] text-primary/70 mb-0.5">Guests</span>
+                    <div className="flex items-baseline gap-1.5">
+                      <input
+                        id="guests"
+                        name="guests"
+                        type="number"
+                        defaultValue={2}
+                        min={1}
+                        max={20}
+                        className="w-8 bg-transparent text-gray-900 text-[15px] font-semibold outline-none leading-tight"
+                      />
+                      <span className="text-gray-400 text-[13px] font-medium">guests</span>
+                    </div>
+                  </div>
+                </label>
               </div>
-              <div className="h-px lg:h-8 w-full lg:w-px bg-border" />
-              <div className="relative flex-1 min-w-[160px]">
-                <Input
-                  name="check_in"
-                  type="date"
-                  className="h-14 w-full pl-4 rounded-xl border-0 bg-transparent text-base"
-                />
+
+              {/* Footer: perks + CTA */}
+              <div className="bg-gradient-to-r from-primary to-primary/80 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="flex flex-wrap gap-x-5 gap-y-1">
+                  {[
+                    { icon: Check, text: 'Free cancellation' },
+                    { icon: Check, text: 'No booking fees' },
+                    { icon: Shield, text: 'Secure & encrypted' },
+                  ].map((item, i) => (
+                    <span key={i} className="flex items-center gap-1.5 text-white/80 text-xs font-medium">
+                      <item.icon className="h-3.5 w-3.5 text-green-300" />
+                      {item.text}
+                    </span>
+                  ))}
+                </div>
+                <Button
+                  type="submit"
+                  className="h-11 px-8 rounded-xl text-sm font-bold bg-white text-primary hover:bg-blue-50 shadow-lg hover:shadow-xl transition-all duration-200 shrink-0 w-full sm:w-auto"
+                >
+                  <Search className="w-4 h-4 mr-2" />
+                  Search Hostels
+                </Button>
               </div>
-              <div className="relative flex-1 min-w-[160px]">
-                <Input
-                  name="check_out"
-                  type="date"
-                  className="h-14 w-full pl-4 rounded-xl border-0 bg-transparent text-base"
-                />
-              </div>
-              <div className="h-px lg:h-8 w-full lg:w-px bg-border" />
-              <div className="relative w-full lg:w-24">
-                <Input
-                  name="guests"
-                  type="number"
-                  defaultValue={1}
-                  min={1}
-                  className="h-14 w-full text-center rounded-xl border-0 bg-transparent text-base"
-                  aria-label="Number of guests"
-                />
-              </div>
-              <Button type="submit" size="lg" className="h-14 px-10 rounded-xl text-base font-semibold bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-300">
-                <Search className="w-5 h-5 mr-2" />
-                Search
-              </Button>
             </form>
           </div>
 
-          {/* Trust indicators - Enhanced */}
-          <div className="flex flex-wrap justify-center gap-6 mt-10 text-white/90 text-sm">
+          {/* Trust indicators */}
+          <div className="flex flex-wrap justify-center gap-3 mt-8 text-white/85 text-sm">
             {[
               { icon: Check, text: 'Free cancellation', color: 'text-green-400' },
-              { icon: Check, text: 'Best price guarantee', color: 'text-green-400' },
               { icon: Check, text: 'No booking fees', color: 'text-green-400' },
-              { icon: Star, text: '4.7★ on Google', color: 'text-yellow-400' }
+              { icon: Star, text: '4.7★ on Google', color: 'text-yellow-400' },
+              { icon: Shield, text: 'Secure payment', color: 'text-blue-300' },
             ].map((item, i) => (
-              <div key={i} className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
-                <item.icon className={`h-4 w-4 ${item.color}`} />
-                <span>{item.text}</span>
+              <div key={i} className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 border border-white/10">
+                <item.icon className={`h-3.5 w-3.5 ${item.color}`} />
+                <span className="text-xs font-medium">{item.text}</span>
               </div>
             ))}
           </div>
@@ -531,11 +614,9 @@ export default function Homepage() {
             <Badge variant="outline" className="mb-4 px-4 py-1">Discover</Badge>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">Explore Our Cities</h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              {error
-                ? 'Error loading locations. Please try again.'
-                : isLoading
-                ? 'Loading locations...'
-                : `${cities.length} cities across Europe with ${properties?.length || 0} real A&O hostels`}
+              {cities.length > 0
+                ? `${cities.length} cities across Europe with ${properties?.length || 0} real A&O hostels`
+                : '45+ hostels across Europe — explore the map to find your next stay.'}
             </p>
           </div>
 
@@ -546,7 +627,7 @@ export default function Homepage() {
           <div className="text-center mt-16">
             <Link href="/hostels">
               <Button size="lg" variant="outline" className="rounded-full px-10 py-6 text-base font-semibold hover:bg-primary hover:text-white transition-all duration-300">
-                View All {cities.length} Cities
+                {cities.length > 0 ? `View All ${cities.length} Cities` : 'View All Hostels'}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>

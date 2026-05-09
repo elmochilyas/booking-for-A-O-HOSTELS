@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature;
 
 use App\Models\Booking;
@@ -8,6 +10,7 @@ use App\Models\Property;
 use App\Models\Room;
 use App\Models\RoomType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class BookingApiTest extends TestCase
@@ -21,6 +24,7 @@ class BookingApiTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        Event::fake();
 
         $property = Property::create([
             'name' => 'A&O Berlin Hauptbahnhof',
@@ -104,7 +108,7 @@ class BookingApiTest extends TestCase
         $guest = Guest::create([
             'email' => 'test2@example.com',
             'password_hash' => bcrypt('password'),
-            'first_name' => 'Test',
+            'first_name' => 'Test2',
             'last_name' => 'User',
             'email_verified_at' => now(),
         ]);
@@ -123,7 +127,7 @@ class BookingApiTest extends TestCase
         $guest2 = Guest::create([
             'email' => 'test3@example.com',
             'password_hash' => bcrypt('password'),
-            'first_name' => 'Test2',
+            'first_name' => 'Test3',
             'last_name' => 'User',
             'email_verified_at' => now(),
         ]);

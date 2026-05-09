@@ -1,74 +1,57 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Illuminate\Support\Str;
 
+#[Table('properties')]
+#[Hidden(['created_at', 'updated_at'])]
 class Property extends Model
 {
-    protected $table = 'properties';
-
-    protected static function boot(): void
-    {
-        parent::boot();
-        static::creating(function ($model) {
-            if (empty($model->id)) {
-                $model->id = Str::uuid()->toString();
-            }
-        });
-    }
-
-    protected $keyType = 'string';
-
-    public $incrementing = false;
+    use HasFactory, HasUuids;
 
     protected $fillable = [
-        'id', 'name', 'slug', 'location', 'address', 'latitude', 'longitude',
-        'check_in_time', 'check_out_time', 'total_rooms', 'description',
-        'phone', 'email', 'images', 'amenities', 'rating', 'review_count',
-        'is_active', 'policies', 'photos',
+        'name', 'location', 'address', 'latitude', 'longitude',
+        'check_in_time', 'check_out_time', 'total_rooms',
+        'description', 'phone', 'email', 'images', 'rating', 'review_count',
     ];
 
     protected $casts = [
         'latitude' => 'decimal:6',
         'longitude' => 'decimal:6',
+        'check_in_time' => 'datetime:H:i',
+        'check_out_time' => 'datetime:H:i',
         'total_rooms' => 'integer',
         'rating' => 'decimal:1',
         'review_count' => 'integer',
+        'images' => 'array',
     ];
-
-    protected $hidden = ['created_at', 'updated_at'];
 
     public function roomTypes(): HasMany
     {
-        return $this->hasMany(RoomType::class, 'property_id');
+        return $this->hasMany(RoomType::class);
     }
 
-    public function rooms(): HasMany
+    public function rooms(): HasManyThrough
     {
-        return $this->hasMany(Room::class, 'property_id');
+        return $this->hasManyThrough(Room::class, RoomType::class);
     }
 
     public function bookings(): HasMany
     {
-        return $this->hasMany(Booking::class, 'property_id');
+        return $this->hasMany(Booking::class);
     }
 
     public function amenities(): HasMany
     {
-        return $this->hasMany(Amenity::class, 'property_id');
-    }
-
-    public function staff(): HasMany
-    {
-        return $this->hasMany(Staff::class, 'property_id');
-    }
-
-    public function reviews(): HasManyThrough
-    {
-        return $this->hasManyThrough(Review::class, Booking::class, 'property_id', 'booking_id');
+        return $this->hasMany(Amenity::class);
     }
 }

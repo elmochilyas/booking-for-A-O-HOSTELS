@@ -168,16 +168,17 @@ export const propertiesService = {
   },
 
   async getLightweight() {
-    const response = await api.get('/properties', { params: { lightweight: 1 } })
-    const raw = response.data?.properties ?? response.data ?? []
-    return raw.map((p: any) => ({
+    const response = await api.get('/properties/destinations')
+    const raw: Array<{ id: string; name: string; location: string; latitude: number; longitude: number; rating: number }> =
+      response.data?.destinations ?? []
+    return raw.map((p) => ({
       id: p.id,
       name: p.name,
       city: p.location,
       country: '',
-      latitude: parseFloat(p.latitude) || 0,
-      longitude: parseFloat(p.longitude) || 0,
-      starRating: parseFloat(p.rating) || 0,
+      latitude: p.latitude,
+      longitude: p.longitude,
+      starRating: p.rating,
       priceFrom: 0,
     }))
   },

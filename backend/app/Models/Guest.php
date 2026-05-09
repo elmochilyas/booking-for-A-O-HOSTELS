@@ -1,42 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
+use App\Enums\GuestStatus;
+use App\Observers\GuestObserver;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Str;
 
+#[Table('guests')]
+#[Hidden([
+    'password_hash', 'id_type', 'id_number',
+    'email_verified_at', 'created_at', 'updated_at',
+])]
+#[ObservedBy([GuestObserver::class])]
 class Guest extends Model
 {
-    protected $table = 'guests';
-
-    protected static function boot(): void
-    {
-        parent::boot();
-        static::creating(function ($model) {
-            if (empty($model->id)) {
-                $model->id = Str::uuid()->toString();
-            }
-        });
-    }
-
-    protected $keyType = 'string';
-
-    public $incrementing = false;
+    use HasFactory, HasUuids;
 
     protected $fillable = [
-        'id', 'email', 'password_hash', 'first_name', 'last_name',
+        'email', 'password_hash', 'first_name', 'last_name',
         'phone', 'country', 'date_of_birth', 'gender',
         'address', 'id_type', 'id_number',
         'email_verified_at', 'verification_token',
         'is_loyalty_member', 'loyalty_points',
         'notification_email', 'notification_sms',
         'is_banned', 'ban_reason', 'banned_at',
-    ];
-
-    protected $hidden = [
-        'password_hash', 'id_type', 'id_number',
-        'email_verified_at', 'created_at', 'updated_at',
     ];
 
     protected $casts = [
@@ -48,20 +43,21 @@ class Guest extends Model
         'notification_sms' => 'boolean',
         'is_banned' => 'boolean',
         'banned_at' => 'datetime',
+        'status' => GuestStatus::class,
     ];
 
     public function bookings(): HasMany
     {
-        return $this->hasMany(Booking::class, 'guest_id');
+        return $this->hasMany(Booking::class);
     }
 
     public function reviews(): HasMany
     {
-        return $this->hasMany(Review::class, 'guest_id');
+        return $this->hasMany(Review::class);
     }
 
     public function payments(): HasMany
     {
-        return $this->hasMany(Payment::class, 'guest_id');
+        return $this->hasMany(Payment::class);
     }
 }

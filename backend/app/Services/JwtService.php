@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\Guest;
 use App\Models\Staff;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use Illuminate\Support\Facades\Cache;
 
 class JwtService
 {
@@ -15,11 +18,14 @@ class JwtService
 
     private int $refreshTtl;
 
-    private static array $blacklistedTokens = [];
-
     public function __construct()
     {
-        $this->secretKey = config('app.jwt_secret', env('JWT_SECRET', 'default-secret-key'));
+        $this->secretKey = config('app.jwt_secret') ?? env('JWT_SECRET');
+
+        if (empty($this->secretKey)) {
+            throw new \RuntimeException('JWT_SECRET is not configured. Please set it in .env or config/app.php');
+        }
+
         $this->ttl = config('app.jwt_ttl', 15);
         $this->refreshTtl = config('app.jwt_refresh_ttl', 20160);
     }
@@ -27,23 +33,14 @@ class JwtService
     public function blacklistToken(string $token, int $expiresAt): void
     {
         $key = hash('sha256', $token);
-        self::$blacklistedTokens[$key] = $expiresAt;
+        Cache::put("jwt_blacklist:{$key}", true, $expiresAt - time());
     }
 
     public function isBlacklisted(string $token): bool
     {
         $key = hash('sha256', $token);
-        if (isset(self::$blacklistedTokens[$key])) {
-            if (self::$blacklistedTokens[$key] < time()) {
-                unset(self::$blacklistedTokens[$key]);
 
-                return false;
-            }
-
-            return true;
-        }
-
-        return false;
+        return Cache::has("jwt_blacklist:{$key}");
     }
 
     public function generateToken(Guest $guest): string

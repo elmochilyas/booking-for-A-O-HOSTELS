@@ -1,109 +1,80 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Modules\Staff\Controllers;
 
-use App\Modules\Staff\Services\StaffService;
+use App\Actions\Staff\CreateStaff;
+use App\Actions\Staff\DeleteStaff;
+use App\Actions\Staff\GetStaffDashboard;
+use App\Actions\Staff\ListStaff;
+use App\Actions\Staff\ToggleActive;
+use App\Actions\Staff\UpdateStaff;
+use App\Contracts\Repositories\StaffRepositoryInterface;
+use App\DTO\CreateStaffDTO;
+use App\DTO\UpdateStaffDTO;
+use App\Http\Requests\Modules\Staff\ByPropertyRequest;
+use App\Http\Requests\Modules\Staff\CreateStaffRequest;
+use App\Http\Requests\Modules\Staff\GetStaffRequest;
+use App\Http\Requests\Modules\Staff\ToggleActiveRequest;
+use App\Http\Requests\Modules\Staff\UpdateStaffRequest;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Routing\Controller;
 
-class StaffController
+class StaffController extends Controller
 {
-    private StaffService $staffService;
+    public function __construct(
+        private StaffRepositoryInterface $staffRepo,
+    ) {}
 
-    public function __construct(StaffService $staffService)
-    {
-        $this->staffService = $staffService;
-    }
-
-    public function index(Request $request): JsonResponse
+    public function index(GetStaffRequest $request, ListStaff $action): JsonResponse
     {
         $propertyId = $request->query('property_id');
-        $staff = $this->staffService->getAllStaff($propertyId);
+        $staff = $action->handle($propertyId);
 
         return response()->json(['data' => $staff]);
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(CreateStaffRequest $request, CreateStaff $action): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email|unique:staff,email',
-            'password' => 'required|string|min:8',
-            'first_name' => 'required|string|max:100',
-            'last_name' => 'required|string|max:100',
-            'role' => 'required|in:reception,manager,admin,superadmin',
-            'property_id' => 'nullable|uuid|exists:properties,id',
-        ]);
+        $staff = $action->handle(CreateStaffDTO::fromRequest($request));
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $staff = $this->staffService->createStaff($request->all());
-
-        return response()->json(['data' => $staff, 'message' => 'Staff created successfully'], 201);
+        return response()->json([
+            'data' => $staff,
+            'message' => 'Staff created successfully',
+        ], 201);
     }
 
     public function show(string $id): JsonResponse
     {
-        $staff = $this->staffService->getStaffById($id);
-
-        if (! $staff) {
-            return response()->json(['message' => 'Staff not found'], 404);
-        }
+        $staff = $this->staffRepo->findOrFail($id);
 
         return response()->json(['data' => $staff]);
     }
 
-    public function update(Request $request, string $id): JsonResponse
+    public function update(UpdateStaffRequest $request, string $id, UpdateStaff $action): JsonResponse
     {
-        $staff = $this->staffService->getStaffById($id);
+        $staff = $this->staffRepo->findOrFail($id);
+        $staff = $action->handle($staff, UpdateStaffDTO::fromRequest($request));
 
-        if (! $staff) {
-            return response()->json(['message' => 'Staff not found'], 404);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'email' => 'sometimes|email|unique:staff,email,'.$id,
-            'password' => 'sometimes|string|min:8',
-            'first_name' => 'sometimes|string|max:100',
-            'last_name' => 'sometimes|string|max:100',
-            'role' => 'sometimes|in:reception,manager,admin,superadmin',
-            'property_id' => 'nullable|uuid|exists:properties,id',
-            'is_active' => 'sometimes|boolean',
+        return response()->json([
+            'data' => $staff,
+            'message' => 'Staff updated successfully',
         ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $staff = $this->staffService->updateStaff($staff, $request->all());
-
-        return response()->json(['data' => $staff, 'message' => 'Staff updated successfully']);
     }
 
-    public function destroy(string $id): JsonResponse
+    public function destroy(string $id, DeleteStaff $action): JsonResponse
     {
-        $staff = $this->staffService->getStaffById($id);
-
-        if (! $staff) {
-            return response()->json(['message' => 'Staff not found'], 404);
-        }
-
-        $this->staffService->deleteStaff($staff);
+        $staff = $this->staffRepo->findOrFail($id);
+        $action->handle($staff);
 
         return response()->json(['message' => 'Staff deleted successfully']);
     }
 
-    public function toggleActive(string $id): JsonResponse
+    public function toggleActive(string $id, ToggleActiveRequest $request, ToggleActive $action): JsonResponse
     {
-        $staff = $this->staffService->getStaffById($id);
-
-        if (! $staff) {
-            return response()->json(['message' => 'Staff not found'], 404);
-        }
-
-        $staff = $this->staffService->toggleActive($staff);
+        $staff = $this->staffRepo->findOrFail($id);
+        $staff = $action->handle($staff);
 
         return response()->json([
             'data' => $staff,
@@ -111,10 +82,19 @@ class StaffController
         ]);
     }
 
-    public function byProperty(string $propertyId): JsonResponse
+    public function byProperty(ByPropertyRequest $request, ListStaff $action): JsonResponse
     {
-        $staff = $this->staffService->getStaffByProperty($propertyId);
+        $propertyId = $request->validated('property_id');
+        $staff = $action->handle($propertyId);
 
         return response()->json(['data' => $staff]);
+    }
+
+    public function dashboard(string $id, GetStaffDashboard $action): JsonResponse
+    {
+        $staff = $this->staffRepo->findOrFail($id);
+        $dashboard = $action->handle($staff);
+
+        return response()->json(['data' => $dashboard]);
     }
 }

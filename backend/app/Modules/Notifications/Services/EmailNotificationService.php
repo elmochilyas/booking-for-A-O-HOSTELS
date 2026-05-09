@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Modules\Notifications\Services;
 
 use App\Models\Booking;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class EmailNotificationService
@@ -117,12 +120,13 @@ class EmailNotificationService
                 $message->to($to)
                     ->subject($subject)
                     ->from(
-                        config('mail.from.address', 'noreply@ao-hostels.com'),
-                        config('mail.from.name', 'A&O Hostels')
+                        config('mail.from.address', as: 'string') ?? 'noreply@ao-hostels.com',
+                        config('mail.from.name', as: 'string') ?? 'A&O Hostels'
                     );
             });
         } catch (\Exception $e) {
-            \Log::error("Email send failed: {$e->getMessage()}");
+            Log::error("Email send failed: {$e->getMessage()}");
+            throw $e; // Re-throw to let callers know email failed
         }
     }
 }

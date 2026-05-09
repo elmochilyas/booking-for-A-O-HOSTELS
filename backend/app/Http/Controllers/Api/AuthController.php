@@ -1,103 +1,57 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api;
 
+use App\Actions\Auth\ForgotPasswordAction;
+use App\Actions\Auth\LoginGuestAction;
+use App\Actions\Auth\LogoutGuestAction;
+use App\Actions\Auth\RefreshTokenAction;
+use App\Actions\Auth\RegisterGuestAction;
+use App\Actions\Auth\ResetPasswordAction;
+use App\Actions\Auth\VerifyEmailAction;
+use App\DTO\CreateGuestDTO;
+use App\Exceptions\EmailNotVerifiedException;
+use App\Exceptions\InvalidCredentialsException;
+use App\Exceptions\InvalidTokenException;
 use App\Http\Controllers\Controller;
-use App\Models\Guest;
-use App\Services\EmailService;
-use App\Services\JwtService;
+use App\Http\Requests\Api\Auth\ForgotPasswordRequest;
+use App\Http\Requests\Api\Auth\LoginRequest;
+use App\Http\Requests\Api\Auth\RegisterRequest;
+use App\Http\Requests\Api\Auth\ResetPasswordRequest;
+use App\Http\Requests\Api\Auth\VerifyEmailRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
+use Illuminate\Routing\Attributes\Middleware;
 
+#[Middleware('guest')]
 class AuthController extends Controller
 {
-    public function __construct(
-        private JwtService $jwtService,
-        private EmailService $emailService,
-    ) {}
-
-    public function register(Request $request): JsonResponse
+    public function register(RegisterRequest $request, RegisterGuestAction $action): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email|unique:guests,email',
-            'password' => 'required|string|min:8',
-            'first_name' => 'required|string|max:100',
-            'last_name' => 'required|string|max:100',
-            'phone' => 'nullable|string|max:20',
-            'country' => 'nullable|string|max:100',
-            'date_of_birth' => 'nullable|date',
-        ]);
+        $dto = CreateGuestDTO::fromRequest($request);
+        $result = $action->handle($dto);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $data = $validator->validated();
-
-        $guest = Guest::create([
-            'id' => Str::uuid()->toString(),
-            'email' => $data['email'],
-            'password_hash' => Hash::make($data['password']),
-            'first_name' => $data['first_name'],
-            'last_name' => $data['last_name'],
-            'phone' => $data['phone'] ?? null,
-            'country' => $data['country'] ?? null,
-            'date_of_birth' => $data['date_of_birth'] ?? null,
-            'email_verified_at' => null,
-            'is_loyalty_member' => false,
-            'loyalty_points' => 0,
-        ]);
-
-        $verificationToken = $this->jwtService->generateEmailVerificationToken($guest);
-        $this->emailService->sendVerificationEmail($guest, $verificationToken);
-
-        $token = $this->jwtService->generateToken($guest);
-
-        return response()->json([
-            'message' => 'Registration successful. Please verify your email.',
-            'guest' => $guest->makeHidden(['password_hash']),
-            'access_token' => $token,
-            'token_type' => 'bearer',
-        ], 201);
+        return response()->json($result, 201);
     }
 
-    public function login(Request $request): JsonResponse
+    public function login(LoginRequest $request, LoginGuestAction $action): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
+        try {
+            $validated = $request->validated();
+            $result = $action->handle($validated['email'], $validated['password']);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $guest = Guest::where('email', $request->email)->first();
-
-        if (! $guest || ! Hash::check($request->password, $guest->password_hash)) {
+            return response()->json($result);
+        } catch (InvalidCredentialsException $e) {
             return response()->json(['error' => 'Invalid credentials'], 401);
-        }
-
-        if (! $guest->email_verified_at) {
+        } catch (EmailNotVerifiedException $e) {
             return response()->json(['error' => 'Email not verified'], 403);
         }
-
-        $token = $this->jwtService->generateToken($guest);
-        $refreshToken = $this->jwtService->generateRefreshToken($guest);
-
-        return response()->json([
-            'message' => 'Login successful',
-            'user' => $guest->makeHidden(['password_hash']),
-            'access_token' => $token,
-            'refresh_token' => $refreshToken,
-            'token_type' => 'bearer',
-        ]);
     }
 
-    public function refresh(Request $request): JsonResponse
+    #[Middleware('auth.jwt')]
+    public function refresh(Request $request, RefreshTokenAction $action): JsonResponse
     {
         $refreshToken = $request->bearerToken();
 
@@ -106,120 +60,50 @@ class AuthController extends Controller
         }
 
         try {
-            $decoded = $this->jwtService->verifyToken($refreshToken);
-            $guest = Guest::find($decoded->sub);
+            $result = $action->handle($refreshToken);
 
-            if (! $guest) {
-                return response()->json(['error' => 'User not found'], 404);
-            }
-
-            $newToken = $this->jwtService->generateToken($guest);
-            $newRefreshToken = $this->jwtService->generateRefreshToken($guest);
-
-            return response()->json([
-                'access_token' => $newToken,
-                'refresh_token' => $newRefreshToken,
-                'token_type' => 'bearer',
-            ]);
+            return response()->json($result);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Invalid refresh token'], 401);
         }
     }
 
-    public function logout(Request $request): JsonResponse
+    #[Middleware('auth.jwt')]
+    public function logout(Request $request, LogoutGuestAction $action): JsonResponse
     {
         $token = $request->bearerToken();
+        $result = $action->handle($token);
 
-        if ($token) {
-            try {
-                $decoded = $this->jwtService->verifyToken($token);
-                $this->jwtService->blacklistToken($token, $decoded->exp ?? (time() + 3600));
-            } catch (\Exception $e) {
-            }
-        }
-
-        return response()->json(['message' => 'Logged out successfully']);
+        return response()->json($result);
     }
 
-    public function verifyEmail(Request $request): JsonResponse
+    #[Middleware('auth.jwt')]
+    public function verifyEmail(VerifyEmailRequest $request, VerifyEmailAction $action): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'token' => 'required|string',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $guest = Guest::where('verification_token', $request->token)->first();
-
-        if ($guest) {
-            $guest->update(['email_verified_at' => now(), 'verification_token' => null]);
-
-            return response()->json(['message' => 'Email verified successfully']);
-        }
-
         try {
-            $decoded = $this->jwtService->verifyEmailToken($request->token);
-            $guest = Guest::find($decoded->sub);
+            $result = $action->handle($request->input('token'));
 
-            if (! $guest) {
-                return response()->json(['error' => 'User not found'], 404);
-            }
-
-            $guest->update(['email_verified_at' => now()]);
-
-            return response()->json(['message' => 'Email verified successfully']);
-        } catch (\Exception $e) {
+            return response()->json($result);
+        } catch (InvalidTokenException $e) {
             return response()->json(['error' => 'Invalid or expired verification token'], 400);
         }
     }
 
-    public function forgotPassword(Request $request): JsonResponse
+    public function forgotPassword(ForgotPasswordRequest $request, ForgotPasswordAction $action): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-        ]);
+        $result = $action->handle($request->validated()['email']);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $guest = Guest::where('email', $request->email)->first();
-
-        if ($guest) {
-            $resetToken = $this->jwtService->generatePasswordResetToken($guest);
-            $this->emailService->sendPasswordResetEmail($guest, $resetToken);
-        }
-
-        return response()->json([
-            'message' => 'If the email exists, a password reset link has been sent.',
-        ]);
+        return response()->json($result);
     }
 
-    public function resetPassword(Request $request): JsonResponse
+    public function resetPassword(ResetPasswordRequest $request, ResetPasswordAction $action): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'token' => 'required|string',
-            'password' => 'required|string|min:8|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
         try {
-            $decoded = $this->jwtService->verifyPasswordResetToken($request->token);
-            $guest = Guest::find($decoded->sub);
+            $validated = $request->validated();
+            $result = $action->handle($validated['token'], $validated['password']);
 
-            if (! $guest) {
-                return response()->json(['error' => 'User not found'], 404);
-            }
-
-            $guest->update(['password_hash' => Hash::make($request->password)]);
-
-            return response()->json(['message' => 'Password reset successfully']);
-        } catch (\Exception $e) {
+            return response()->json($result);
+        } catch (InvalidTokenException $e) {
             return response()->json(['error' => 'Invalid or expired reset token'], 400);
         }
     }

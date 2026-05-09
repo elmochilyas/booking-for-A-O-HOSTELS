@@ -1,32 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Str;
 
+#[Table('room_types')]
+#[Hidden(['created_at', 'updated_at'])]
 class RoomType extends Model
 {
-    protected $table = 'room_types';
-
-    protected static function boot(): void
-    {
-        parent::boot();
-        static::creating(function ($model) {
-            if (empty($model->id)) {
-                $model->id = Str::uuid()->toString();
-            }
-        });
-    }
-
-    protected $keyType = 'string';
-
-    public $incrementing = false;
+    use HasFactory, HasUuids;
 
     protected $fillable = [
-        'id', 'property_id', 'name', 'capacity', 'base_price',
+        'property_id', 'name', 'capacity', 'base_price',
         'description', 'images', 'amenities', 'max_occupancy',
     ];
 
@@ -36,20 +29,18 @@ class RoomType extends Model
         'max_occupancy' => 'integer',
     ];
 
-    protected $hidden = ['created_at', 'updated_at'];
-
     public function property(): BelongsTo
     {
-        return $this->belongsTo(Property::class, 'property_id');
+        return $this->belongsTo(Property::class);
     }
 
     public function rooms(): HasMany
     {
-        return $this->hasMany(Room::class, 'room_type_id');
+        return $this->hasMany(Room::class);
     }
 
     public function bookings(): HasMany
     {
-        return $this->hasMany(Booking::class, 'room_type_id');
+        return $this->hasMany(Booking::class);
     }
 }

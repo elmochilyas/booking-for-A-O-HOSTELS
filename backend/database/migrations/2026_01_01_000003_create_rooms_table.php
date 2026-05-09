@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,7 +16,14 @@ return new class extends Migration
             $table->uuid('room_type_id');
             $table->string('room_number', 20);
             $table->integer('floor');
-            $table->enum('status', ['available', 'booked', 'maintenance', 'cleaning', 'occupied'])->default('available');
+
+            // Use string for SQLite compatibility, enum for MySQL
+            if (DB::getDriverName() !== 'sqlite') {
+                $table->enum('status', ['available', 'booked', 'maintenance', 'cleaning', 'occupied'])->default('available');
+            } else {
+                $table->string('status', 20)->default('available');
+            }
+
             $table->json('features')->nullable();
             $table->string('view', 50)->nullable();
             $table->string('window_type', 50)->nullable();

@@ -1,0 +1,1 @@
+﻿{"tool":"pint","result":"fail","files":[{"path":"app\\Providers\\QueueServiceProvider.php","fixers":["fully_qualified_strict_types","ordered_imports"]},{"path":"bootstrap\\app.php","fixers":["fully_qualified_strict_types","ordered_imports"]}]}
