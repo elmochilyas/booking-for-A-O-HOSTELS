@@ -19,9 +19,9 @@ class RoomSeeder extends Seeder
         } else {
             DB::statement('SET FOREIGN_KEY_CHECKS=0');
         }
-        
+
         DB::table('rooms')->truncate();
-        
+
         if (DB::getDriverName() === 'sqlite') {
             DB::statement('PRAGMA foreign_keys = ON');
         } else {
@@ -47,7 +47,7 @@ class RoomSeeder extends Seeder
 
             foreach ($roomTypeList as $i => $rt) {
                 $weight = $weights[$i] ?? (1 / $roomTypeList->count());
-                $count = (int) round($total * $weight);
+                $count = (int) round($total * $weight, 0);
                 $counts[$i] = $count;
                 $assigned += $count;
             }
@@ -67,7 +67,7 @@ class RoomSeeder extends Seeder
                         'id' => Str::uuid()->toString(),
                         'property_id' => $property->id,
                         'room_type_id' => $roomType->id,
-                        'room_number' => strtoupper(substr($roomType->name, 0, 1)) . str_pad((string)$n, 3, '0', STR_PAD_LEFT),
+                        'room_number' => strtoupper(substr($roomType->name, 0, 1)).str_pad((string) $n, 3, '0', STR_PAD_LEFT),
                         'floor' => $floor,
                         'status' => 'available',
                         'created_at' => now(),

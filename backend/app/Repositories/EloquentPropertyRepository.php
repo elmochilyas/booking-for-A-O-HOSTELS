@@ -155,12 +155,12 @@ class EloquentPropertyRepository implements PropertyRepositoryInterface
             ->whereNotNull('longitude')
             ->get()
             ->map(fn (Property $p) => [
-                'id'        => $p->id,
-                'name'      => $p->name,
-                'location'  => $p->location,
-                'latitude'  => (float) $p->latitude,
+                'id' => $p->id,
+                'name' => $p->name,
+                'location' => $p->location,
+                'latitude' => (float) $p->latitude,
                 'longitude' => (float) $p->longitude,
-                'rating'    => (float) $p->rating,
+                'rating' => (float) $p->rating,
             ])
             ->toArray()
         );

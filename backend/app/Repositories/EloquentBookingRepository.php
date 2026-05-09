@@ -216,7 +216,7 @@ class EloquentBookingRepository implements BookingRepositoryInterface
 
     public function countByPropertyAndStatus(?string $propertyId, string $status, ?string $dateColumn = null, ?string $date = null): int
     {
-        if (!$propertyId) {
+        if (! $propertyId) {
             return 0;
         }
 
@@ -231,7 +231,7 @@ class EloquentBookingRepository implements BookingRepositoryInterface
 
     public function sumRevenueByPropertyAndDate(?string $propertyId, array $statuses, string $date): float
     {
-        if (!$propertyId) {
+        if (! $propertyId) {
             return 0.0;
         }
 

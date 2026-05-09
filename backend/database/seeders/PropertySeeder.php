@@ -92,12 +92,12 @@ class PropertySeeder extends Seeder
         } else {
             DB::statement('SET FOREIGN_KEY_CHECKS=0');
         }
-        
+
         Extra::truncate();
         Amenity::truncate();
         DB::table('room_types')->truncate();
         Property::truncate();
-        
+
         if (DB::getDriverName() === 'sqlite') {
             DB::statement('PRAGMA foreign_keys = ON');
         } else {
